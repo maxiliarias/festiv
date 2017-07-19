@@ -2,6 +2,7 @@
   <li class="list-group-item">
     <div class="container">
       <!-- use hbs #each to loop through results. just writing html for one result -->
+      <a class="btn" name="button" href="/">Back to All Venues</a>
       <ul class="list-group">
         {{#each venues}}
         <li class="list-group-item">
@@ -12,7 +13,6 @@
                 <img src='{{this.link}}'>
               </div>
               <div class="col l6 s12">
-                <h5>Info</h5>
                 <ul>
                   <li><b>Address: </b><a href="{{this.url}}">{{this.address}} </a></li>
                   <li><b>Phone Number:</b> {{this.phone}} </li>

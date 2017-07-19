@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var models = require('../models');
 var User = models.User;
-var Venue = models.Venue;
 var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
@@ -17,11 +16,11 @@ const Handlebars = require('Handlebars');
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
 router.use(function(req, res, next) {
-  if (!req.user) {
-    res.redirect('/login');
-  } else {
-    return next();
-  }
+    if (!req.user) {
+        res.redirect('/login');
+    } else {
+        return next();
+    }
 });
 
 //////////////////////////////// PRIVATE ROUTES ////////////////////////////////
@@ -29,245 +28,293 @@ router.use(function(req, res, next) {
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-  req.session.search = req.session.search || [];
-  if (req.session.search.length > 0) {
-    res.render('list', {
-      venues: req.session.search,
-      googleApi: process.env.GOOGLEPLACES
-    })
-  } else {
-    res.render('home', {googleApi: process.env.GOOGLEPLACES});
-  }
+    // console.log('session!',req.session)
+    req.session.search = req.session.search || [];
+    if (req.session.search.length > 0) {
+        var modal = ""
+        if(req.query.modal){
+            modal = "display:block"
+        }
+        res.render('list', {
+            venues: req.session.search,
+            googleApi: process.env.GOOGLEPLACES,
+            modal: modal
+        })
+    } else {
+        res.render('home', {
+            googleApi: process.env.GOOGLEPLACES
+        });
+    }
 });
 
 /* VENUES creates session venues */
-router.post('/info', function(req, res) {
-  if (req.session.search && req.session.search.length > 0) {
-    res.render('list', {
-      venues: req.session.search,
-      googleApi: process.env.GOOGLEPLACES
-    })
-  } else {
-    var options = {
-      provider: 'google',
-      httpAdapter: 'https', // Default
-      apiKey: process.env.GOOGLEPLACES
-    };
-    var geocoder = NodeGeocoder(options);
-    let placeId;
-    let venues = [];
-    let lat;
-    let long;
-    geocoder.geocode(req.body.location).then(function(response) {
-      lat = response[0].latitude;
-      long = response[0].longitude;
-    }).then(function() {
-      let radius = parseInt(req.body.radius) * 1609;
-      let type = req.body.type.split(" ").join("_").toLowerCase();
-      return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${long}&radius=${radius}&type=${type}&minprice=3`).then(resp => JSON.parse(resp)).then(obj => {
-        placeId = [];
-        obj.results.forEach(item => {
-          placeId.push(item.place_id)
-        });
-        for (var i = 0; i < placeId.length; i++) {
-          venues.push(request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`).then(resp => JSON.parse(resp)).then(obj2 => ({
-            name: obj2.result.name,
-            address: obj2.result.formatted_address,
-            phone: obj2.result.formatted_phone_number,
-            photos: obj2.result.photos,
-            rating: obj2.result.rating,
-            lat: obj2.result.geometry.location.lat,
-            long: obj2.result.geometry.location.lng,
-            hours: obj2.result.opening_hours
-              ? obj2.result.opening_hours.weekday_text
-              : ["Not found"],
-            type: obj2.result.types,
-            url: obj2.result.url,
-            website: obj2.result.website,
-            link: obj2.result.photos
-              ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES
-              : ''
-          })))
-        }
-        return Promise.all(venues)
-      }).then(arrayOfResults => {
-        req.session.search = arrayOfResults;
+router.post('/venues', function(req, res) {
+    if (req.session.search && req.session.search.length > 0 && req.session.pagetoken === "") {
         res.render('list', {
-          venues: arrayOfResults,
-          googleApi: process.env.GOOGLEPLACES
-        });
-      }).catch(err => console.log("ERR", err))
-    }).catch(function(err) {
-      console.log(err);
-    });
-  }
-})
+            venues: req.session.search,
+            googleApi: process.env.GOOGLEPLACES
+        })
+    } else {
+        var options = {
+            provider: 'google',
+            httpAdapter: 'https', // Default
+            apiKey: process.env.GOOGLEPLACES
+        };
+        var geocoder = NodeGeocoder(options);
+        let placeId= [];
+        let venues = [];
+        let lat;
+        let long;
 
-// router.get('allVenues', function(req, res) {
-//   res.render('list', {
-//     venues: req.session.search,
-//     googleApi: process.env.GOOGLEPLACES
-//   });
-// })
+        //need this dummy address and type for the next page button
+        req.body.location = req.body.location || "310 West 99 Street New York,NY 10025";
+        req.body.type = req.body.type || " "
+        geocoder.geocode(req.body.location)
+        .then(function(response) {
+            lat = response[0].latitude;
+            long = response[0].longitude;
+        })
+        .then(function() {
+            let radius = parseInt(req.body.radius) * 1609.34;
+            let type = req.body.type.split(" ").join("_").toLowerCase();
+
+            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${long}&radius=${radius}&keyword=${type}&minprice=3`+ (req.session.pagetoken ? `&pagetoken=${req.session.pagetoken}` : ``))
+            .then(resp => JSON.parse(resp))
+            .then(obj => {
+                obj.next_page_token ? req.session.pagetoken = obj.next_page_token : ""
+                obj.results.forEach(item => {
+                    placeId.push(item.place_id)
+                });
+                for (var i = 0; i < placeId.length; i++) {
+                    venues.push(request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
+                    .then(resp => JSON.parse(resp))
+                    .then(obj2 => ({
+                        name: obj2.result.name,
+                        address: obj2.result.formatted_address,
+                        phone: obj2.result.formatted_phone_number,
+                        photos: obj2.result.photos,
+                        rating: obj2.result.rating,
+                        lat: obj2.result.geometry.location.lat,
+                        long: obj2.result.geometry.location.lng,
+                        hours: obj2.result.opening_hours
+                        ? obj2.result.opening_hours.weekday_text
+                        : ["Opening Hours Unavailable"],
+                        type: obj2.result.types,
+                        url: obj2.result.url,
+                        website: obj2.result.website,
+                        link: obj2.result.photos
+                        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES
+                        : ''
+                        }
+                    )))
+                }
+                return Promise.all(venues)
+            })
+            .then(arrayOfResults => {
+                var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
+                var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
+
+                req.session.search = filteredVenues;
+                res.render('list', {
+                    venues: filteredVenues,
+                    googleApi: process.env.GOOGLEPLACES
+                });
+            })
+            .catch(err => console.log("ERR", err))
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+    }
+})
 
 /* REFRESH allows you to restart your search */
 router.get('/refresh', function(req, res) {
-  delete req.session.search;
-  res.redirect('/');
+    delete req.session.search;
+    delete req.session.pagetoken;
+    res.redirect('/');
 })
 
 /* NEW SEARCH goes here after search within venues is pinged*/
 router.post('/newSearch', function(req, res) {
-  delete req.session.search;
-  res.redirect(307, '/info');
+    delete req.session.search;
+    res.redirect(307, '/venues');
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
 router.get('/venue', function(req, res) {
-  var venueName = req.query.name;
-  var address = req.query.address;
-  req.session.search.forEach(venue => {
-    if (venue.name === venueName && venue.address === address) {
-      res.render('venue', {venue});
-    }
-  })
+    var venueName = req.query.name;
+    var address = req.query.address;
+    req.session.search.forEach(venue => {
+        if (venue.name === venueName && venue.address === address) {
+            res.render('venue', {venue});
+        }
+    })
 })
 
-// /* INDIVIDUAL VENUE can see more information about one venue */
-// router.post('/venue/:venueName', function(req, res) {
-//   console.log("cart registered");
-// })
-
-/* ADD TO CART adds the speicifc venue to your cart */
+/* ADD TO CART adds the specifc venue to your cart */
 router.post('/cart', function(req, res) {
-  var venueName = req.query.name;
-  var address = req.query.address;
-  User.findById(req.user._id).populate('cart').exec(function(err, user) {
-    req.session.search.forEach(venue => {
-      if (venue.name === venueName && venue.address === address) {
-        var cart = user.cart;
-        Cart.findById(cart._id, function(err, foundCart) {
-          cart.venues.push(venue);
-          cart.save(function(err, savedCart) {
-            res.render('cart', {venues: user.cart.venues});
-          })
+    var venueName = req.query.name;
+    var address = req.query.address;
+    console.log('venuename', venueName, 'address'. address);
+    User.findById(req.user._id)
+        .exec(function(err, user) {
+        console.log('session', req.session);
+        req.session.search.forEach(venue => {
+            if (venue.name === venueName && venue.address === address) {
+                var cart = user.cart;
+                let exists = false
+                if(cart.length >0){
+                    cart.forEach(item => {
+                        if(item.name === venueName && item.address === address){
+                            exists= true
+                        }
+                    })
+                }
+                if(exists){
+                    // var string = encodeURIComponent('This venue is already on your contact list');
+                    res.redirect('/?modal=true');// + string);
+                } else {
+                    user.cart.push(venue)
+                    user.save(function(err, savedCart) {
+                        res.render('cart', {venues: user.cart});
+                    })
+                }
+            }
         })
-      }
     })
-  })
 })
 
 /* SHOW CART shows all items in cart*/
 router.get('/showCart', function(req, res) {
-  User.findById(req.user._id).populate('cart').exec(function(err, user) {
-    res.render('cart', {venues: user.cart.venues})
-  })
+    User.findById(req.user._id)
+    .exec(function(err, user) {
+        res.render('cart', {venues: user.cart})
+    })
 })
 
 /* REMOVE a specific venue from the cart*/
 router.post('/remove', function(req, res) {
-  var venueName = req.query.name;
-  var address = req.query.address;
-  User.findById(req.user._id).exec(function(err, user) {
-    Cart.findById(user.cart, function(err, foundCart) {
-      let index;
-      foundCart.venues.forEach((venueObject, i) => {
-        if (venueObject.name === venueName && venueObject.address === address) {
-          index = i;
-        }
-      })
-      foundCart.venues.splice(index, 1);
-      foundCart.save(function(err, savedCart) {
-        user.save(function(error, savedUser) {
-          res.redirect('/showCart');
+    var venueName = req.query.name;
+    var address = req.query.address;
+    User.findById(req.user._id)
+        .exec(function(err, user) {
+            let index;
+            let cart= user.cart
+            cart.forEach((venueObj, i) => {
+                if (venueObj.name === venueName && venueObj.address === address) {
+                    index = i;
+                }
+            })
+            cart.splice(index, 1);
+            user.save(function(error, savedUser) {
+                res.redirect('/showCart');
+            })
         })
-      })
+})
+
+
+/* CONTACTLIST is the link to the questionnaire*/
+router.get('/contactlist', function(req, res, next) {
+    res.render('contactlist');
+})
+
+/*Use Hunter API to find emails*/
+router.get('/getemails', function(req, res) {
+    User.findById(req.user._id)
+        .exec(function(err, user) {
+        let cart = req.user.cart
+        cart.forEach(venue => {
+            console.log('WEBSITESS !' , venue.website)
+            var web = venue.website
+            /*THE BELOW IS TO HELP HUNTER FIND EMAILS, HAVE TO DECIDE WHICH GENERATES MORE RETURNS*/
+            // var subDom = web.indexOf("www.")
+            // var subDom2 = web.indexOf('.')
+            // var end = web.indexOf('.com')
+            // var domainArea;
+            // subDom === -1 ? domainArea = web.slice(subDom2 +1, end +4) : domainArea = web.slice(subDom + 4, end + 4)
+
+            request(`https://api.hunter.io/v2/domain-search?domain=${web}&api_key=${process.env.HUNTER}&type=generic`)
+            .then(resp => JSON.parse(resp))
+            .then(obj => {
+                console.log('HEREE !',obj.data.emails)
+                //these emails are in priority order of what is likely most accurate
+                let toEmail =['events@','info@','privatedining@','contact','reservations@']
+                let email1;
+                let email2;
+
+                //should I move this function elsewhere?
+                collectEmail= () => {
+                    for (var i=0; i< toEmail.length; i++){
+                        if(email2){
+                            break;
+                        }
+                        obj.data.emails.forEach(email => {
+                            if(email1){
+                                if(email.value.indexOf(toEmail[i])>=0){
+                                    email2 = email.value
+                                }
+                            } else {
+                                if(email.value.indexOf(toEmail[i])>=0){
+                                    email1 = email.value
+                                }
+                            }
+                        })
+                    }
+                }
+                collectEmail();
+                console.log('sendGrid EMAIL 1', email1);
+                console.log('sendGrid EMAIL 2', email2);
+            })
+        })
     })
-  })
+    res.redirect('/')
 })
 
-/* WISHLIST is the link tot he questionnaire*/
-router.get('/wishlist', function(req, res, next) {
-  res.render('wishlist');
-})
-
-/* SUBMIT WISHLIST we will now send an email to venues*/
-router.post('/wishlist', function(req, res) {
-  //Cart.findById(req.user.cart, function(foundCart) {
-  // for (var i = 0; i < 1; i++) {
-  // var nodemailer = require('nodemailer');
-  //
-  // var content = `Hello from Festiv!\n
-  //   Our client, ${req.user.fname}, is interested in booking your venue for my upcoming event.
-  //   ${req.user.fname} would like to inquire about scheduling an event on ${req.body.date}
-  //   for ${req.body.hours} hours, for approximately ${req.body.guestCount} guests.
-  //   In terms of pricing, our client would prefer ${req.body.price}. Please let me know
-  //   of any packages or potential prices for the event.
-  //   \n
-  //   Looking forward to hearing back from you!\n\n
-  //   Best,
-  //   Festiv
-  //   festivspaces@gmail.com`;
-  // var transporter = nodemailer.createTransport({
-  //   service: 'gmail',
-  //   auth: {
-  //     user: 'festivspaces@gmail.com',
-  //     pass: 'bookfestiv6'
-  //   }
-  // });
-  //
-  // var mailOptions = {
-  //   from: 'festivspaces@gmail.com',
-  //   to: 'jtomli@seas.upenn.edu',
-  //   subject: req.user.fname + " would like to book your venue!",
-  //   text: content
-  // };
-  //
-  // transporter.sendMail(mailOptions, function(error, info) {
-  //   if (error) {
-  //     console.log(error);
-  //   } else {
-  //     console.log('Email sent: ' + info.response);
-  //   }
-  //  });
-  var request = sg.emptyRequest({
-    method: 'POST',
-    path: '/v3/mail/send',
-    body: {
-      personalizations: [
-        {
-          to: [
-            {
-              email: 'maxiliarias@gmail.com'
-            }
-          ],
-          'substitutions': {
-            '-businessName-': 'tester businesss',
-            '-fname-': req.user.fname,
-            '-date-': req.body.date,
-            '-guestCount-': req.body.guestCount,
-            '-price-': req.body.price,
-            '-hours-': req.body.hours
-          },
-          subject: req.user.fname + " would like to book your venue with Festiv!"
+/* SUBMIT CONTACTLIST we will now send an email to venues*/
+router.post('/contactlist', function(req, res) {
+    //Will want to loop through an array of emails to trigger sendgrid several times
+    var request = sg.emptyRequest({
+        method: 'POST',
+        path: '/v3/mail/send',
+        body: {
+            personalizations: [
+                {
+                    to: [
+                        {
+                        //here I want to put in the hunter emails
+                        email: 'maxiliarias@gmail.com'
+                        }
+                    ],
+                    'substitutions': {
+                        '-businessName-': 'tester businesss', //should loop through cart/session for venue name
+                        '-fname-': req.user.fname,
+                        '-date-': req.body.date,
+                        '-guestCount-': req.body.guestCount,
+                        '-price-': req.body.price,
+                        '-hours-': req.body.hours
+                    },
+                    subject: req.user.fname + " would like to book your venue with Festiv!"
+                }
+            ],
+            from: {
+                email: 'hello@festivspaces.com'
+            },
+            template_id: process.env.TEMPLATE_ID
         }
-      ],
-      from: {
-        email: 'festivspaces@gmail.com'
-      },
-      template_id: process.env.TEMPLATE_ID
-    }
-  });
-  sg.API(request, function(error, response) {
-    if (error) {
-      console.log('Error response received');
-    }
-    console.log(response.statusCode);
-    console.log(response.body);
-    console.log(response.headers);
-    res.redirect('/refresh');
-  });
+    });
+    sg.API(request, function(error, response) {
+        if (error) {
+            console.log('Error response received');
+        }
+        console.log(response.statusCode);
+        console.log(response.body);
+        console.log(response.headers);
+        res.redirect('/refresh');
+    });
 })
+
+
 
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
 

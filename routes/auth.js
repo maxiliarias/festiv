@@ -15,15 +15,12 @@ module.exports = function(passport) {
     if (req.body.password !== req.body.passwordRepeat) {
       return res.render('signup', {error: "Passwords don't match."});
     }
-    var cart = new models.Cart({cart: [], username: req.body.username})
-    cart.save(function(err, cart) {
       var u = new models.User({
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
         fname: req.body.fname,
         lname: req.body.lname,
-        cart: cart._id
       });
       u.save(function(err, user) {
         if (err) {
@@ -33,7 +30,6 @@ module.exports = function(passport) {
         }
         res.redirect('/login');
       });
-    })
   });
 
   // GET Login page
