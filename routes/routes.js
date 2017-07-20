@@ -219,7 +219,7 @@ router.get('/contactlist', function(req, res, next) {
     res.render('contactlist');
 })
 
-/*Use Hunter API to find emails*/
+/*Use Hunter API to find venue owner/business emails*/
 router.get('/getemails', function(req, res) {
     User.findById(req.user._id)
         .exec(function(err, user) {
@@ -314,7 +314,12 @@ router.post('/contactlist', function(req, res) {
     });
 })
 
-
+router.post('/messages', function(req,res){
+    console.log(req.body)
+    // message.save on mongoose
+    // find all messages and pass that to hbs 
+    res.render('/messages', {message: req.body})
+})
 
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
 
