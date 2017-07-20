@@ -9,8 +9,13 @@ var userSchema = mongoose.Schema({
   cart: Array
 });
 
+var Message = mongoose.model('Message', {
+    content: String
+});
+
 User = mongoose.model('User', userSchema);
 
 module.exports = {
-  User: User
+  User: User,
+  Message: Message
 };
