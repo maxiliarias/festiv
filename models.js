@@ -10,7 +10,9 @@ var userSchema = mongoose.Schema({
 });
 
 var Message = mongoose.model('Message', {
-    content: String
+    time: String,
+    from: String,
+    content: String    
 });
 
 User = mongoose.model('User', userSchema);

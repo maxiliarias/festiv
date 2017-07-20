@@ -323,9 +323,9 @@ var { Message } = require('../models');
 
 router.post('/messages', upload.array(), function(req,res){
     simpleParser(req.body.email, function(err, mail) {
-        console.log('WHOLE MAIL',mail);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
+        console.log('MAIL date', mail.date);
         var msg = new Message({
             time: mail.date,
             from: mail.from.text,
