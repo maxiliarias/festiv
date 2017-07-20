@@ -6,6 +6,7 @@ var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
+var request1 = require('request');
 // const Handlebars = require('Handlebars');
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
@@ -315,10 +316,17 @@ router.post('/contactlist', function(req, res) {
 })
 
 router.post('/messages', function(req,res){
-    console.log(" take 2 - i'm testing sendgrid!! ",req)
+    console.log(" take 3 - i'm testing sendgrid!! ",req)
+    var url ='https://requestb.in/1kxuvp71'
+    request1(url, function (error, response, body) {
+      if (!error) {
+        console.log(body);
+      }
+    });
+    res.redirect('/contactlist')
     // message.save on mongoose
     // find all messages and pass that to hbs
-    res.render('/messages', {messages: req.body})
+    // res.render('/messages', {messages: req.body})
 })
 
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
