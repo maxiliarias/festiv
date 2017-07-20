@@ -15,13 +15,13 @@ var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
-router.use(function(req, res, next) {
-    if (!req.user) {
-        res.redirect('/login');
-    } else {
-        return next();
-    }
-});
+// router.use(function(req, res, next) {
+//     if (!req.user) {
+//         res.redirect('/login');
+//     } else {
+//         return next();
+//     }
+// });
 
 //////////////////////////////// PRIVATE ROUTES ////////////////////////////////
 // Only logged in users can see these routes
