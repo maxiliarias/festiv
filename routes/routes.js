@@ -322,20 +322,19 @@ const simpleParser = require('mailparser').simpleParser;
 var { Message } = require('../models');
 
 router.post('/messages', upload.array(), function(req,res){
-    console.log(" take 4 - i'm testing sendgrid!! ", req.body)
-
     simpleParser(req.body.email, function(err, mail) {
         console.log('WHOLE MAIL',mail);
         console.log('MAIL TEXT',mail.text);
+        console.log('MAIL FROM', mail.from.text);
         var msg = new Message({
+            time: mail.date,
+            from: mail.from.text,
             content: mail.text
         });
         msg.save(function(err, m) {
             res.status(200).end();
         })
-        // res.render('/messages', {messages: mail.text})
     })
-
     // message.save on mongoose
     // find all messages and pass that to hbs
     // res.render('/messages', {messages: req.body})
