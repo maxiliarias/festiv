@@ -318,7 +318,7 @@ router.post('/messages', function(req,res){
     console.log(req.body)
     // message.save on mongoose
     // find all messages and pass that to hbs
-    res.render('/messages', {message: req.body})
+    res.render('/messages', {messages: req.body})
 })
 
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
