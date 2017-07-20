@@ -326,7 +326,7 @@ router.post('/messages', upload.array(), function(req,res){
 
     simpleParser(req.body.email, function(err, mail) {
         console.log('WHOLE MAIL',mail);
-        console.log('MAIL TEXT',text);
+        console.log('MAIL TEXT',mail.text);
         var msg = new Message({
             content: mail.text
         });
