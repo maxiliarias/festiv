@@ -6,7 +6,7 @@ var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
-const Handlebars = require('Handlebars');
+// const Handlebars = require('Handlebars');
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
 // Users who are not logged in can see these routes
@@ -317,7 +317,7 @@ router.post('/contactlist', function(req, res) {
 router.post('/messages', function(req,res){
     console.log(req.body)
     // message.save on mongoose
-    // find all messages and pass that to hbs 
+    // find all messages and pass that to hbs
     res.render('/messages', {message: req.body})
 })
 
