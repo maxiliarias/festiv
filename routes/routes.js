@@ -315,7 +315,7 @@ router.post('/contactlist', function(req, res) {
 })
 
 router.post('/messages', function(req,res){
-    console.log(req.body)
+    console.log("i'm testing sendgrid!! ",req.body)
     // message.save on mongoose
     // find all messages and pass that to hbs
     res.render('/messages', {messages: req.body})
