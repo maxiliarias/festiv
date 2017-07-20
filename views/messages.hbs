@@ -1,2 +1,7 @@
-hello
-{{messages}}
+<h1>Your Inbox </h1>
+
+{{#each message}}
+    <p><b>From:</b> {{this.from}}</p>
+    <p><b>Date:</b> {{this.time}}</p>
+    <p><b>Content:</b></br> {{{this.content}}}</p>
+{{/each}}

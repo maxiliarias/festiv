@@ -1,31 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../models');
-var User = models.User;
+var { Message, User } = require('../models');
+// var User = models.User;
 var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
-var request1 = require('request');
-// const Handlebars = require('Handlebars');
+var multer  = require('multer');
+var upload = multer();
+const simpleParser = require('mailparser').simpleParser;
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
 // Users who are not logged in can see these routes
-
-// no public routes!
-
-///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
-
-// router.use(function(req, res, next) {
-//     if (!req.user) {
-//         res.redirect('/login');
-//     } else {
-//         return next();
-//     }
-// });
-
-//////////////////////////////// PRIVATE ROUTES ////////////////////////////////
-// Only logged in users can see these routes
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
@@ -128,6 +115,19 @@ router.post('/venues', function(req, res) {
         });
     }
 })
+
+///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
+
+router.use(function(req, res, next) {
+    if (!req.user) {
+        res.redirect('/login');
+    } else {
+        return next();
+    }
+});
+
+//////////////////////////////// PRIVATE ROUTES ////////////////////////////////
+// Only logged in users can see these routes
 
 /* REFRESH allows you to restart your search */
 router.get('/refresh', function(req, res) {
@@ -291,15 +291,19 @@ router.post('/contactlist', function(req, res) {
                         '-businessName-': 'tester businesss', //should loop through cart/session for venue name
                         '-fname-': req.user.fname,
                         '-date-': req.body.date,
+                        '-starttime-': req.body.starttime,
                         '-guestCount-': req.body.guestCount,
                         '-price-': req.body.price,
                         '-hours-': req.body.hours
                     },
-                    subject: req.user.fname + " would like to book your venue with Festiv!"
+                    subject: req.user.fname + " would like to book your venue with Festiv!",
+                    custom_args: {
+                        "userid": req.user._id
+                    }
                 }
             ],
             from: {
-                email: 'hello@festivspaces.com'
+                email: 'hello@parse.festivspaces.com'
             },
             template_id: process.env.TEMPLATE_ID
         }
@@ -308,19 +312,15 @@ router.post('/contactlist', function(req, res) {
         if (error) {
             console.log('Error response received');
         }
-        console.log(response.statusCode);
-        console.log(response.body);
-        console.log(response.headers);
+        console.log('RESPONSE', response);
+        console.log('STATUS HERE' ,response.statusCode);
+        console.log('BODY HERE', response.body);
+        console.log('HEADERS HERE', response.headers);
         res.redirect('/refresh');
     });
 })
 
-var multer  = require('multer');
-var upload = multer();
-const simpleParser = require('mailparser').simpleParser;
-
-var { Message } = require('../models');
-
+/* RECEIVE replies to our emails, and store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL TEXT',mail.text);
@@ -340,6 +340,19 @@ router.post('/messages', upload.array(), function(req,res){
     // res.render('/messages', {messages: req.body})
 })
 
+/*Render a page with all of the messages*/
+router.get('/messages',function(req,res){
+    Message.find(function(err,msg){
+        msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
+        console.log('HI',msg);
+        res.render('messages', {message: msg })
+    })
+})
+
+/*Receive user id and venue names from Event API and create new Message in Mongoose for user */
+router.post('/createMsg',function(req,res){
+    console.log('CREATE MSG POST',req)
+})
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
 
 module.exports = router;
