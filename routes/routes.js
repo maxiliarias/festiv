@@ -280,6 +280,7 @@ router.get('/getemails', function(req, res) {
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
     //Will want to loop through an array of emails to trigger sendgrid several times
+
     var request = sg.emptyRequest({
         method: 'POST',
         path: '/v3/mail/send',
@@ -303,7 +304,7 @@ router.post('/contactlist', function(req, res) {
                     },
                     subject: req.user.fname + " would like to book your venue with Festiv!",
                     custom_args: {
-                        "userid": req.user._id
+                        "userid": req.user._id + "MAXI TAXI"
                     }
                 }
             ],
