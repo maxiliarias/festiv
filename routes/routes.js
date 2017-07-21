@@ -305,7 +305,7 @@ router.post('/contactlist', function(req, res) {
                     },
                     subject: req.user.fname + " would like to book your venue with Festiv!",
                     custom_args: {
-                        "userid": req.user._id + "MAXI TAXI"
+                        "userid": ""+ req.user._id + "MAXI TAXI"
                     }
                 }
             ],
