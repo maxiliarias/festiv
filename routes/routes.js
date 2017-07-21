@@ -329,9 +329,9 @@ router.post('/contactlist', function(req, res) {
 
 /* RECEIVE replies to our emails, and store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
-    console.log('CREATE MSG POST',req.body)
 
     simpleParser(req.body.email, function(err, mail) {
+        console.log('MAIL TEXT',mail);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
         console.log('MAIL date', mail.date);
