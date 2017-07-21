@@ -123,13 +123,13 @@ router.post('/createMsg',function(req,res){
 
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
-router.use(function(req, res, next) {
-    if (!req.user) {
-        res.redirect('/login');
-    } else {
-        return next();
-    }
-});
+// router.use(function(req, res, next) {
+//     if (!req.user) {
+//         res.redirect('/login');
+//     } else {
+//         return next();
+//     }
+// });
 
 //////////////////////////////// PRIVATE ROUTES ////////////////////////////////
 // Only logged in users can see these routes
@@ -328,6 +328,8 @@ router.post('/contactlist', function(req, res) {
 
 /* RECEIVE replies to our emails, and store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
+    console.log('CREATE MSG POST',req.body)
+
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
