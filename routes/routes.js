@@ -119,6 +119,7 @@ router.post('/venues', function(req, res) {
 /*Receive user id and venue names from Event API and create new Message in Mongoose for user */
 router.post('/createMsg',function(req,res){
     console.log('CREATE MSG POST',req)
+    res.send('OK')
 })
 
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
