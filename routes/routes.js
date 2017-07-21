@@ -116,6 +116,11 @@ router.post('/venues', function(req, res) {
     }
 })
 
+/*Receive user id and venue names from Event API and create new Message in Mongoose for user */
+router.post('/createMsg',function(req,res){
+    console.log('CREATE MSG POST',req)
+})
+
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
 router.use(function(req, res, next) {
@@ -349,10 +354,7 @@ router.get('/messages',function(req,res){
     })
 })
 
-/*Receive user id and venue names from Event API and create new Message in Mongoose for user */
-router.post('/createMsg',function(req,res){
-    console.log('CREATE MSG POST',req)
-})
+
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
 
 module.exports = router;
