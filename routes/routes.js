@@ -305,17 +305,13 @@ router.post('/contactlist', function(req, res) {
                     },
                     subject: req.user.fname + " would like to book your venue with Festiv!",
                     custom_args: {
-                        "userid": ""+ req.user._id + "MAXI TAXI"
+                        "userid":req.user._id
                     }
                 }
             ],
             from: {
                 email: 'hello@parse.festivspaces.com'
             },
-            // content: [{
-            //     type: "text/plain",
-            //     value: "I'm testing with Jay!"
-            // }]
             template_id: process.env.TEMPLATE_ID
         }
     });
