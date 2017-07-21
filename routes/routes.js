@@ -118,7 +118,7 @@ router.post('/venues', function(req, res) {
 
 /*Receive user id and venue names from Event API and create new Message in Mongoose for user */
 router.post('/createMsg',function(req,res){
-    console.log('CREATE MSG POST',req)
+    console.log('CREATE MSG POST',req.body);
     res.send('OK')
 })
 
@@ -312,11 +312,11 @@ router.post('/contactlist', function(req, res) {
             from: {
                 email: 'hello@parse.festivspaces.com'
             },
-            content: [{
-                type: "text/plain",
-                value: "I'm testing with Jay!"
-            }]
-            // template_id: process.env.TEMPLATE_ID
+            // content: [{
+            //     type: "text/plain",
+            //     value: "I'm testing with Jay!"
+            // }]
+            template_id: process.env.TEMPLATE_ID
         }
     });
     sg.API(request, function(error, response) {
