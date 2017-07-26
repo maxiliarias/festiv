@@ -15,12 +15,14 @@ module.exports = function(passport) {
     if (req.body.password !== req.body.passwordRepeat) {
       return res.render('signup', {error: "Passwords don't match."});
     }
+        var fname=req.body.fname
+        var lname=req.body.lname
       var u = new models.User({
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
-        fname: req.body.fname,
-        lname: req.body.lname,
+        fname: fname[0].toUpperCase() + fname.substring(1,fname.length),
+        lname: lname[0].toUpperCase() + lname.substring(1,lname.length)
       });
       u.save(function(err, user) {
         if (err) {

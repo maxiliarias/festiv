@@ -32,6 +32,14 @@
       </form>
     </div>
   </div>
+  <div>
+      {{#each events}}
+        <p>{{this.name}}</p>
+        {{#each this.venue}}
+            <p>{{this.name}}</p>
+        {{/each}}
+      {{/each}}
+  </div>
   <!-- use hbs #each to loop through results. just writing html for one result -->
   <form action="/venues" method="post">
     <button class="btn" type="submit" name="button">Next Page</button>

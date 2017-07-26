@@ -16,12 +16,15 @@ const simpleParser = require('mailparser').simpleParser;
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-    var events;
-    Event.find({eventOwner: req.user._id},function(err,ocassions){
-        events = ocassions
-        req.session.search = req.session.search || [];
-        if (req.session.search.length > 0) {
-            // assumption, i have req.query.placeId
+
+    req.session.search = req.session.search || [];
+    if (req.session.search.length > 0) {
+        var events;
+        Event.find({eventOwner: req.user._id})
+            .populate('venue')
+            .exec(function(err,ocassions){
+            events = ocassions
+        // assumption, i have req.query.placeId
             var temp = JSON.parse(JSON.stringify(req.session.search));
             temp.forEach(function(venue) {
                 if (venue.placeId === req.query.placeId) {
@@ -35,12 +38,12 @@ router.get('/', function(req, res, next) {
                 googleApi: process.env.GOOGLEPLACES,
                 events: events
             })
-        } else {
-            res.render('home', {
-                googleApi: process.env.GOOGLEPLACES
-            });
-        }
-    })
+        })
+    } else {
+        res.render('home', {
+            googleApi: process.env.GOOGLEPLACES
+        });
+    }
 });
 
 /* VENUES creates session venues */
@@ -331,58 +334,6 @@ router.get('/contactlist', function(req, res, next) {
     })
 })
 
-/*Use Hunter API to find venue owner/business emails*/
-router.get('/getemails', function(req, res) {
-    User.findById(req.user._id)
-    .exec(function(err, user) {
-        let cart = req.user.cart
-        cart.forEach(venue => {
-            console.log('WEBSITESS !' , venue.website)
-            var web = venue.website
-            /*THE BELOW IS TO HELP HUNTER FIND EMAILS, HAVE TO DECIDE WHICH GENERATES MORE RETURNS*/
-            // var subDom = web.indexOf("www.")
-            // var subDom2 = web.indexOf('.')
-            // var end = web.indexOf('.com')
-            // var domainArea;
-            // subDom === -1 ? domainArea = web.slice(subDom2 +1, end +4) : domainArea = web.slice(subDom + 4, end + 4)
-
-            request(`https://api.hunter.io/v2/domain-search?domain=${web}&api_key=${process.env.HUNTER}&type=generic`)
-            .then(resp => JSON.parse(resp))
-            .then(obj => {
-                console.log('HEREE !',obj.data.emails)
-                //these emails are in priority order of what is likely most accurate
-                let toEmail =['events@','info@','privatedining@','contact','reservations@']
-                let email1;
-                let email2;
-
-                //should I move this function elsewhere?
-                collectEmail= () => {
-                    for (var i=0; i< toEmail.length; i++){
-                        if(email2){
-                            break;
-                        }
-                        obj.data.emails.forEach(email => {
-                            if(email1){
-                                if(email.value.indexOf(toEmail[i])>=0){
-                                    email2 = email.value
-                                }
-                            } else {
-                                if(email.value.indexOf(toEmail[i])>=0){
-                                    email1 = email.value
-                                }
-                            }
-                        })
-                    }
-                }
-                collectEmail();
-                console.log('sendGrid EMAIL 1', email1);
-                console.log('sendGrid EMAIL 2', email2);
-            })
-        })
-    })
-    res.redirect('/')
-})
-
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
     var eventId=req.body.eventId
@@ -408,27 +359,27 @@ router.post('/contactlist', function(req, res) {
                         // Check database to see if there's an email for that venue already
                         //if not, retrieve email using hunter
                         if(!venue.email){
-                            helper.collectEmail(web)
-                            .then((emails) => {
-                                console.log('RETRIEVED EMAILS', emails)
-                                //STORE THE EMAILS IN THE DATABASE
-
-                                if (emails[0]){
-                                    venue.email.push(emails[0])
-                                }
-                                if(emails[1]){
-                                    venue.email.push(emails[1])
-                                }
-
-                                venue.save(function(err,savedV){
-                                    if(err){
-                                        console.log('error saving venue email', err)
-                                    } else {
-                                        console.log('Successfully saved venue w emails')
-                                        helper.sendMail(req, venue)
-                                    }
-                                })
-                            })
+                            // helper.collectEmail(web)
+                            // .then((emails) => {
+                            //     console.log('RETRIEVED EMAILS', emails)
+                            //     //STORE THE EMAILS IN THE DATABASE
+                            //
+                            //     if (emails[0]){
+                            //         venue.email.push(emails[0])
+                            //     }
+                            //     if(emails[1]){
+                            //         venue.email.push(emails[1])
+                            //     }
+                            //
+                            //     venue.save(function(err,savedV){
+                            //         if(err){
+                            //             console.log('error saving venue email', err)
+                            //         } else {
+                            //             console.log('Successfully saved venue w emails')
+                            //             helper.sendMail(req, venue)
+                            //         }
+                            //     })
+                            // })
                             console.log('bananas')
                         }
                         else{
@@ -444,30 +395,42 @@ router.post('/contactlist', function(req, res) {
 
 /* RECEIVE replies to our emails, and store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
-
     simpleParser(req.body.email, function(err, mail) {
-        console.log('MAIL HEADERS',mail.headers);
+        console.log('MAIL To', mail.to.text);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
         console.log('MAIL date', mail.date);
+        var atSign= mail.to.text.indexOf("@")
+        console.log('MANGO',mail.to.text.slice(2,atSign))
         var chat = new Chat({
+            chatOwner: mail.to.text.slice(2,atSign),
             date: mail.date,
             from: mail.from.text,
             content: mail.text
         });
-         console.log('BANANAS',chat)
-        // chat.save(function(err, chat) {
-        //     res.status(200).end();
-        // })
+        console.log('BANANAS',chat)
+        chat.save(function(err, chat) {
+            if(err){
+                console.log('Error saving the chat',err);
+            } else {
+                console.log('saved the chat!');
+                res.status(200).end();
+            }
+        })
     })
 })
 
 /*Render a page with all of the messages*/
 router.get('/messages',function(req,res){
-    Message.find(function(err,msg){
-        msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
-        console.log('HI',msg);
-        res.render('messages', {message: msg })
+    var venueId=req.query.venueId
+    Chat.find({chatOwner:venueId},function(err,msg){
+        if(err){
+            console.log('error find a chat with that venue id', err)
+        } else {
+            msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
+            console.log('HI',msg);
+            res.render('messages', {message: msg })
+        }
     })
 })
 
