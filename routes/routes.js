@@ -412,11 +412,12 @@ router.post('/contactlist', function(req, res) {
                             .then((emails) => {
                                 console.log('RETRIEVED EMAILS', emails)
                                 //STORE THE EMAILS IN THE DATABASE
+
+                                if (emails[0]){
+                                    venue.email.push(emails[0])
+                                }
                                 if(emails[1]){
-                                    venue.email.push(emails[0])
                                     venue.email.push(emails[1])
-                                } else if (emails[0]){
-                                    venue.email.push(emails[0])
                                 }
 
                                 venue.save(function(err,savedV){
@@ -424,59 +425,15 @@ router.post('/contactlist', function(req, res) {
                                         console.log('error saving venue email', err)
                                     } else {
                                         console.log('Successfully saved venue w emails')
+                                        helper.sendMail(req, venue)
                                     }
                                 })
                             })
+                            console.log('bananas')
                         }
-                            //TAILOR THE BODY
-                        var b = {
-                                personalizations: [{
-                                    'substitutions': {
-                                        '-businessName-':venue.name,
-                                        '-fname-':req.user.fname,
-                                        '-date-':req.body.date,
-                                        '-starttime-':req.body.starttime,
-                                        '-guestCount-':req.body.guestCount,
-                                        '-price-':req.body.price,
-                                        '-hours-':req.body.hours,
-                                    },
-                                    custom_args: {
-                                        "userid":req.user._id
-                                    }
-                                }],
-                                from: {
-                                    email: 'hello@parse.festivspaces.com'
-                                },
-                                template_id: process.env.TEMPLATE_ID_QUOTE
-                            }
-
-                        // need to make sure this happens after the first if
-                        if(venue.email[1]){
-                            b.personalizations[0].to = [{email: venue.email[0]}]
-                            b.personalizations[0].cc = [{email: venue.email[1]}]
-                        } else if (venue.email[0]){
-                            b.personalizations[0].to = [{email: venue.email[0]}]
-                        } else {
-                            b.personalizations[0].to=[{email: 'maxiliarias@gmail.com'}]
-                            b.personalizations[0].substitutions['-placeid-']= venue.placeId
-                            b.template_id= process.env.TEMPLATE_ID_NO_EMAIL
+                        else{
+                            helper.sendMail(req, venue)
                         }
-
-                        // need to make sure this happens after the second if
-                        //SEND THE EMAIL
-                        var request = sg.emptyRequest({
-                            method: 'POST',
-                            path: '/v3/mail/send',
-                            body: b
-                        });
-                        sg.API(request, function(error, response) {
-                            if (error) {
-                                console.log('Error response received');
-                            }
-                            console.log('STATUS HERE' ,response.statusCode);
-                            console.log('BODY HERE', response.body);
-                            console.log('HEADERS HERE', response.headers);
-                        });
                     })
                 })
                 res.redirect('/contactlist')
@@ -489,7 +446,7 @@ router.post('/contactlist', function(req, res) {
 router.post('/messages', upload.array(), function(req,res){
 
     simpleParser(req.body.email, function(err, mail) {
-        console.log('MAIL',mail);
+        console.log('MAIL HEADERS',mail.headers);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
         console.log('MAIL date', mail.date);
@@ -498,8 +455,8 @@ router.post('/messages', upload.array(), function(req,res){
             from: mail.from.text,
             content: mail.text
         });
-         console.log('BANANAS',msg)
-        // msg.save(function(err, m) {
+         console.log('BANANAS',chat)
+        // chat.save(function(err, chat) {
         //     res.status(200).end();
         // })
     })
