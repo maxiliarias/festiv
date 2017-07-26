@@ -401,9 +401,10 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('MAIL FROM', mail.from.text);
         console.log('MAIL date', mail.date);
         var atSign= mail.to.text.indexOf("@")
+        var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('MANGO',mail.to.text.slice(2,atSign))
         var chat = new Chat({
-            chatOwner: mail.to.text.slice(2,atSign),
+            chatOwner: mail.to.text.slice(idSpot,atSign),
             date: mail.date,
             from: mail.from.text,
             content: mail.text
