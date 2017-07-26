@@ -68,20 +68,36 @@
             </ul>
           </div>
         </div>
-        <form action="/cart?name={{this.name}}&address={{this.address}}" method="post">
-          <button id="myVenues" class="btn" type="submit" name="button">Add to MyVenues</button>
-        </form>
+
+         <a href="/?placeId={{this.placeId}}"><button id="myVenues" class="btn" type="submit" name="button">Tag to an Event</button></a>
+
+         <!-- Modal to pick event -->
+        <div id="viewVenues" class="modal" style ={{this.modal}}>
+          <div class="modal-content">
+            <h3>Add {{this.name}} to one of your existing event lists?</h3>
+            <ul>
+             {{#each ../events}}
+                <p>Venue PlaceId is {{../this.placeId}}</p>
+                <p>Event Id is {{this._id}}
+                  <li><a href="/modifyEvent?eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}"> {{this.name}} </a></li>
+             {{/each}}
+            </ul>
+            <h3>Or add this venue to a new list?</h3>
+            <form action="/addEvent?placeId={{this.placeId}}" method="post">
+              <input type=text name=event placeholder="Name your special event here">
+              <input type=hidden name=domain value={{this.website}}>
+              <input type=hidden name=name value={{this.name}}>
+              <button class="btn" type="submit" name="button"> Add a new Event!</button>
+            </form>
+            <span id="closeMod" class="close">&times;</span>
+          </div>
+        </div>
+
       </div>
     </li>
     {{/each}}
   </ul>
-  <div id="myModal" class="modal" style = {{modal}}>
-    <!-- Modal content -->
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <p>This venue is already on your contact list</p>
-    </div>
-  </div>
+
   <form action="/venues" method="post">
     <button class="btn" type="submit" name="button">Next Page</button>
   </form>

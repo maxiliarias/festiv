@@ -1,11 +1,12 @@
 
-var modal = document.getElementById('myModal');
+var modal = document.getElementById('viewVenues');
 var btn = document.getElementById("myVenues");
-var x = document.getElementsByClassName("close");
-
+var x = document.getElementById('closeMod');
+console.log('XX is here', x)
 
 // When the user clicks on (x), close the modal
-x.onClick = function() {
+x.onclick = function() {
+    console.log('printing in onclick')
     modal.style.display = "none";
 }
 
@@ -15,3 +16,6 @@ window.onClick = function(event) {
         modal.style.display = "none";
     }
 }
+
+//Do something to indicate venue has been added to a particular list
+//give it a heart shape that changes color on click

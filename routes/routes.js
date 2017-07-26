@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../models');
-var { Message, User } = require('../models');
-// var User = models.User;
+var {User, Event, Venue, Chat } = require('../models');
+var {helper} = require('../helper');
 var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
@@ -16,23 +16,31 @@ const simpleParser = require('mailparser').simpleParser;
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-    // console.log('session!',req.session)
-    req.session.search = req.session.search || [];
-    if (req.session.search.length > 0) {
-        var modal = ""
-        if(req.query.modal){
-            modal = "display:block"
+    var events;
+    Event.find({eventOwner: req.user._id},function(err,ocassions){
+        events = ocassions
+        req.session.search = req.session.search || [];
+        if (req.session.search.length > 0) {
+            // assumption, i have req.query.placeId
+            var temp = JSON.parse(JSON.stringify(req.session.search));
+            temp.forEach(function(venue) {
+                if (venue.placeId === req.query.placeId) {
+                    venue.modal = "display:block";
+                } else {
+                    venue.modal = "";
+                }
+            });
+            res.render('list', {
+                venues: temp,
+                googleApi: process.env.GOOGLEPLACES,
+                events: events
+            })
+        } else {
+            res.render('home', {
+                googleApi: process.env.GOOGLEPLACES
+            });
         }
-        res.render('list', {
-            venues: req.session.search,
-            googleApi: process.env.GOOGLEPLACES,
-            modal: modal
-        })
-    } else {
-        res.render('home', {
-            googleApi: process.env.GOOGLEPLACES
-        });
-    }
+    })
 });
 
 /* VENUES creates session venues */
@@ -74,27 +82,36 @@ router.post('/venues', function(req, res) {
                     placeId.push(item.place_id)
                 });
                 for (var i = 0; i < placeId.length; i++) {
+                    var venueId= placeId[i]
+                    console.log('venueId are', venueId)
                     venues.push(request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
                     .then(resp => JSON.parse(resp))
-                    .then(obj2 => ({
-                        name: obj2.result.name,
-                        address: obj2.result.formatted_address,
-                        phone: obj2.result.formatted_phone_number,
-                        photos: obj2.result.photos,
-                        rating: obj2.result.rating,
-                        lat: obj2.result.geometry.location.lat,
-                        long: obj2.result.geometry.location.lng,
-                        hours: obj2.result.opening_hours
-                        ? obj2.result.opening_hours.weekday_text
-                        : ["Opening Hours Unavailable"],
-                        type: obj2.result.types,
-                        url: obj2.result.url,
-                        website: obj2.result.website,
-                        link: obj2.result.photos
-                        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES
-                        : ''
-                        }
-                    )))
+                    .then(
+                        (function(v){
+                            return function(obj2) {
+                                console.log('venue:', v);
+                                return {
+                                    placeId: v,
+                                    name: obj2.result.name,
+                                    address: obj2.result.formatted_address,
+                                    phone: obj2.result.formatted_phone_number,
+                                    photos: obj2.result.photos,
+                                    rating: obj2.result.rating,
+                                    lat: obj2.result.geometry.location.lat,
+                                    long: obj2.result.geometry.location.lng,
+                                    hours: obj2.result.opening_hours
+                                    ? obj2.result.opening_hours.weekday_text
+                                    : ["Opening Hours Unavailable"],
+                                    type: obj2.result.types,
+                                    url: obj2.result.url,
+                                    website: obj2.result.website,
+                                    link: obj2.result.photos
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES
+                                    : ''
+                                }
+                            }
+                        })(venueId)
+                    ))
                 }
                 return Promise.all(venues)
             })
@@ -103,6 +120,7 @@ router.post('/venues', function(req, res) {
                 var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
 
                 req.session.search = filteredVenues;
+                console.log('HEREEE', filteredVenues);
                 res.render('list', {
                     venues: filteredVenues,
                     googleApi: process.env.GOOGLEPLACES
@@ -119,6 +137,10 @@ router.post('/venues', function(req, res) {
 /*Receive user id and venue names from Event API and create new Message in Mongoose for user */
 router.post('/createMsg',function(req,res){
     console.log('CREATE MSG POST',req.body);
+    var userId = req.body.userid
+    User.findById(userId,function(req,res){
+
+    })
     res.send('OK')
 })
 
@@ -159,14 +181,94 @@ router.get('/venue', function(req, res) {
     })
 })
 
+/*Create a new event, makes a new venue, tags the venue to the event and saves to mongoose*/
+router.post('/addEvent',function(req,res){
+    console.log('user id is', typeof req.user._id);
+    console.log('name',req.body.event);
+    console.log('venue id', typeof req.query.placeId);
+    var event = new Event({
+        eventOwner: req.user._id,
+        name: req.body.event,
+    })
+
+    event.save(function(err,event){
+        if(err){
+            console.log("Error saving the new event", err)
+        } else {
+            console.log("Successfully saved the event")
+            var newVenue = new Venue ({
+                venueOption: event._id,
+                placeId:req.query.placeId,
+                domain: req.body.domain,
+                name: req.body.name
+            })
+            newVenue.save(function(err,newVen){
+                if(err){
+                    console.log("Error saving the new venue",err);
+                } else {
+                    console.log("Successfully saved the venue")
+                    res.redirect('/');
+                }
+            })
+
+        }
+    })
+})
+
+/*This creates and saves a new venue with the eventowner id */
+router.get('/modifyEvent',function(req,res){
+    //Make this a toggle where it adds or removes the venue
+    var eventId=req.query.eventId;
+    var venueId=req.query.venueId;
+    var domain=req.query.dom;
+    var name=req.query.name;
+    console.log('EVENTID',eventId)
+    console.log('VENUEID',venueId)
+    console.log('DOMAIN',domain);
+    console.log('Name',name)
+    //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
+    //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
+    Venue.find({venueOption: eventId})
+    .then(function(venues) {
+        if (!venues || venues.length <= 0) {
+            return false;
+        }
+        for(var i = 0; i < venues.length; i++) {
+            if (venues[i].placeId === venueId) {
+                // maybe here remove the venue if its a toggle
+                return true;
+            }
+        }
+        return false;
+    })
+    .then(function(exists) {
+        if (!exists) {
+            var newVenue = new Venue({
+                venueOption:eventId,
+                placeId:venueId,
+                domain:domain,
+                name:name
+            })
+            newVenue.save(function(e, saved) {
+                console.log('saved',saved)
+                res.redirect('/');
+            });
+            Venue.find({venueOption: eventId},function(err,venues){
+                console.log('apples', venues)
+            })
+        } else {
+            res.redirect('/');
+        }
+    })
+})
+
 /* ADD TO CART adds the specifc venue to your cart */
 router.post('/cart', function(req, res) {
     var venueName = req.query.name;
     var address = req.query.address;
     console.log('venuename', venueName, 'address'. address);
     User.findById(req.user._id)
-        .exec(function(err, user) {
-        console.log('session', req.session);
+    .exec(function(err, user) {
         req.session.search.forEach(venue => {
             if (venue.name === venueName && venue.address === address) {
                 var cart = user.cart;
@@ -186,6 +288,7 @@ router.post('/cart', function(req, res) {
                     user.save(function(err, savedCart) {
                         res.render('cart', {venues: user.cart});
                     })
+
                 }
             }
         })
@@ -205,31 +308,33 @@ router.post('/remove', function(req, res) {
     var venueName = req.query.name;
     var address = req.query.address;
     User.findById(req.user._id)
-        .exec(function(err, user) {
-            let index;
-            let cart= user.cart
-            cart.forEach((venueObj, i) => {
-                if (venueObj.name === venueName && venueObj.address === address) {
-                    index = i;
-                }
-            })
-            cart.splice(index, 1);
-            user.save(function(error, savedUser) {
-                res.redirect('/showCart');
-            })
+    .exec(function(err, user) {
+        let index;
+        let cart= user.cart
+        cart.forEach((venueObj, i) => {
+            if (venueObj.name === venueName && venueObj.address === address) {
+                index = i;
+            }
         })
+        cart.splice(index, 1);
+        user.save(function(error, savedUser) {
+            res.redirect('/showCart');
+        })
+    })
 })
 
 
 /* CONTACTLIST is the link to the questionnaire*/
 router.get('/contactlist', function(req, res, next) {
-    res.render('contactlist');
+    Event.find({eventOwner:req.user._id},function(err,ocassions){
+        res.render('contactlist', ({events: ocassions}))
+    })
 })
 
 /*Use Hunter API to find venue owner/business emails*/
 router.get('/getemails', function(req, res) {
     User.findById(req.user._id)
-        .exec(function(err, user) {
+    .exec(function(err, user) {
         let cart = req.user.cart
         cart.forEach(venue => {
             console.log('WEBSITESS !' , venue.website)
@@ -280,73 +385,124 @@ router.get('/getemails', function(req, res) {
 
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
-    //Will want to loop through an array of emails to trigger sendgrid several times
+    var eventId=req.body.eventId
+    Event.findById(eventId, function(err,event){
+        event.date=req.body.date
+        event.time=req.body.starttime
+        event.hours=req.body.hours
+        event.guestCount=req.body.guestCount
+        event.price=req.body.price
 
-    var request = sg.emptyRequest({
-        method: 'POST',
-        path: '/v3/mail/send',
-        body: {
-            personalizations: [
-                {
-                    to: [
-                        {
-                        //here I want to put in the hunter emails
-                        email: 'maxiliarias@gmail.com'
+        event.save(function(err,savedEvent){
+            if(err){
+                console.log('Error saving event paramaters', err );
+            } else {
+                console.log('Successfully saved event parameters');
+                Venue.find({venueOption: eventId},function(err,venues){
+                    console.log('VENUES FOR THAT EVENT',venues)
+                    venues.forEach(venue => {
+                        var web = venue.domain
+                        var b;
+                        console.log('THE VENUE',venue)
+                        console.log('WEBSITE', web);
+                        // Check database to see if there's an email for that venue already
+                        //if not, retrieve email using hunter
+                        if(!venue.email){
+                            helper.collectEmail(web)
+                            .then((emails) => {
+                                console.log('RETRIEVED EMAILS', emails)
+                                //STORE THE EMAILS IN THE DATABASE
+                                if(emails[1]){
+                                    venue.email.push(emails[0])
+                                    venue.email.push(emails[1])
+                                } else if (emails[0]){
+                                    venue.email.push(emails[0])
+                                }
+
+                                venue.save(function(err,savedV){
+                                    if(err){
+                                        console.log('error saving venue email', err)
+                                    } else {
+                                        console.log('Successfully saved venue w emails')
+                                    }
+                                })
+                            })
                         }
-                    ],
-                    'substitutions': {
-                        '-businessName-': 'tester businesss', //should loop through cart/session for venue name
-                        '-fname-': req.user.fname,
-                        '-date-': req.body.date,
-                        '-starttime-': req.body.starttime,
-                        '-guestCount-': req.body.guestCount,
-                        '-price-': req.body.price,
-                        '-hours-': req.body.hours
-                    },
-                    subject: req.user.fname + " would like to book your venue with Festiv!",
-                    custom_args: {
-                        "userid":req.user._id
-                    }
-                }
-            ],
-            from: {
-                email: 'hello@parse.festivspaces.com'
-            },
-            template_id: process.env.TEMPLATE_ID
-        }
-    });
-    sg.API(request, function(error, response) {
-        if (error) {
-            console.log('Error response received');
-        }
-        console.log('RESPONSE', response);
-        console.log('STATUS HERE' ,response.statusCode);
-        console.log('BODY HERE', response.body);
-        console.log('HEADERS HERE', response.headers);
-        res.redirect('/refresh');
-    });
+                            //TAILOR THE BODY
+                        var b = {
+                                personalizations: [{
+                                    'substitutions': {
+                                        '-businessName-':venue.name,
+                                        '-fname-':req.user.fname,
+                                        '-date-':req.body.date,
+                                        '-starttime-':req.body.starttime,
+                                        '-guestCount-':req.body.guestCount,
+                                        '-price-':req.body.price,
+                                        '-hours-':req.body.hours,
+                                    },
+                                    custom_args: {
+                                        "userid":req.user._id
+                                    }
+                                }],
+                                from: {
+                                    email: 'hello@parse.festivspaces.com'
+                                },
+                                template_id: process.env.TEMPLATE_ID_QUOTE
+                            }
+
+                        // need to make sure this happens after the first if
+                        if(venue.email[1]){
+                            b.personalizations[0].to = [{email: venue.email[0]}]
+                            b.personalizations[0].cc = [{email: venue.email[1]}]
+                        } else if (venue.email[0]){
+                            b.personalizations[0].to = [{email: venue.email[0]}]
+                        } else {
+                            b.personalizations[0].to=[{email: 'maxiliarias@gmail.com'}]
+                            b.personalizations[0].substitutions['-placeid-']= venue.placeId
+                            b.template_id= process.env.TEMPLATE_ID_NO_EMAIL
+                        }
+
+                        // need to make sure this happens after the second if
+                        //SEND THE EMAIL
+                        var request = sg.emptyRequest({
+                            method: 'POST',
+                            path: '/v3/mail/send',
+                            body: b
+                        });
+                        sg.API(request, function(error, response) {
+                            if (error) {
+                                console.log('Error response received');
+                            }
+                            console.log('STATUS HERE' ,response.statusCode);
+                            console.log('BODY HERE', response.body);
+                            console.log('HEADERS HERE', response.headers);
+                        });
+                    })
+                })
+                res.redirect('/contactlist')
+            }
+        })
+    })
 })
 
 /* RECEIVE replies to our emails, and store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
 
     simpleParser(req.body.email, function(err, mail) {
-        console.log('MAIL TEXT',mail);
+        console.log('MAIL',mail);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
         console.log('MAIL date', mail.date);
-        var msg = new Message({
-            time: mail.date,
+        var chat = new Chat({
+            date: mail.date,
             from: mail.from.text,
             content: mail.text
         });
-        msg.save(function(err, m) {
-            res.status(200).end();
-        })
+         console.log('BANANAS',msg)
+        // msg.save(function(err, m) {
+        //     res.status(200).end();
+        // })
     })
-    // message.save on mongoose
-    // find all messages and pass that to hbs
-    // res.render('/messages', {messages: req.body})
 })
 
 /*Render a page with all of the messages*/
