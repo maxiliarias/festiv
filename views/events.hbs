@@ -1,0 +1,62 @@
+<ul>
+  <li class="list-group-item">
+    <div class="container">
+      <!-- use hbs #each to loop through results. just writing html for one result -->
+      <a class="btn" name="button" href="/">Back to All Venues</a>
+      <ul class="list-group">
+        {{#each events}}
+        <li class="list-group-item">
+          <div class="container">
+            <div class="row">
+              <div class="col l8 s12">
+                <h3>{{this.name}}
+                  <a href="/removeEvent?id={{this._id}}">
+                      <button class="btn" type="submit" name="button">Remove Event</button>
+                  </a></h3>
+                {{#each this.venue}}
+                    <p>{{this.name}}
+                    <a href="/removeVenue?venueid={{this._id}}&eventid={{../this._id}}">
+                        <button class="btn" type="submit" name="button">X</button>
+                    </a></p>
+                {{/each}}
+              </div>
+              <div class="col l4 s12">
+                <ul>
+                  <li><b>Date: </b>{{this.date}}</li>
+                  <li><b>Time:</b> {{this.time}} </li>
+                  <li><b>Hour(s):</b> {{this.hours}} </li>
+                  <li><b>Guest Count:</b> {{this.guestCount}} </li>
+                  <li><b>Price:</b> {{this.price}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal to pick event -->
+         <div id="viewVenues" class="modal" style ={{this.modal}}>
+           <div class="modal-content">
+             <h3>Modify Event Details</h3>
+             <form action="/modifyEvent?id={{this._id}}" method="post">
+               <input type=text name=event placeholder="You event here">
+               <input type=date name=date placeholder="You event here">
+               <input type=Number name=time placeholder="What time will it start?">
+               <input type=Number name=hours placeholder="How many hours would you like to reserve?">
+               <input type=Number name=guestCount placeholder="How many guests will you be inviting?">
+               <select name="price">
+                   <option id="choosePrice" value="" disabled selected>Choose Your Price Type</option>
+                   <option>Open Bar</option>
+                   <option>Minimum Spend</option>
+                 </select>
+               <button class="btn" type="submit" name="button"> Submit</button>
+             </form>
+             <span id="closeMod" class="close">&times;</span>
+           </div>
+         </div>
+
+        </li>
+        {{/each}}
+      </ul>
+        <a class="btn" name="button" href="/">Back to All Venues</a>
+    </div>
+  </li>
+</ul>

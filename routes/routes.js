@@ -210,16 +210,18 @@ router.post('/addEvent',function(req,res){
                     console.log("Error saving the new venue",err);
                 } else {
                     console.log("Successfully saved the venue")
-                    res.redirect('/');
+                    event.venue.push(newVen._id)
+                    event.save(function(err,savedE){
+                        res.redirect('/');
+                    })
                 }
             })
-
         }
     })
 })
 
-/*This creates and saves a new venue with the eventowner id */
-router.get('/modifyEvent',function(req,res){
+/* ADDS A VENUE TO AN EXISTING EVENT */
+router.get('/addVenue',function(req,res){
     //Make this a toggle where it adds or removes the venue
     var eventId=req.query.eventId;
     var venueId=req.query.venueId;
@@ -252,76 +254,82 @@ router.get('/modifyEvent',function(req,res){
                 domain:domain,
                 name:name
             })
-            newVenue.save(function(e, saved) {
-                console.log('saved',saved)
-                res.redirect('/');
+            newVenue.save(function(err, newVen) {
+                if(err){
+                    console.log('could not save new Venue',err)
+                } else {
+                console.log('saved new venue to event',newVen)
+                Event.findById(eventId)
+                .exec(function(err,event){
+                    if(err){
+                        console.log('could not save venue Id to event',err);
+                    } else {
+                        event.venue.push(newVen._id)
+                        event.save(function(err,savedE){
+                            console.log('Saved venue Id to event',err);
+                            res.redirect('/');
+                        })
+                    }
+                })
+                }
             });
-            Venue.find({venueOption: eventId},function(err,venues){
-                console.log('apples', venues)
-            })
         } else {
             res.redirect('/');
         }
     })
 })
 
-/* ADD TO CART adds the specifc venue to your cart */
-router.post('/cart', function(req, res) {
-    var venueName = req.query.name;
-    var address = req.query.address;
-    console.log('venuename', venueName, 'address'. address);
-    User.findById(req.user._id)
-    .exec(function(err, user) {
-        req.session.search.forEach(venue => {
-            if (venue.name === venueName && venue.address === address) {
-                var cart = user.cart;
-                let exists = false
-                if(cart.length >0){
-                    cart.forEach(item => {
-                        if(item.name === venueName && item.address === address){
-                            exists= true
-                        }
-                    })
-                }
-                if(exists){
-                    // var string = encodeURIComponent('This venue is already on your contact list');
-                    res.redirect('/?modal=true');// + string);
-                } else {
-                    user.cart.push(venue)
-                    user.save(function(err, savedCart) {
-                        res.render('cart', {venues: user.cart});
-                    })
+/* SHOW all EVENTS related to that particular user*/
+router.get('/events', function(req, res) {
+    Event.find({eventOwner:req.user._id})
+    .populate('venue')
+    .exec(function(err,events){
+        res.render('events',{events: events})
+    })
+})
 
-                }
+/* REMOVE a specific event from the database*/
+router.get('/removeEvent', function(req, res) {
+    var eventId= req.query.id;
+    Event.findById(eventId)
+    .exec(function(err, event){
+        event.remove(function(err,event){
+            if(err){
+                console.log('error removing event', err)
+            } else {
+                console.log('Successfully removed event');
+                res.redirect('/events')
             }
         })
     })
 })
 
-/* SHOW CART shows all items in cart*/
-router.get('/showCart', function(req, res) {
-    User.findById(req.user._id)
-    .exec(function(err, user) {
-        res.render('cart', {venues: user.cart})
-    })
-})
-
-/* REMOVE a specific venue from the cart*/
-router.post('/remove', function(req, res) {
-    var venueName = req.query.name;
-    var address = req.query.address;
-    User.findById(req.user._id)
-    .exec(function(err, user) {
-        let index;
-        let cart= user.cart
-        cart.forEach((venueObj, i) => {
-            if (venueObj.name === venueName && venueObj.address === address) {
-                index = i;
+/* REMOVE a specific venue from an event*/
+router.get('/removeVenue', function(req, res) {
+    var venueid= req.query.venueid
+    var eventid=req.query.eventid
+    console.log('HERE', eventid)
+    console.log('HERE', venueid)
+    Event.findById(eventid)
+    .exec(function(err,event){
+        for (var i=0; i<event.venue.length; i++){
+            if(event.venue[i] == venueid){
+                //WHY is v still 7 in mongoose database?
+                event.venue.splice(i,1)
             }
-        })
-        cart.splice(index, 1);
-        user.save(function(error, savedUser) {
-            res.redirect('/showCart');
+        }
+        event.save(function(err,e){
+            Venue.findById(venueid)
+            .exec(function(err, venue){
+                venue.remove(function(err,venue){
+                    if(err){
+                        console.log('error removing venue', err)
+                    } else {
+                        console.log('Successfully removed venue');
+                        res.redirect('/events')
+                    }
+                })
+            })
         })
     })
 })
@@ -402,10 +410,12 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('MAIL date', mail.date);
         var atSign= mail.to.text.indexOf("@")
         var idSpot= mail.to.text.indexOf("<id") + 3
-        console.log('MANGO',mail.to.text.slice(2,atSign))
+        console.log('MANGO',mail.to.text.slice(idSpot,atSign))
+
+
         var chat = new Chat({
             chatOwner: mail.to.text.slice(idSpot,atSign),
-            date: mail.date,
+            date: helper.formatDate(mail.date),
             from: mail.from.text,
             content: mail.text
         });
@@ -428,8 +438,8 @@ router.get('/messages',function(req,res){
         if(err){
             console.log('error find a chat with that venue id', err)
         } else {
-            msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
             console.log('HI',msg);
+            msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
             res.render('messages', {message: msg })
         }
     })

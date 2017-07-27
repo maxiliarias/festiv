@@ -84,6 +84,19 @@ var helper = {
             console.log('BODY HERE', response.body);
             console.log('HEADERS HERE', response.headers);
         });
+    },
+    formatDate:function(input){
+        date= new Date(input)
+        year = date.getFullYear();
+        month = date.getMonth()+1;
+        dt = date.getDate();
+        if (dt < 10) {
+          dt = '0' + dt;
+        }
+        if (month < 10) {
+          month = '0' + month;
+        }
+        return (month + " " + dt + " " + year)
     }
 }
 
