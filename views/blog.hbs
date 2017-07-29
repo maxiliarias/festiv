@@ -3,6 +3,7 @@
         <h2 class="section-heading">Tips & Secrets</h2>
         <h3 class="section-subheading text-muted text-center">
             Insights from our Favorite Bloggers
+            <span class="fa fa-heart" aria-hidden="true"></span>
         </h3>
     </div>
 </div>
@@ -11,7 +12,7 @@
     <div class="card-deck">
         {{#each blog}}
             <div class="card">
-                <img class="card-img-top" src="{{this.coverPhoto}}" class="img-responsive" width="90%">
+                <a href="{{this.link}}"><img class="card-img-top" src="{{this.coverPhoto}}" class="img-responsive" width="90%"></a>
                 <div class="card-block">
                     <h4 class="card-title">{{this.postTitle}}</h4>
                     </div>

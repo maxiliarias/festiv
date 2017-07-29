@@ -1,5 +1,5 @@
-<div class="row-fluid">
-    <div class="col-lg-12 col-md-10 ">
+<div class="row">
+    <div class="col-sm-12">
         <div class="cover-container">
             <!-- START PANEL -->
             <div class="cover-item" style="background-image: url('{{this.photo1}}')"></div>
@@ -12,45 +12,58 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-6 offset-2 pl-5">
-        <h2 class="section-heading text-blue text-left pad-top">{{this.name}}</h2>
-        <p><a href="{{this.website}}">{{this.website}} </a></p>
-        <p>{{this.rating}} Rating {{this.phone}} </p>
-        <form action="/cart?name={{this.name}}&address={{this.address}}" method="post">
-            <button class="btn btn-primary" type="submit" name="button">Tag an Event</button>
-        </form>
-        <a href="/questionnaire">
-            <button class="btn btn-yellow" type="submit" name="button">All set? Request Bids</button>
-        </a>
-    </div>
-    <div class="col-sm-4 pad-top">
+    <div class="col-sm-8 pad-top pl-5">
         <div class="row">
-            <div class="section-light">
-                <div id="venueMap"></div>
-                <a href="{{this.url}}">{{this.address}} </a>
+            <div class="col-sm-4 text-center">
+                <form action="/cart?name={{this.name}}&address={{this.address}}" method="post">
+                    <button class="btn btn-primary" type="submit" name="button">Tag An Event</button>
+                </form>
+                <a href="/questionnaire">
+                    <button class="btn btn-yellow" type="submit" name="button">All Set? Request Bids</button>
+                </a>
+                <div class="contactSide text-left">
+                    <h6>Your Events</h6>
+                    {{#each events}}
+                        <span class="fa fa-heart" aria-hidden="true">
+                            <a href="/addVenue?/eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}">{{this.name}}</a>
+                        </span> </br>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <h2 class="section-heading text-blue text-left">{{this.name}}</h2>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <span class="fa fa-star" aria-hidden="true"><p class="inline">{{this.rating}} Rating</p></span>
+                    </div>
+                    <div class="col-sm-5">
+                        <span class="fa fa-link" aria-hidden="true">
+                        <p class="inline"><a href="{{this.website}}">{{this.website}} </a></p></span>
+                    </div>
+                    <div class="col-sm-5">
+                        <span class="fa fa-phone" aria-hidden="true"><p class="inline"> {{this.phone}} </p></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="col-sm-4 pad-top section-primary">
+                <div id="venueMap" class="sidebar"></div>
+                <p class="text-white text-center"><b>{{this.address}}</b></p>
+    </div>
 </div>
-<div class="row section-light">
-        <div class="col-sm-2 sidebar pad-top">
-            <p>contact list bar</p>
-        </div>
-        <div class="col-sm-6 pad-top">
+<div class="row ">
+        <div class="col-sm-8 sidebar pad-top">
 
         </div>
-        <div class="col-sm-4 pad-top">
-            <b>Hours:</b>
-            <ul>
-                <li>
-                    <br></br>
-                    <div style="padding: 5px; border-radius: 3px">
-                        {{#each this.hours}}
-                        <p>{{this}}</p>
-                        {{/each}}
-                    </div>
-                </li>
-            </ul>
+        <div class="col-sm-4 pad-top venueSide section-light">
+            <h6 class="text-blue">Hours: <span class="fa fa-clock-o" aria-hidden="true"></span></h6>
+            <div style="padding: 5px; border-radius: 3px">
+                {{#each this.hours}}
+                <p>{{this}}</p>
+                {{/each}}
+            </div>
         </div>
 </div>
 

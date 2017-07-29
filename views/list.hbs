@@ -12,7 +12,7 @@
     </div>
 </div> -->
     <div class="row">
-        <div class="col-sm-12 section-primary">
+        <div class="col-sm-12 section-blue fixed-pos">
             <form action="/venues" method="post">
                 <button class="btn btn-primary" type="submit" name="button">Next Page</button>
             </form>
@@ -20,8 +20,8 @@
     </div>
     <div class="row">
     <!-- Left Filter Sidebar -->
-    <div class="col-sm-2 fixed-pos section-light pad-top pl-4 sidebar">
-        <div class="col-sm-12 section-primary sidebar">
+    <div class="col-sm-2 fixed-pos section-light pad-top pl-4 ml-3 sidebar listMargin">
+        <div class="col-sm-12 section-primary sidebar text-white">
         <h4 style='padding: 10px'>Filters</h4>
         <div >
             <form class="mx-auto" method="post" action="/newSearch">
@@ -58,16 +58,14 @@
     <form action="/venues" method="post">
         <button class="btn" type="submit" name="button">Next Page</button>
     </form>
-    <div class="col-sm-6 float section-light pad-top" id="results">
+    <div class="col-sm-6 float section-light pad-top listMargin" id="results">
         <div class="row">
-            <div class="col-sm-12"> hello</div>
+            <div class="col-sm-12"></div>
         {{#each venues}}
             <div class="col-sm-6">
                 <div class="card">
                 <img class="card-img-top" src='{{this.link}}' class="img-responsive" width="250px" alt="Card image cap">
                     <div class="card-block">
-                        <!-- WILL HAVE TO UPDATE THIS ROUTE, pass in placeid and make request for information
-                        maybe make this link a form with hidden inputs that get passed -->
                         <form method="post" action="/venue?name={{this.name}}&address={{this.address}}">
                             <input type="hidden" name="placeId" value="{{this.placeId}}">
                             <input type="hidden" name="photoLink" value="{{this.link}}">
@@ -90,7 +88,7 @@
                             <input class="btn-transparent" type="submit" value="{{this.name}}">
                         </form>
                             <h4 class="card-title"></h4></a>
-                            <p class="card-text">{{this.address}}</p>
+                            <p class="card-text text-muted">{{this.address}}</p>
                             <p class="card-text"><small class="text-muted">hello</small></p>
                             <a href="/?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-primary" type="submit" name="button">Tag An Event</button></a>
                     </div>
@@ -102,8 +100,6 @@
                 <h3>Add {{this.name}} to one of your existing event lists?</h3>
                 <ul>
                     {{#each ../events}}
-                    <p>Venue PlaceId is {{../this.placeId}}</p>
-                    <p>Event Id is {{this._id}}
                         <li><a href="/addVenue?eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}"> {{this.name}} </a></li>
                         {{/each}}
                     </ul>

@@ -1,6 +1,6 @@
 body {
   font: 14px "Open Sans", Helvetica, Arial, sans-serif;
-
+  min-width: 800px;
 }
 .container-fluid{
     margin-top:85px;
@@ -12,8 +12,12 @@ btn-primary, .btn-xl, h2 {
 }
 .btn-yellow{
     color: white;
-    background-color: #ffffb3;
-    border-color: #ffffb3;
+    background-color: #EEDE76;
+    border-color: #EEDE76;
+}
+.btn-yellow:hover{
+    background-color: #F2DA45;
+    border-color: #F2DA45;
 }
 .btn-transparent{
     background-color: white;
@@ -47,6 +51,17 @@ h3.section-subheading {
     height: 630px;
     width: 100%;
 }
+.contactSide{
+    margin-top: 20px;
+    padding-left: 20px;
+    padding-top: 20px;
+    min-height: 250px;
+    border: rgb(76, 219, 219) solid 10px;
+    color: rgb(76, 219, 219);
+}
+.venueSide{
+    border: white solid 20px;
+}
 .parallax {
     /* The image used */
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/front-page/max.jpeg");
@@ -65,6 +80,7 @@ h3.section-subheading {
     white-space: nowrap;
     overflow-x: scroll;
     overflow-y: hidden;
+    border-bottom: rgb(242, 242, 242) solid 8px
 }
 .cover-item {
     position: relative;
@@ -110,6 +126,9 @@ h3.section-subheading {
 }
 .text-light{
     color: #FAF9F9
+}
+.inline{
+    display: inline;
 }
 a {
 color: rgb(76, 219, 219);
@@ -168,6 +187,9 @@ form{
 .section-light{
     background-color:#FAF9F9;
 }
+.section-blue{
+    background-color: rgb(76, 219, 219);
+}
 
 .card{
     border-radius: 25px;
@@ -194,18 +216,22 @@ form{
 .fixed-pos{
     position:fixed;
 }
-
+.listMargin{
+margin-top: 4%;
+}
 #results{
     margin-left: 9%;
 }
 #resultsmap{
     position: fixed;
-    top: 10%;
+    top: 16%;
     left: 67%;
     padding: 25px 0px 0px 0px;
 }
 #venueMap {
     height: 300px;
+    width: 95%;
+    margin: 15px;
 }
 
 .pad-top{

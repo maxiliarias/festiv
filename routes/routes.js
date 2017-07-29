@@ -203,49 +203,56 @@ router.post('/newSearch', function(req, res) {
 
 /* INDIVIDUAL VENUE can see more information about one venue */
 router.post('/venue', function(req, res) {
-    console.log('here Photo1',req.body.photo1)
-    res.render('venue',{
-        placeid: req.body.placeid,
-        name: req.query.name, //
-        address: req.query.address,
-        phone: req.body.phone,
-        photo1: req.body.photo1
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo2: req.body.photo2
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo3: req.body.photo3
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo4: req.body.photo4
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo5: req.body.photo5
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo6: req.body.photo6
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo7: req.body.photo7
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo8: req.body.photo8
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo9: req.body.photo9
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        photo10: req.body.photo10
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
-        : '',
-        rating: req.body.rating,
-        lat: req.body.lat,
-        lng: req.body.lng,
-        hours: req.body.hours.split(','),
-        url: req.body.url, //
-        website: req.body.website,
-        link: req.body.link //
+    Event.find({eventOwner: req.user._id},function(err,events){
+        if(err){
+            console.log('error finding events in venue profile page',err);
+        } else {
+            console.log('found events in venue profile!');
+            res.render('venue',{
+                events: events,
+                placeid: req.body.placeid,
+                name: req.query.name, //
+                address: req.query.address,
+                phone: req.body.phone,
+                photo1: req.body.photo1
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo2: req.body.photo2
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo3: req.body.photo3
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo4: req.body.photo4
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo5: req.body.photo5
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo6: req.body.photo6
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo7: req.body.photo7
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo8: req.body.photo8
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo9: req.body.photo9
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                photo10: req.body.photo10
+                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
+                : '',
+                rating: req.body.rating,
+                lat: req.body.lat,
+                lng: req.body.lng,
+                hours: req.body.hours.split(','),
+                url: req.body.url, //
+                website: req.body.website,
+                link: req.body.link //
+            })
+        }
     })
 })
 

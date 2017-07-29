@@ -40,6 +40,7 @@ var chatSchema = mongoose.Schema({
 })
 
 var blogSchema = mongoose.Schema({
+    link: String,
     postTitle: String,
     blog: String,
     author: String,
