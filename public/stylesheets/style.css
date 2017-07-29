@@ -1,14 +1,58 @@
 body {
-  min-height: 75rem;
   font: 14px "Open Sans", Helvetica, Arial, sans-serif;
+
+}
+.container-fluid{
+    margin-top:85px;
+}
+btn-primary, .btn-xl, h2 {
+    font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+.btn-yellow{
+    color: white;
+    background-color: #ffffb3;
+    border-color: #ffffb3;
+}
+.btn-transparent{
+    background-color: white;
+    color: rgb(76, 219, 219);
+    border: none;
+    font-size: 25px;
+    text-align: left;
+    white-space: normal;
 }
 
+h2.section-heading {
+  font-size: 40px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+h3.section-subheading {
+  font-size: 16px;
+  font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-transform: none;
+  font-style: italic;
+  font-weight: 400;
+  margin-bottom: 50px;
+ }
+.blog-head{
+    text-transform: uppercase;
+}
+
+.sidebar{
+    height: 630px;
+    width: 100%;
+}
 .parallax {
     /* The image used */
-    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/max.jpeg");
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/front-page/max.jpeg");
 
     /* Set a specific height */
-    height: 500px;
+    height: 600px;
 
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
@@ -16,7 +60,43 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
 }
-
+.cover-container {
+    width: 100%;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+.cover-item {
+    position: relative;
+    display: inline-block;
+    box-shadow: 2px 2px 4px #bbb;
+    border-top-right-radius: 4px;
+    width: 400px;
+    height: 300px;
+    vertical-align: bottom;
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.bg1{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/blog/oh-happy-day/pumpkin1.jpg');
+}
+.bg2{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/blog/style-me-pretty/macaroonsBlooms.jpg');
+}
+.bg3{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/blog/green-wedding-shoes/whisky_cake.jpg');
+}
+.hero-image {
+    height: 400px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+.hero-text{
+    margin-top: 15%;
+}
 .flex {
     display: flex;
     align-items: center;
@@ -27,6 +107,15 @@ body {
 }
 .text-blue{
     color: rgb(76, 219, 219);
+}
+.text-light{
+    color: #FAF9F9
+}
+a {
+color: rgb(76, 219, 219);
+}
+a:hover{
+    text-decoration: none;
 }
 
 .btn-primary {
@@ -40,27 +129,148 @@ body {
     border-color: rgb(19, 245, 245); /*set the color you want here*/
 }
 .navbar {
-   background-color:rgb(201, 226, 226);
-   background:rgb(242, 242, 242);
-   border-color: transparent;
+   background-color:white;
+   background: white;
+   border-bottom: rgb(242, 242, 242) solid 4px;
 }
 .navbar-brand {
     padding:0px 15px;
     margin: 10px;
 }
+.navbar-light .navbar-nav .nav-link {
+    color: rgb(76, 219, 219);
+    font-weight: bold;
+}
 
-ul.nav a:hover { color: rgb(76, 219, 219) !important; }
-.section{
+#navbarNavDropdown{
+    flex-direction: row-reverse;
+}
+
+ul.nav-item a:hover { color: red !important; }
+
+.navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.open, .navbar-light .navbar-nav .open>.nav-link {
+    color: #636c72;
+}
+aside {
+    background-color: #ffffb3;
+    padding: 30px;
+}
+footer{
     background-color: rgb(201, 226, 226);
+    padding-bottom: 20px;
+}
+form{
+    margin-bottom: 20px;
+}
+.section-primary{
+    background-color: rgb(201, 226, 226);
+}
+.section-light{
+    background-color:#FAF9F9;
 }
 
 .card{
     border-radius: 25px;
-    margin: 30px 50px;
+    margin-bottom: 30px;
+}
+.card-img-top{
+    overflow:hidden;
+    height: 200px;
+}
+.card p{
+    word-wrap: break-word;
 }
 .card-img-top{
     margin: 12px;
 }
-.heading{
-    margin-top: 20px;
+.card-title {
+    color: rgb(76, 219, 219);
+}
+
+.float {
+    display: flex;
+    flex-wrap: wrap;
+}
+.fixed-pos{
+    position:fixed;
+}
+
+#results{
+    margin-left: 9%;
+}
+#resultsmap{
+    position: fixed;
+    top: 10%;
+    left: 67%;
+    padding: 25px 0px 0px 0px;
+}
+#venueMap {
+    height: 300px;
+}
+
+.pad-top{
+    padding-top: 30px;
+}
+
+.no-padding {
+  padding: 0;
+}
+.no-gutter > [class*='col-'] {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.portfolio-box {
+  position: relative;
+  display: block;
+  max-width: 650px;
+  margin: 0 auto;
+}
+.portfolio-box .portfolio-box-caption {
+  color: white;
+  opacity: 0;
+  display: block;
+  background: rgb(76, 219, 219);
+  position: absolute;
+  bottom: 0;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  -webkit-transition: all 0.35s;
+  -moz-transition: all 0.35s;
+  transition: all 0.35s;
+}
+.portfolio-box .portfolio-box-caption .portfolio-box-caption-content {
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-category,
+.portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-name {
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+  padding: 0 15px;
+}
+.portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-category {
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 14px;
+}
+.portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-name {
+  font-size: 18px;
+}
+.portfolio-box:hover .portfolio-box-caption {
+  opacity: 1;
+}
+.portfolio-box:focus {
+  outline: none;
+}
+@media (min-width: 768px) {
+  .portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-category {
+    font-size: 16px;
+  }
+  .portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-name {
+    font-size: 22px;
+  }
 }

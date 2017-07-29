@@ -1,0 +1,28 @@
+<div class="row pad-top section-light">
+    <div class="col-xs-12 text-blue mx-auto">
+        <h2 class="section-heading">Tips & Secrets</h2>
+        <h3 class="section-subheading text-muted text-center">
+            Insights from our Favorite Bloggers
+        </h3>
+    </div>
+</div>
+<div class="row section-light mx-auto">
+    <div class="col-sm-8 offset-2">
+    <div class="card-deck">
+        {{#each blog}}
+            <div class="card">
+                <img class="card-img-top" src="{{this.coverPhoto}}" class="img-responsive" width="90%">
+                <div class="card-block">
+                    <h4 class="card-title">{{this.postTitle}}</h4>
+                    </div>
+                <div class="card-footer">
+                    <small>Blog: {{this.blog}}</small></br>
+                    <small>Credit: </small>
+                    <small>{{this.author}}</small>
+                    <small>{{this.photographer}}</small>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+    </div>
+</div>

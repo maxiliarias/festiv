@@ -1,55 +1,63 @@
-<ul>
-    <li class="list-group-item">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h3>{{venue.name}}</h3>
-                    <img src='{{venue.link}}'>
-                    <br></br>
-                    <br></br>
+<div class="row-fluid">
+    <div class="col-lg-12 col-md-10 ">
+        <div class="cover-container">
+            <!-- START PANEL -->
+            <div class="cover-item" style="background-image: url('{{this.photo1}}')"></div>
+            <div class="cover-item" style="background-image: url('{{this.photo2}}')"></div>
+            <div class="cover-item" style="background-image: url('{{this.photo3}}')"></div>
+            <div class="cover-item" style="background-image: url('{{this.photo4}}')"></div>
+            <div class="cover-item" style="background-image: url('{{this.photo5}}')"></div>
+        </div>
+    </div>
+</div>
 
-                    <style>
-                    #map {
-                        height: 300px;
-                        width: 87%;
-                    }
-                    </style>
-                    <div id="map" class={}></div>
-                </div>
-                <div class="col l6 s12">
-                    <ul style="padding-top: 60px">
-                        <li><b>Address: </b><a href="{{venue.url}}">{{venue.address}} </a></li>
-                        <br></br>
-                        <li><b>Phone Number:</b> {{venue.phone}} </li>
-                        <br></br>
-
-                        <li><b>Rating:</b> {{venue.rating}} </li>
-                        <br></br>
-
-                        <li><b>Website:</b> <a href="{{venue.website}}">{{venue.website}} </a> </li>
-                        <br></br>
-                        <li><b>Hours:</b>
-                            <br></br>
-                            <div style="padding: 5px; border-radius: 3px">
-                                {{#each venue.hours}}
-                                <p>{{this}}</p>
-                                {{/each}}
-                            </div>
-                        </li>
-                    </ul>
-                    <form action="/cart?name={{venue.name}}&address={{venue.address}}" method="post">
-                        <button class="btn" type="submit" name="button">Add to MyVenues</button>
-                    </form>
-                </div>
+<div class="row">
+    <div class="col-sm-6 offset-2 pl-5">
+        <h2 class="section-heading text-blue text-left pad-top">{{this.name}}</h2>
+        <p><a href="{{this.website}}">{{this.website}} </a></p>
+        <p>{{this.rating}} Rating {{this.phone}} </p>
+        <form action="/cart?name={{this.name}}&address={{this.address}}" method="post">
+            <button class="btn btn-primary" type="submit" name="button">Tag an Event</button>
+        </form>
+        <a href="/questionnaire">
+            <button class="btn btn-yellow" type="submit" name="button">All set? Request Bids</button>
+        </a>
+    </div>
+    <div class="col-sm-4 pad-top">
+        <div class="row">
+            <div class="section-light">
+                <div id="venueMap"></div>
+                <a href="{{this.url}}">{{this.address}} </a>
             </div>
         </div>
-    </li>
-</ul>
+    </div>
+</div>
+<div class="row section-light">
+        <div class="col-sm-2 sidebar pad-top">
+            <p>contact list bar</p>
+        </div>
+        <div class="col-sm-6 pad-top">
+
+        </div>
+        <div class="col-sm-4 pad-top">
+            <b>Hours:</b>
+            <ul>
+                <li>
+                    <br></br>
+                    <div style="padding: 5px; border-radius: 3px">
+                        {{#each this.hours}}
+                        <p>{{this}}</p>
+                        {{/each}}
+                    </div>
+                </li>
+            </ul>
+        </div>
+</div>
 
 <script>
 function initMap() {
-    var uluru = {lat: {{venue.lat}}, lng: {{venue.long}} };
-    var map = new google.maps.Map(document.getElementById('map'), {
+    var uluru = {lat: {{this.lat}}, lng: {{this.lng}} };
+    var map = new google.maps.Map(document.getElementById('venueMap'), {
         zoom: 12,
         center: uluru
     });

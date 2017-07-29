@@ -1,116 +1,164 @@
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{googleApi}}&libraries=places"></script>
-<div class="results-page">
-  <div>
-    <h1 style='padding: 10px'>Best Venue Matches</h1>
-    <div class="row center">
-      <form id="form" method="post" action="/newSearch">
-        <div class="input-field col s6">
-          <select name="type">
-            <option disabled selected>Choose your venue</option>
-            <option>Bar</option>
-            <option>Restaurant</option>
-            <option>Night club</option>
-            <option>Museum</option>
-            <option>Library</option>
-            <option>Art gallery</option>
-          </select>
-        </div>
-        <div id="locationField" class="input-field col s6">
-          <input type="text" name="location" id="autocomplete">
-        </div>
-        <div class="input-field col s6">
-          <select name="radius">
-            <option disabled selected>Choose your radius</option>
-            <option value='5'>5 miles</option>
-            <option value='10'>10 miles</option>
-            <option value ='20'>20 miles</option>
-          </select>
-        </div>
-        <button class="btn waves-effect waves-light brown" type="submit">Submit
-            <i class="material-icons right">send</i>
-        </button>
-      </form>
-    </div>
-  </div>
-  <div>
-      {{#each events}}
+
+<!-- TOP EVENTS Dropdown -->
+<!-- <div class="row">
+    <div class="col-xs-12">
+        <h3> Your Events </h3>
+        {{#each events}}
         <p>{{this.name}}</p>
         {{#each this.venue}}
-            <p>{{this.name}}</p>
+        <p>{{this.name}}</p>
         {{/each}}
-      {{/each}}
-  </div>
-  <!-- use hbs #each to loop through results. just writing html for one result -->
-  <form action="/venues" method="post">
-    <button class="btn" type="submit" name="button">Next Page</button>
-  </form>
-  <ul class="list-group">
-    {{#each venues}}
-    <li class="list-group-item">
-      <div class="container">
-        <div class="row">
-          <div class="col l6 s12">
-            <a href="/venue?name={{this.name}}&address={{this.address}}"><h3>{{this.name}}</h3></a>
-            <img src='{{this.link}}'>
-          </div>
-          <div class="col l6 s12">
-            <ul>
-              <li><b>Address: </b><a href="{{this.url}}">{{this.address}} </a></li>
-              <li><b>Phone Number:</b> {{this.phone}} </li>
-              <li><b>Rating:</b> {{this.rating}} </li>
-              <li><b>Website:</b> <a href="{{this.website}}">{{this.website}} </a> </li>
-              <li><b>Type:</b>
-                <div style="padding: 5px">
-                  {{#each this.type}}
-                    <p>{{this}}</p>
-                  {{/each}}
-                </div>
-              </li>
-              <li><b>Hours:</b>
-                <div style="padding: 5px">
-                  {{#each this.hours}}
-                    <p>{{this}}</p>
-                  {{/each}}
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-         <a href="/?placeId={{this.placeId}}"><button id="myVenues" class="btn" type="submit" name="button">Tag to an Event</button></a>
-
-         <!-- Modal to pick event -->
-        <div class="viewVenues modal" style ={{this.modal}}>
-          <div class="modal-content">
-            <h3>Add {{this.name}} to one of your existing event lists?</h3>
-            <ul>
-             {{#each ../events}}
-                <p>Venue PlaceId is {{../this.placeId}}</p>
-                <p>Event Id is {{this._id}}
-                  <li><a href="/addVenue?eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}"> {{this.name}} </a></li>
-             {{/each}}
-            </ul>
-            <h3>Or add this venue to a new list?</h3>
-            <form action="/addEvent?placeId={{this.placeId}}" method="post">
-              <input type=text name=event placeholder="Name your special event here">
-              <input type=hidden name=domain value={{this.website}}>
-              <input type=hidden name=name value={{this.name}}>
-              <button class="btn" type="submit" name="button"> Add a new Event!</button>
+        {{/each}}
+    </div>
+</div> -->
+    <div class="row">
+        <div class="col-sm-12 section-primary">
+            <form action="/venues" method="post">
+                <button class="btn btn-primary" type="submit" name="button">Next Page</button>
             </form>
-            <span id="closeMod" class="close">&times;</span>
-          </div>
         </div>
+    </div>
+    <div class="row">
+    <!-- Left Filter Sidebar -->
+    <div class="col-sm-2 fixed-pos section-light pad-top pl-4 sidebar">
+        <div class="col-sm-12 section-primary sidebar">
+        <h4 style='padding: 10px'>Filters</h4>
+        <div >
+            <form class="mx-auto" method="post" action="/newSearch">
+                <div class="form group">
+                    <select name="type" class="form-control">
+                        <option disabled selected>Choose your venue</option>
+                        <option>Bar</option>
+                        <option>Restaurant</option>
+                        <option>Night club</option>
+                        <option>Museum</option>
+                        <option>Library</option>
+                        <option>Art gallery</option>
+                    </select>
+                </div>
+                <div id="locationField" class="form-group">
+                    <input type="text"  class="form-control" name="location" id="autocomplete">
+                </div>
+                <div class="form-group">
+                    <select name="radius"  class="form-control">
+                        <option disabled selected>Choose your radius</option>
+                        <option value='5'>5 miles</option>
+                        <option value='10'>10 miles</option>
+                        <option value ='20'>20 miles</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit
+                </button>
+            </form>
+        </div>
+        </div>
+    </div>
 
-      </div>
-    </li>
-    {{/each}}
-  </ul>
+    <!-- Venue Result Cards -->
+    <form action="/venues" method="post">
+        <button class="btn" type="submit" name="button">Next Page</button>
+    </form>
+    <div class="col-sm-6 float section-light pad-top" id="results">
+        <div class="row">
+            <div class="col-sm-12"> hello</div>
+        {{#each venues}}
+            <div class="col-sm-6">
+                <div class="card">
+                <img class="card-img-top" src='{{this.link}}' class="img-responsive" width="250px" alt="Card image cap">
+                    <div class="card-block">
+                        <!-- WILL HAVE TO UPDATE THIS ROUTE, pass in placeid and make request for information
+                        maybe make this link a form with hidden inputs that get passed -->
+                        <form method="post" action="/venue?name={{this.name}}&address={{this.address}}">
+                            <input type="hidden" name="placeId" value="{{this.placeId}}">
+                            <input type="hidden" name="photoLink" value="{{this.link}}">
+                            <input type="hidden" name="lat" value="{{this.lat}}">
+                            <input type="hidden" name="lng" value="{{this.long}}">
+                            <input type="hidden" name="phone" value="{{this.phone}}">
+                            <input type="hidden" name="rating" value="{{this.rating}}">
+                            <input type="hidden" name="hours" value="{{this.hours}}">
+                            <input type="hidden" name="website" value="{{this.website}}">
+                            <input type="hidden" name="photo1" value="{{this.photo1}}">
+                            <input type="hidden" name="photo2" value="{{this.photo2}}">
+                            <input type="hidden" name="photo3" value="{{this.photo3}}">
+                            <input type="hidden" name="photo4" value="{{this.photo4}}">
+                            <input type="hidden" name="photo5" value="{{this.photo5}}">
+                            <input type="hidden" name="photo6" value="{{this.photo6}}">
+                            <input type="hidden" name="photo7" value="{{this.photo7}}">
+                            <input type="hidden" name="photo8" value="{{this.photo8}}">
+                            <input type="hidden" name="photo9" value="{{this.photo9}}">
+                            <input type="hidden" name="photo10" value="{{this.photo10}}">
+                            <input class="btn-transparent" type="submit" value="{{this.name}}">
+                        </form>
+                            <h4 class="card-title"></h4></a>
+                            <p class="card-text">{{this.address}}</p>
+                            <p class="card-text"><small class="text-muted">hello</small></p>
+                            <a href="/?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-primary" type="submit" name="button">Tag An Event</button></a>
+                    </div>
+                </div>
 
-  <form action="/venues" method="post">
-    <button class="btn" type="submit" name="button">Next Page</button>
-  </form>
+        <!-- Modal to pick event -->
+        <div class="viewVenues modal" style ={{this.modal}}>
+            <div class="modal-content">
+                <h3>Add {{this.name}} to one of your existing event lists?</h3>
+                <ul>
+                    {{#each ../events}}
+                    <p>Venue PlaceId is {{../this.placeId}}</p>
+                    <p>Event Id is {{this._id}}
+                        <li><a href="/addVenue?eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}"> {{this.name}} </a></li>
+                        {{/each}}
+                    </ul>
+                    <h3>Or add this venue to a new list?</h3>
+                    <form action="/addEvent?placeId={{this.placeId}}" method="post">
+                        <input type=text name=event placeholder="Name your special event here">
+                        <input type=hidden name=domain value={{this.website}}>
+                        <input type=hidden name=name value={{this.name}}>
+                        <button class="btn" type="submit" name="button"> Add a new Event!</button>
+                    </form>
+                    <span id="closeMod" class="close">&times;</span>
+                </div>
+            </div>
+            </div>
+        {{/each}}
+        </div>
+    </div>
+
+    <div class="col-sm-4" id="resultsmap">
+        <div id="map" class="sidebar"></div>
+    </div>
 </div>
-  <script>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc&sensor=false&libraries=places"></script>
+<script src="/markerclusterer/src/markerclusterer.js"></script>
+
+   <script>
+     function initialize() {
+       var center = new google.maps.LatLng({{venues.0.lat}}, {{venues.0.long}});
+
+       var map = new google.maps.Map(document.getElementById('map'), {
+         zoom: 12,
+         center: center
+       });
+
+       var markers = [
+           {{#each venues}}
+           {
+               lat: {{this.lat}},
+               lng: {{this.long}}
+           },
+           {{/each}}
+       ];
+
+        markers = markers.map(function(location) {
+         return new google.maps.Marker({
+           position: location
+         });
+       });
+       var markerCluster = new MarkerClusterer(map, markers,
+           {imagePath: '/markerclusterer/images/m'});
+     }
+     google.maps.event.addDomListener(window, 'load', initialize);
+
     var input = document.getElementById('autocomplete');
     var autocomplete = new google.maps.places.Autocomplete(input);
-  </script>
+</script>

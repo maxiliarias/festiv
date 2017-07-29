@@ -39,12 +39,22 @@ var chatSchema = mongoose.Schema({
     content: String
 })
 
+var blogSchema = mongoose.Schema({
+    postTitle: String,
+    blog: String,
+    author: String,
+    photographer: String,
+    coverPhoto: String
+})
+
+Blog = mongoose.model('Blog', blogSchema);
 User = mongoose.model('User', userSchema);
 Event= mongoose.model('Event', eventSchema);
 Venue = mongoose.model('Venue',venueSchema);
 Chat= mongoose.model('Chat',chatSchema);
 
 module.exports = {
+  Blog: Blog,
   User: User,
   Event: Event,
   Venue: Venue,

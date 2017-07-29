@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../models');
-var {User, Event, Venue, Chat } = require('../models');
+var {Blog, User, Event, Venue, Chat } = require('../models');
 var {helper} = require('../helper');
 var request = require('request-promise');
 var fs = require('fs');
@@ -46,6 +46,25 @@ router.get('/', function(req, res, next) {
     }
 });
 
+/* Blog Routes*/
+router.get('/blog',function(req,res){
+    Blog.find(function(err,blogs){
+        if(err){
+            console.log('error finding blogs',err);
+        } else {
+            res.render('blog',{blog:blogs})
+        }
+    })
+})
+router.get('/pumpkinflair',function(req,res){
+    res.render('pumpkinflair')
+})
+router.get('/macaroonsBlooms',function(req,res){
+    res.render('macaroonsBlooms')
+})
+router.get('/whiskyaficionados',function(req,res){
+    res.render('whiskyaficionados')
+})
 /* VENUES creates session venues */
 router.post('/venues', function(req, res) {
     if (req.session.search && req.session.search.length > 0 && req.session.pagetoken === "") {
@@ -92,13 +111,21 @@ router.post('/venues', function(req, res) {
                     .then(
                         (function(v){
                             return function(obj2) {
-                                console.log('venue:', v);
                                 return {
                                     placeId: v,
                                     name: obj2.result.name,
                                     address: obj2.result.formatted_address,
                                     phone: obj2.result.formatted_phone_number,
-                                    photos: obj2.result.photos,
+                                    photo1: obj2.result.photos[0] ? obj2.result.photos[0].photo_reference : "",
+                                    photo2: obj2.result.photos[1] ? obj2.result.photos[1].photo_reference : "",
+                                    photo3: obj2.result.photos[2] ? obj2.result.photos[2].photo_reference : "",
+                                    photo4: obj2.result.photos[3] ? obj2.result.photos[3].photo_reference : "",
+                                    photo5: obj2.result.photos[4] ? obj2.result.photos[4].photo_reference : "",
+                                    photo6: obj2.result.photos[5] ? obj2.result.photos[5].photo_reference : "",
+                                    photo7: obj2.result.photos[6] ? obj2.result.photos[6].photo_reference : "",
+                                    photo8: obj2.result.photos[7] ? obj2.result.photos[7].photo_reference : "",
+                                    photo9: obj2.result.photos[8] ? obj2.result.photos[8].photo_reference : "",
+                                    photo10: obj2.result.photos[9] ? obj2.result.photos[9].photo_reference : "",
                                     rating: obj2.result.rating,
                                     lat: obj2.result.geometry.location.lat,
                                     long: obj2.result.geometry.location.lng,
@@ -147,6 +174,7 @@ router.post('/createMsg',function(req,res){
     res.send('OK')
 })
 
+
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
 // router.use(function(req, res, next) {
@@ -174,13 +202,50 @@ router.post('/newSearch', function(req, res) {
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
-router.get('/venue', function(req, res) {
-    var venueName = req.query.name;
-    var address = req.query.address;
-    req.session.search.forEach(venue => {
-        if (venue.name === venueName && venue.address === address) {
-            res.render('venue', {venue});
-        }
+router.post('/venue', function(req, res) {
+    console.log('here Photo1',req.body.photo1)
+    res.render('venue',{
+        placeid: req.body.placeid,
+        name: req.query.name, //
+        address: req.query.address,
+        phone: req.body.phone,
+        photo1: req.body.photo1
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo2: req.body.photo2
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo3: req.body.photo3
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo4: req.body.photo4
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo5: req.body.photo5
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo6: req.body.photo6
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo7: req.body.photo7
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo8: req.body.photo8
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo9: req.body.photo9
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        photo10: req.body.photo10
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
+        : '',
+        rating: req.body.rating,
+        lat: req.body.lat,
+        lng: req.body.lng,
+        hours: req.body.hours.split(','),
+        url: req.body.url, //
+        website: req.body.website,
+        link: req.body.link //
     })
 })
 
@@ -333,7 +398,6 @@ router.get('/removeVenue', function(req, res) {
         })
     })
 })
-
 
 /* CONTACTLIST is the link to the questionnaire*/
 router.get('/contactlist', function(req, res, next) {
