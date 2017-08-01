@@ -21,6 +21,7 @@ router.get('/', function(req, res, next) {
     req.session.search = req.session.search || [];
     if (req.session.search.length > 0) {
         Event.find({eventOwner: req.user._id})
+            .populate('vEvent')
             .exec(function(err,ocassions){
         // assumption, i have req.query.placeId
             var temp = JSON.parse(JSON.stringify(req.session.search));
@@ -329,13 +330,38 @@ router.post('/addEvent',function(req,res){
                     console.log("Error saving the new venue",err);
                 } else {
                     console.log("Successfully saved the venue")
-                    event.venue.push(newVen._id)
+                    event.vEvent.push(newVen._id)
                     event.save(function(err,savedE){
                         res.redirect('/');
                     })
                 }
             })
         }
+    })
+})
+
+router.post('/modifyEvent', function(req,res){
+    Event.findById(req.body.eventId)
+    .exec(function(err,event){
+        console.log('name', req.body.name);
+        console.log('date', req.body.date);
+        // (req.body.name) ? event.name=req.body.name : null
+        if(req.body.date) {
+            event.date= req.body.date
+        }
+        // (req.body.time) ? event.time= req.body.time : null
+        // (req.body.hours) ? event.hours= req.body.hours :null
+        // (req.body.guestCount) ? event.guestCount= req.body.guestCount : null
+        // (req.body.price) ? event.price= req.body.price : null
+        console.log('event is', event)
+        event.save(function(err,savedE){
+            if(err){
+                console.log('error saving event changes',err);
+            }else {
+                console.log('saved the event changes');
+                res.redirect('/events')
+            }
+        });
     })
 })
 
@@ -346,7 +372,7 @@ router.get('/addVenue',function(req,res){
     var placeId=req.query.placeId;
     var name=req.query.name;
     console.log('EVENTID',eventId)
-    console.log('VENUEID',venueId)
+    console.log('PLACEID',placeId)
     console.log('Name',name)
     //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
@@ -380,7 +406,7 @@ router.get('/addVenue',function(req,res){
                     if(err){
                         console.log('could not save venue Id to event',err);
                     } else {
-                        event.venue.push(newVen._id)
+                        event.vEvent.push(newVen._id)
                         event.save(function(err,savedE){
                             console.log('Saved venue Id to event',err);
                             res.redirect('/');
@@ -398,7 +424,7 @@ router.get('/addVenue',function(req,res){
 /* SHOW all EVENTS related to that particular user*/
 router.get('/events', function(req, res) {
     Event.find({eventOwner:req.user._id})
-    .populate('venue')
+    .populate('vEvent')
     .exec(function(err,events){
         res.render('events',{events: events})
     })
@@ -406,7 +432,7 @@ router.get('/events', function(req, res) {
 
 /* REMOVE a specific event from the database*/
 router.get('/removeEvent', function(req, res) {
-    var eventId= req.query.id;
+    var eventId= req.query.eventId;
     Event.findById(eventId)
     .exec(function(err, event){
         event.remove(function(err,event){
@@ -422,20 +448,17 @@ router.get('/removeEvent', function(req, res) {
 
 /* REMOVE a specific venue from an event*/
 router.get('/removeVenue', function(req, res) {
-    var venueid= req.query.venueid
-    var eventid=req.query.eventid
-    console.log('HERE', eventid)
-    console.log('HERE', venueid)
-    Event.findById(eventid)
+    var vEventId= req.query.vEventId
+    var eventId=req.query.eventid
+    Event.findById(eventId)
     .exec(function(err,event){
-        for (var i=0; i<event.venue.length; i++){
-            if(event.venue[i] == venueid){
-                //WHY is v still 7 in mongoose database?
-                event.venue.splice(i,1)
+        for (var i=0; i<event.vEvent.length; i++){
+            if(event.vEvent[i] == vEventId){
+                event.vEvent.splice(i,1)
             }
         }
         event.save(function(err,e){
-            VEvent.findById(venueid)
+            VEvent.findById(vEventId)
             .exec(function(err, venue){
                 venue.remove(function(err,venue){
                     if(err){

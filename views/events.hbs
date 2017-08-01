@@ -1,62 +1,61 @@
-<ul>
-  <li class="list-group-item">
-    <div class="container">
-      <!-- use hbs #each to loop through results. just writing html for one result -->
-      <a class="btn" name="button" href="/">Back to All Venues</a>
-      <ul class="list-group">
-        {{#each events}}
-        <li class="list-group-item">
-          <div class="container">
-            <div class="row">
-              <div class="col l8 s12">
-                <h3>{{this.name}}
-                  <a href="/removeEvent?id={{this._id}}">
-                      <button class="btn" type="submit" name="button">Remove Event</button>
-                  </a></h3>
-                {{#each this.venue}}
+<div class="row bg5 hero-image">
+    <div class="col-sm-12 text-center hero-text ">
+    <h2 class= "text-white">My Events</h2>
+    <h5 class="text-white">Celebrate everything until further notice</h5>
+    </div>
+</div>
+
+<a class="btn" name="button" href="/">Back to All Venues</a>
+    <div class="row pl-4 pad-top">
+    {{#each events}}
+            <div class="col-sm-2 offset-1 section-light pt-3">
+                <form class="form mx-auto" method="post" action="/modifyEvent">
+                    <input type="text" class="form-control" name="name" value="{{this.name}}" required>
+                  <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
+                  <input type="date" class="form-control datepicker" name="date" value="{{this.date}}" data-provide="datepicker" data-date-startdate="0" >
+                  <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="Start Time" >
+                  <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Number of Hours" >
+                  <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Guest Count" >
+                  <select class="form-control" name="price" >
+                        <option id="choosePrice" value="{{this.price}}" disabled selected>Choose Your Price Type</option>
+                        <option>Open Bar</option>
+                        <option>Minimum Spend</option>
+                  </select>
+                  <button class="btn-primary" type="submit" class="inline">Modify Event</button>
+                 </form>
+                    <a href="/removeEvent?eventId={{this._id}}">
+                        <button class="btn-yellow" type="submit" class="inline">Remove Event</button>
+                    </a>
+            </div>
+            <div class="col-sm-2 pad-top">
+                {{#each this.vEvent}}
                     <p>{{this.name}}
-                    <a href="/removeVenue?venueid={{this._id}}&eventid={{../this._id}}">
-                        <button class="btn" type="submit" name="button">X</button>
+                    <a href="/removeVenue?vEventId={{this._id}}&eventid={{../this._id}}">
+                        <button class="btn-yellow" type="submit" name="removeVEvent">x</button>
                     </a></p>
                 {{/each}}
-              </div>
-              <div class="col l4 s12">
-                <ul>
-                  <li><b>Date: </b>{{this.date}}</li>
-                  <li><b>Time:</b> {{this.time}} </li>
-                  <li><b>Hour(s):</b> {{this.hours}} </li>
-                  <li><b>Guest Count:</b> {{this.guestCount}} </li>
-                  <li><b>Price:</b> {{this.price}}</li>
-                </ul>
-              </div>
             </div>
-          </div>
 
-          <!-- Modal to pick event -->
-         <div id="viewVenues" class="modal" style ={{this.modal}}>
-           <div class="modal-content">
-             <h3>Modify Event Details</h3>
-             <form action="/modifyEvent?id={{this._id}}" method="post">
-               <input type=text name=event placeholder="You event here">
-               <input type=date name=date placeholder="You event here">
-               <input type=Number name=time placeholder="What time will it start?">
-               <input type=Number name=hours placeholder="How many hours would you like to reserve?">
-               <input type=Number name=guestCount placeholder="How many guests will you be inviting?">
-               <select name="price">
-                   <option id="choosePrice" value="" disabled selected>Choose Your Price Type</option>
-                   <option>Open Bar</option>
-                   <option>Minimum Spend</option>
-                 </select>
-               <button class="btn" type="submit" name="button"> Submit</button>
-             </form>
-             <span id="closeMod" class="close">&times;</span>
-           </div>
-         </div>
-
-        </li>
-        {{/each}}
-      </ul>
-        <a class="btn" name="button" href="/">Back to All Venues</a>
+        <!-- Modal to pick event -->
+        <div id="viewVenues" class="modal" style ={{this.modal}}>
+            <div class="modal-content">
+                <h3 class="section-heading pad-top pl-4">Modify Event Details</h3>
+                <form action="/modifyEvent?eventId={{this._id}}" method="post">
+                    <input type=text name=name placeholder="Your event name">
+                    <input type=date name=date placeholder="Your event date">
+                    <input type=Number name=time placeholder="What time will it start?">
+                    <input type=Number name=hours placeholder="How many hours would you like to reserve?">
+                    <input type=Number name=guestCount placeholder="How many guests are you expecting?">
+                    <select name="price">
+                        <option id="choosePrice" value="" disabled selected>Choose Your Price Type</option>
+                        <option>Open Bar</option>
+                        <option>Minimum Spend</option>
+                    </select>
+                    <button class="btn" type="submit" name="button">Submit</button>
+                </form>
+                <span id="closeMod" class="close">&times;</span>
+            </div>
+        </div>
+    {{/each}}
     </div>
-  </li>
-</ul>
+<a class="btn" name="button" href="/">Back to All Venues</a>

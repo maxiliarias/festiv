@@ -45,7 +45,9 @@ var helper = {
                         '-hours-':req.body.hours,
                     },
                     custom_args: {
-                        "venueid":match._id
+                        "vEventid": venue._id,
+                        "vDataid": match._id
+
                     }
                 }],
                 from: {
