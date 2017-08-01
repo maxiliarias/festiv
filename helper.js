@@ -32,11 +32,11 @@ var helper = {
         return [e1, e2]
         })
     },
-    sendMail: function(req, venue){
+    sendMail: function(req, match, venue){
         var b = {
                 personalizations: [{
                     'substitutions': {
-                        '-businessName-':venue.name,
+                        '-businessName-':match.name,
                         '-fname-':req.user.fname,
                         '-date-':req.body.date,
                         '-starttime-':req.body.starttime,
@@ -45,7 +45,7 @@ var helper = {
                         '-hours-':req.body.hours,
                     },
                     custom_args: {
-                        "venueid":venue._id
+                        "venueid":match._id
                     }
                 }],
                 from: {
@@ -59,14 +59,14 @@ var helper = {
                 template_id: process.env.TEMPLATE_ID_QUOTE
             }
 
-        if(venue.email[1]){
-            b.personalizations[0].to = [{email: venue.email[0]}]
-            b.personalizations[0].cc = [{email: venue.email[1]}]
-        } else if (venue.email[0]){
-            b.personalizations[0].to = [{email: venue.email[0]}]
+        if(match.email[1]){
+            b.personalizations[0].to = [{email: match.email[0]}]
+            b.personalizations[0].cc = [{email: match.email[1]}]
+        } else if (match.email[0]){
+            b.personalizations[0].to = [{email: match.email[0]}]
         } else {
             b.personalizations[0].to=[{email: 'maxiliarias@gmail.com'}]
-            b.personalizations[0].substitutions['-placeid-']= venue.placeId
+            b.personalizations[0].substitutions['-placeid-']= match.placeId
             b.template_id= process.env.TEMPLATE_ID_NO_EMAIL
         }
 

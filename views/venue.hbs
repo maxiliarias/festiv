@@ -32,9 +32,10 @@
             </div>
             <div class="col-sm-8">
                 <h2 class="section-heading text-blue text-left">{{this.name}}</h2>
+                <h3 class="section-subheading text-muted">{{this.company.twitter.bio}}</h2>
                 <div class="row">
                     <div class="col-sm-2">
-                        <span class="fa fa-star" aria-hidden="true"><p class="inline">{{this.rating}} Rating</p></span>
+                        <span class="fa fa-star" aria-hidden="true"><p class="inline">{{this.rating}}/5.0 Rating</p></span>
                     </div>
                     <div class="col-sm-5">
                         <span class="fa fa-link" aria-hidden="true">
@@ -44,6 +45,7 @@
                         <span class="fa fa-phone" aria-hidden="true"><p class="inline"> {{this.phone}} </p></span>
                     </div>
                 </div>
+                <p class="pad-top">{{this.company.description}} </p>
             </div>
         </div>
     </div>

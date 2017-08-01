@@ -1,12 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var models = require('../models');
-var {Blog, User, Event, Venue, Chat } = require('../models');
+var {Blog, User, Event,VEvent, VData, Chat } = require('../models');
 var {helper} = require('../helper');
 var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
+var clearbit = require('clearbit')(process.env.CLEARBIT);
 var multer  = require('multer');
 var upload = multer();
 const simpleParser = require('mailparser').simpleParser;
@@ -19,11 +20,8 @@ router.get('/', function(req, res, next) {
 
     req.session.search = req.session.search || [];
     if (req.session.search.length > 0) {
-        var events;
         Event.find({eventOwner: req.user._id})
-            .populate('venue')
             .exec(function(err,ocassions){
-            events = ocassions
         // assumption, i have req.query.placeId
             var temp = JSON.parse(JSON.stringify(req.session.search));
             temp.forEach(function(venue) {
@@ -33,10 +31,11 @@ router.get('/', function(req, res, next) {
                     venue.modal = "";
                 }
             });
+            console.log('my events', ocassions);
             res.render('list', {
                 venues: temp,
                 googleApi: process.env.GOOGLEPLACES,
-                events: events
+                events: ocassions
             })
         })
     } else {
@@ -93,10 +92,10 @@ router.post('/venues', function(req, res) {
             long = response[0].longitude;
         })
         .then(function() {
-            let radius = parseInt(req.body.radius) * 1609.34;
+            let radius = (parseInt(req.body.radius) * 1609.34).toString();
             let type = req.body.type.split(" ").join("_").toLowerCase();
 
-            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${long}&radius=${radius}&keyword=${type}&minprice=3`+ (req.session.pagetoken ? `&pagetoken=${req.session.pagetoken}` : ``))
+            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${long}&rankby=distance&keyword=${type}&minprice=3`+ (req.session.pagetoken ? `&pagetoken=${req.session.pagetoken}` : ``))
             .then(resp => JSON.parse(resp))
             .then(obj => {
                 obj.next_page_token ? req.session.pagetoken = obj.next_page_token : ""
@@ -104,41 +103,57 @@ router.post('/venues', function(req, res) {
                     placeId.push(item.place_id)
                 });
                 for (var i = 0; i < placeId.length; i++) {
-                    var venueId= placeId[i]
-                    console.log('venueId are', venueId)
-                    venues.push(request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
+                    var venueId = placeId[i]
+                    venues.push(
+                    request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
                     .then(resp => JSON.parse(resp))
                     .then(
                         (function(v){
                             return function(obj2) {
-                                return {
-                                    placeId: v,
-                                    name: obj2.result.name,
-                                    address: obj2.result.formatted_address,
-                                    phone: obj2.result.formatted_phone_number,
-                                    photo1: obj2.result.photos[0] ? obj2.result.photos[0].photo_reference : "",
-                                    photo2: obj2.result.photos[1] ? obj2.result.photos[1].photo_reference : "",
-                                    photo3: obj2.result.photos[2] ? obj2.result.photos[2].photo_reference : "",
-                                    photo4: obj2.result.photos[3] ? obj2.result.photos[3].photo_reference : "",
-                                    photo5: obj2.result.photos[4] ? obj2.result.photos[4].photo_reference : "",
-                                    photo6: obj2.result.photos[5] ? obj2.result.photos[5].photo_reference : "",
-                                    photo7: obj2.result.photos[6] ? obj2.result.photos[6].photo_reference : "",
-                                    photo8: obj2.result.photos[7] ? obj2.result.photos[7].photo_reference : "",
-                                    photo9: obj2.result.photos[8] ? obj2.result.photos[8].photo_reference : "",
-                                    photo10: obj2.result.photos[9] ? obj2.result.photos[9].photo_reference : "",
-                                    rating: obj2.result.rating,
-                                    lat: obj2.result.geometry.location.lat,
-                                    long: obj2.result.geometry.location.lng,
-                                    hours: obj2.result.opening_hours
-                                    ? obj2.result.opening_hours.weekday_text
-                                    : ["Opening Hours Unavailable"],
-                                    type: obj2.result.types,
-                                    url: obj2.result.url,
-                                    website: obj2.result.website,
-                                    link: obj2.result.photos
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES
-                                    : ''
-                                }
+                                return VData.find()
+                                .then(function(storedVenues){
+                                    for (var j=0; j< storedVenues.length; j++){
+                                        if(storedVenues[j].placeId === v){
+                                            return true;
+                                        }
+                                    }
+                                return false
+                                })
+                                .then(function(exists){
+                                    if(!exists){
+                                        var newVen = new VData({
+                                            placeId: v,
+                                            name: obj2.result.name,
+                                            domain: obj2.result.website
+                                        })
+                                        newVen.save();
+                                    }
+                                    return ({
+                                        placeId: v,
+                                        name: obj2.result.name,
+                                        address: obj2.result.formatted_address,
+                                        phone: obj2.result.formatted_phone_number,
+                                        photo1: obj2.result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES : '',
+                                        photo2: obj2.result.photos ?   (obj2.result.photos[1] ? obj2.result.photos[1].photo_reference : "") : "",
+                                        photo3: obj2.result.photos ?   (obj2.result.photos[2] ? obj2.result.photos[2].photo_reference : "") : "",
+                                        photo4: obj2.result.photos ?   (obj2.result.photos[3] ? obj2.result.photos[3].photo_reference : "") : "",
+                                        photo5: obj2.result.photos ?   (obj2.result.photos[4] ? obj2.result.photos[4].photo_reference : "") : "",
+                                        photo6: obj2.result.photos ?   (obj2.result.photos[5] ? obj2.result.photos[5].photo_reference : "") : "",
+                                        photo7: obj2.result.photos ?   (obj2.result.photos[6] ? obj2.result.photos[6].photo_reference : "") : "",
+                                        photo8: obj2.result.photos ?   (obj2.result.photos[7] ? obj2.result.photos[7].photo_reference : "") : "",
+                                        photo9: obj2.result.photos ?   (obj2.result.photos[8] ? obj2.result.photos[8].photo_reference : "") : "",
+                                        photo10:obj2.result.photos ?   (obj2.result.photos[9] ? obj2.result.photos[9].photo_reference : "") : "",
+                                        rating: obj2.result.rating,
+                                        lat: obj2.result.geometry.location.lat,
+                                        long: obj2.result.geometry.location.lng,
+                                        hours: obj2.result.opening_hours
+                                        ? obj2.result.opening_hours.weekday_text
+                                        : ["Opening Hours Unavailable"],
+                                        type: obj2.result.types,
+                                        url: obj2.result.url,
+                                        website: obj2.result.website
+                                    })
+                                })
                             }
                         })(venueId)
                     ))
@@ -150,7 +165,6 @@ router.post('/venues', function(req, res) {
                 var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
 
                 req.session.search = filteredVenues;
-                console.log('HEREEE', filteredVenues);
                 res.render('list', {
                     venues: filteredVenues,
                     googleApi: process.env.GOOGLEPLACES
@@ -208,50 +222,84 @@ router.post('/venue', function(req, res) {
             console.log('error finding events in venue profile page',err);
         } else {
             console.log('found events in venue profile!');
-            res.render('venue',{
-                events: events,
-                placeid: req.body.placeid,
-                name: req.query.name, //
-                address: req.query.address,
-                phone: req.body.phone,
-                photo1: req.body.photo1
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo2: req.body.photo2
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo3: req.body.photo3
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo4: req.body.photo4
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo5: req.body.photo5
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo6: req.body.photo6
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo7: req.body.photo7
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo8: req.body.photo8
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo9: req.body.photo9
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                photo10: req.body.photo10
-                ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
-                : '',
-                rating: req.body.rating,
-                lat: req.body.lat,
-                lng: req.body.lng,
-                hours: req.body.hours.split(','),
-                url: req.body.url, //
-                website: req.body.website,
-                link: req.body.link //
-            })
+            clearbit.Company.find({domain: req.body.website})
+              .then(function (company) {
+                console.log('inside clearbit ', company);
+                VData.findById(req.body.placeId, function(err, foundVdata){
+                    if(err){
+                        console.log('err finding vData',err);
+                    } else {
+                        console.log('found vData, updating');
+                        foundVdata.facebook = company.facebook.handle || ""
+                        foundVdata.twitter = company.twitter.handle || ""
+                        foundVdata.description= company.description || ""
+                        foundVdata.metaD= company.site.metaDescription || ""
+                        foundVdata.twitterBio= company.twitter.Bio || ""
+
+                        foundVdata.save(function(err,savedVdata){
+                            if(err){
+                                console.log('error saving Vdata after update');
+                            } else {
+                                console.log('Successfully saved vData, now rendering venues.hbs');
+                                res.render('venue',{
+                                    company: company,
+                                    events: events,
+                                    placeId: req.body.placeId,
+                                    name: req.query.name,
+                                    address: req.query.address,
+                                    phone: req.body.phone,
+                                    photo1: req.body.photo1
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo2: req.body.photo2
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo3: req.body.photo3
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo4: req.body.photo4
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo5: req.body.photo5
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo6: req.body.photo6
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo7: req.body.photo7
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo8: req.body.photo8
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo9: req.body.photo9
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    photo10: req.body.photo10
+                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
+                                    : '',
+                                    rating: req.body.rating,
+                                    lat: req.body.lat,
+                                    lng: req.body.lng,
+                                    hours: req.body.hours.split(','),
+                                    url: req.body.url, //
+                                    website: req.body.website
+                                })
+                            }
+                        })
+                    }
+                })
+              })
+              .catch(clearbit.Company.QueuedError, function (err) {
+                // Company lookup queued - try again later
+              })
+              .catch(clearbit.Company.NotFoundError, function (err) {
+                // Company could not be found
+                console.log(err);
+              })
+              .catch(function (err) {
+                console.error(err);
+              });
         }
     })
 })
@@ -260,7 +308,7 @@ router.post('/venue', function(req, res) {
 router.post('/addEvent',function(req,res){
     console.log('user id is', typeof req.user._id);
     console.log('name',req.body.event);
-    console.log('venue id', typeof req.query.placeId);
+    console.log('placeId', typeof req.query.placeId);
     var event = new Event({
         eventOwner: req.user._id,
         name: req.body.event,
@@ -271,10 +319,9 @@ router.post('/addEvent',function(req,res){
             console.log("Error saving the new event", err)
         } else {
             console.log("Successfully saved the event")
-            var newVenue = new Venue ({
+            var newVenue = new VEvent ({
                 venueOption: event._id,
                 placeId:req.query.placeId,
-                domain: req.body.domain,
                 name: req.body.name
             })
             newVenue.save(function(err,newVen){
@@ -296,22 +343,20 @@ router.post('/addEvent',function(req,res){
 router.get('/addVenue',function(req,res){
     //Make this a toggle where it adds or removes the venue
     var eventId=req.query.eventId;
-    var venueId=req.query.venueId;
-    var domain=req.query.dom;
+    var placeId=req.query.placeId;
     var name=req.query.name;
     console.log('EVENTID',eventId)
     console.log('VENUEID',venueId)
-    console.log('DOMAIN',domain);
     console.log('Name',name)
     //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
-    Venue.find({venueOption: eventId})
+    VEvent.find({venueOption: eventId})
     .then(function(venues) {
         if (!venues || venues.length <= 0) {
             return false;
         }
         for(var i = 0; i < venues.length; i++) {
-            if (venues[i].placeId === venueId) {
+            if (venues[i].placeId === placeId) {
                 // maybe here remove the venue if its a toggle
                 return true;
             }
@@ -320,10 +365,9 @@ router.get('/addVenue',function(req,res){
     })
     .then(function(exists) {
         if (!exists) {
-            var newVenue = new Venue({
+            var newVenue = new VEvent({
                 venueOption:eventId,
-                placeId:venueId,
-                domain:domain,
+                placeId:placeId,
                 name:name
             })
             newVenue.save(function(err, newVen) {
@@ -391,7 +435,7 @@ router.get('/removeVenue', function(req, res) {
             }
         }
         event.save(function(err,e){
-            Venue.findById(venueid)
+            VEvent.findById(venueid)
             .exec(function(err, venue){
                 venue.remove(function(err,venue){
                     if(err){
@@ -428,42 +472,46 @@ router.post('/contactlist', function(req, res) {
                 console.log('Error saving event paramaters', err );
             } else {
                 console.log('Successfully saved event parameters');
-                Venue.find({venueOption: eventId},function(err,venues){
+                VEvent.find({venueOption: eventId},function(err,venues){
                     console.log('VENUES FOR THAT EVENT',venues)
                     venues.forEach(venue => {
-                        var web = venue.domain
-                        var b;
-                        console.log('THE VENUE',venue)
-                        console.log('WEBSITE', web);
-                        // Check database to see if there's an email for that venue already
-                        //if not, retrieve email using hunter
-                        if(!venue.email){
-                            // helper.collectEmail(web)
-                            // .then((emails) => {
-                            //     console.log('RETRIEVED EMAILS', emails)
-                            //     //STORE THE EMAILS IN THE DATABASE
-                            //
-                            //     if (emails[0]){
-                            //         venue.email.push(emails[0])
-                            //     }
-                            //     if(emails[1]){
-                            //         venue.email.push(emails[1])
-                            //     }
-                            //
-                            //     venue.save(function(err,savedV){
-                            //         if(err){
-                            //             console.log('error saving venue email', err)
-                            //         } else {
-                            //             console.log('Successfully saved venue w emails')
-                            //             helper.sendMail(req, venue)
-                            //         }
-                            //     })
-                            // })
-                            console.log('bananas')
-                        }
-                        else{
-                            helper.sendMail(req, venue)
-                        }
+                        VData.find({placeId:venue.placeId}, function(err,matches){
+                            matches.forEach(match => {
+                                var web = match.domain
+                                var b;
+                                console.log('THE VENUE',venue)
+                                console.log('WEBSITE', web);
+                                // Check database to see if there's an email for that venue already
+                                //if not, retrieve email using hunter
+                                if(!match.email){
+                                    // helper.collectEmail(web)
+                                    // .then((emails) => {
+                                    //     console.log('RETRIEVED EMAILS', emails)
+                                    //     //STORE THE EMAILS IN THE DATABASE
+                                    //
+                                    //     if (emails[0]){
+                                    //         match.email.push(emails[0])
+                                    //     }
+                                    //     if(emails[1]){
+                                    //         match.email.push(emails[1])
+                                    //     }
+                                    //
+                                    //     match.save(function(err,savedV){
+                                    //         if(err){
+                                    //             console.log('error saving venue email', err)
+                                    //         } else {
+                                    //             console.log('Successfully saved venue w emails')
+                                    //             helper.sendMail(req, match, venue)
+                                    //         }
+                                    //     })
+                                    // })
+                                    console.log('bananas')
+                                }
+                                else{
+                                    helper.sendMail(req, match, venue)
+                                }
+                            })
+                        })
                     })
                 })
                 res.redirect('/contactlist')
@@ -482,7 +530,6 @@ router.post('/messages', upload.array(), function(req,res){
         var atSign= mail.to.text.indexOf("@")
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('MANGO',mail.to.text.slice(idSpot,atSign))
-
 
         var chat = new Chat({
             chatOwner: mail.to.text.slice(idSpot,atSign),

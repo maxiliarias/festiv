@@ -23,13 +23,23 @@ var eventSchema = mongoose.Schema({
     venue: [{ type: Schema.Types.ObjectId, ref: 'Venue' }]//pulls in all the venue ids related to this specific event of a user
 })
 
-var venueSchema = mongoose.Schema({
+var vEventSchema = mongoose.Schema({
     venueOption:{type: Schema.Types.ObjectId, ref: 'Event' },
+    placeId: String,
+    name: String,
+    chat:[{ type: Schema.Types.ObjectId, ref: 'Chat' }]
+})
+
+var vDataSchema = mongoose.Schema({
     placeId: String,
     name: String,
     domain: String,
     email: Array,
-    chat:[{ type: Schema.Types.ObjectId, ref: 'Chat' }]
+    description: String,
+    metaD: String,
+    twitterBio: String,
+    twitter: String,
+    facebook: String,
 })
 
 var chatSchema = mongoose.Schema({
@@ -51,13 +61,15 @@ var blogSchema = mongoose.Schema({
 Blog = mongoose.model('Blog', blogSchema);
 User = mongoose.model('User', userSchema);
 Event= mongoose.model('Event', eventSchema);
-Venue = mongoose.model('Venue',venueSchema);
+vEvent = mongoose.model('vEvent',vEventSchema);
+vData = mongoose.model('vData',vDataSchema);
 Chat= mongoose.model('Chat',chatSchema);
 
 module.exports = {
   Blog: Blog,
   User: User,
   Event: Event,
-  Venue: Venue,
+  VEvent: vEvent,
+  VData: vData,
   Chat: Chat
 };
