@@ -1,7 +1,37 @@
-<h1>Your Inbox </h1>
+<div class="row bg6 hero-image">
+    <div class="col-sm-12 text-center hero-text ">
+    <h2 class= "text-white"> Inbox </h2>
+    <h5 class="text-white"> review messages, bids and history</h5>
+    </div>
+</div>
 
-{{#each message}}
-    <p><b>From:</b> {{this.from}}</p>
-    <p><b>Date:</b> {{this.date}}</p>
-    <p><b>Content:</b></br> {{{this.content}}}</p>
-{{/each}}
+<div class="row pl-4 pad-top mx-auto">
+    <div class="col-sm-4 ml-4 mb-4 section-primary pad-top">
+        {{#each events}}
+            <h6 class="text-white"><b>{{this.name}}</b></h6>
+            {{#each this.vEvent}}
+                <p class="text-white pl-2">
+                    <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
+                    {{#if this.chat}}
+                        <p> {{this.chat}} here</p>
+                        <span class="fa fa-heart" aria-hidden="true"></span>
+                    {{/if}}
+                </p>
+            {{/each}}
+        {{/each}}
+    </div>
+    <div class="col-sm 8 mr-4 mb-4 section-light mx-auto">
+        {{#if message}}
+            <h6 class="text-blue"> Conversation History </h6>
+            {{#each message}}
+                <div class="p-2 section-blue">
+                    <p><b>From:</b> {{this.from}}</p>
+                    <p><b>Date:</b> {{this.date}}</p>
+                    <p></br> {{{this.content}}}</p>
+                </div>
+            {{/each}}
+        {{else}}
+            <h6 class="pad-top text-center text-blue"><b>Click on a Venue to See Your Conversation History</b></h6>
+        {{/if}}
+    </div>
+</div>

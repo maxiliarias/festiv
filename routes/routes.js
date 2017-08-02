@@ -46,7 +46,7 @@ router.get('/', function(req, res, next) {
     }
 });
 
-/* Blog Routes*/
+/* Blog Routes public*/
 router.get('/blog',function(req,res){
     Blog.find(function(err,blogs){
         if(err){
@@ -67,7 +67,7 @@ router.get('/whiskyaficionados',function(req,res){
 })
 /* VENUES creates session venues */
 router.post('/venues', function(req, res) {
-    if (req.session.search && req.session.search.length > 0 && req.session.pagetoken === "") {
+    if (req.session.search && req.session.search.length > 0 && req.session.pagetoken.length === 0) {
         res.render('list', {
             venues: req.session.search,
             googleApi: process.env.GOOGLEPLACES
@@ -82,24 +82,45 @@ router.post('/venues', function(req, res) {
         let placeId= [];
         let venues = [];
         let lat;
-        let long;
+        let lng;
 
         //need this dummy address and type for the next page button
-        req.body.location = req.body.location || "310 West 99 Street New York,NY 10025";
+        req.session.location = req.body.location || req.session.location;
         req.body.type = req.body.type || " "
-        geocoder.geocode(req.body.location)
+        geocoder.geocode(req.session.location)
         .then(function(response) {
-            lat = response[0].latitude;
-            long = response[0].longitude;
+            console.log('outside if', req.query.num);
+
+            // if(req.query.num === "0"){
+            //     console.log('inside if', req.query.num);
+            //     req.session.lat = response[0].latitude || req.session.lat;
+            //     req.session.long = response[0].longitude || req.session.long;
+            // }
+            lat= response[0].latitude
+            lng= response[0].longitude
+            console.log('LAT REQ.SESSION', lat)
+            console.log('LAT response', response[0].latitude)
         })
         .then(function() {
-            let radius = (parseInt(req.body.radius) * 1609.34).toString();
-            let type = req.body.type.split(" ").join("_").toLowerCase();
+            // let radius = (parseInt(req.body.radius) * 1609.34).toString();
+            req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
+            let keyword= req.session.keyword
+            req.session.pagetoken= req.session.pagetoken || [""];
 
-            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${long}&rankby=distance&keyword=${type}&minprice=3`+ (req.session.pagetoken ? `&pagetoken=${req.session.pagetoken}` : ``))
+            console.log('APPLES', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
+            console.log('LAT IS', lat)
+            console.log('LONG IS', lng);
+            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
             .then(resp => JSON.parse(resp))
             .then(obj => {
-                obj.next_page_token ? req.session.pagetoken = obj.next_page_token : ""
+                if(obj.next_page_token){
+                    console.log('inside FIRST PAGE IF')
+                    if(req.session.pagetoken.length<= 3){
+                        console.log('inside Second PAGE IF')
+                        req.session.pagetoken.push(obj.next_page_token)
+                    }
+                }
+                console.log('page token is', req.session.pagetoken);
                 obj.results.forEach(item => {
                     placeId.push(item.place_id)
                 });
@@ -115,6 +136,7 @@ router.post('/venues', function(req, res) {
                                 .then(function(storedVenues){
                                     for (var j=0; j< storedVenues.length; j++){
                                         if(storedVenues[j].placeId === v){
+                                            console.log('found vdata');
                                             return true;
                                         }
                                     }
@@ -162,12 +184,15 @@ router.post('/venues', function(req, res) {
                 return Promise.all(venues)
             })
             .then(arrayOfResults => {
+                console.log('array of results', arrayOfResults[0].name);
                 var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
                 var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
-
-                req.session.search = filteredVenues;
+                var filteredVenues2 = filteredVenues.filter(place => {return place.photo5 !== ""})
+                console.log(filteredVenues.length-filteredVenues2.length, ' # of venues removed')
+                req.session.search = filteredVenues2;
+                console.log('in my session', req.session.search[0].name);
                 res.render('list', {
-                    venues: filteredVenues,
+                    venues: filteredVenues2,
                     googleApi: process.env.GOOGLEPLACES
                 });
             })
@@ -189,24 +214,14 @@ router.post('/createMsg',function(req,res){
     res.send('OK')
 })
 
-
-///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
-
-// router.use(function(req, res, next) {
-//     if (!req.user) {
-//         res.redirect('/login');
-//     } else {
-//         return next();
-//     }
-// });
-
-//////////////////////////////// PRIVATE ROUTES ////////////////////////////////
-// Only logged in users can see these routes
-
 /* REFRESH allows you to restart your search */
 router.get('/refresh', function(req, res) {
+    console.log('session',res.session);
     delete req.session.search;
     delete req.session.pagetoken;
+    console.log('keyword',res.session);
+    // delete req.session.lat;
+    // delete req.session.long;
     res.redirect('/');
 })
 
@@ -217,6 +232,7 @@ router.post('/newSearch', function(req, res) {
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
+/* still can be public*/
 router.post('/venue', function(req, res) {
     Event.find({eventOwner: req.user._id},function(err,events){
         if(err){
@@ -226,17 +242,17 @@ router.post('/venue', function(req, res) {
             clearbit.Company.find({domain: req.body.website})
               .then(function (company) {
                 console.log('inside clearbit ', company);
-                VData.findById(req.body.placeId, function(err, foundVdata){
+                VData.findOne({placeId: req.body.placeId}, function(err, foundVdata){
                     if(err){
                         console.log('err finding vData',err);
                     } else {
-                        console.log('found vData, updating');
+
                         foundVdata.facebook = company.facebook.handle || ""
                         foundVdata.twitter = company.twitter.handle || ""
                         foundVdata.description= company.description || ""
                         foundVdata.metaD= company.site.metaDescription || ""
                         foundVdata.twitterBio= company.twitter.Bio || ""
-
+                        console.log('found vData, updating', foundVdata);
                         foundVdata.save(function(err,savedVdata){
                             if(err){
                                 console.log('error saving Vdata after update');
@@ -249,9 +265,7 @@ router.post('/venue', function(req, res) {
                                     name: req.query.name,
                                     address: req.query.address,
                                     phone: req.body.phone,
-                                    photo1: req.body.photo1
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo1 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
+                                    photo1: req.body.photo1,
                                     photo2: req.body.photo2
                                     ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
                                     : '',
@@ -305,6 +319,21 @@ router.post('/venue', function(req, res) {
     })
 })
 
+
+
+///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
+
+router.use(function(req, res, next) {
+    if (!req.user) {
+        res.redirect('/login');
+    } else {
+        return next();
+    }
+});
+
+//////////////////////////////// PRIVATE ROUTES ////////////////////////////////
+// Only logged in users can see these routes
+
 /*Create a new event, makes a new venue, tags the venue to the event and saves to mongoose*/
 router.post('/addEvent',function(req,res){
     console.log('user id is', typeof req.user._id);
@@ -340,19 +369,19 @@ router.post('/addEvent',function(req,res){
     })
 })
 
+/*Modify event details*/
 router.post('/modifyEvent', function(req,res){
     Event.findById(req.body.eventId)
     .exec(function(err,event){
         console.log('name', req.body.name);
         console.log('date', req.body.date);
-        // (req.body.name) ? event.name=req.body.name : null
-        if(req.body.date) {
-            event.date= req.body.date
-        }
-        // (req.body.time) ? event.time= req.body.time : null
-        // (req.body.hours) ? event.hours= req.body.hours :null
-        // (req.body.guestCount) ? event.guestCount= req.body.guestCount : null
-        // (req.body.price) ? event.price= req.body.price : null
+        console.log('price', req.body.price);
+        (req.body.name) ? event.name=req.body.name : null;
+        (req.body.date) ? event.date= req.body.date: null;
+        (req.body.time) ? event.time= req.body.time : null;
+        (req.body.hours) ? event.hours= req.body.hours :null;
+        (req.body.guestCount) ? event.guestCount= req.body.guestCount : null;
+        (req.body.price) ? event.price= req.body.price : null;
         console.log('event is', event)
         event.save(function(err,savedE){
             if(err){
@@ -531,6 +560,7 @@ router.post('/contactlist', function(req, res) {
                                     console.log('bananas')
                                 }
                                 else{
+                                    console.log('MATCH IS', match)
                                     helper.sendMail(req, match, venue)
                                 }
                             })
@@ -553,35 +583,60 @@ router.post('/messages', upload.array(), function(req,res){
         var atSign= mail.to.text.indexOf("@")
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('MANGO',mail.to.text.slice(idSpot,atSign))
-
+        var venueId= mail.to.text.slice(idSpot,atSign)
         var chat = new Chat({
-            chatOwner: mail.to.text.slice(idSpot,atSign),
+            chatOwner: venueId,
             date: helper.formatDate(mail.date),
             from: mail.from.text,
             content: mail.text
         });
         console.log('BANANAS',chat)
-        chat.save(function(err, chat) {
+        chat.save(function(err, msg) {
             if(err){
                 console.log('Error saving the chat',err);
             } else {
                 console.log('saved the chat!');
-                res.status(200).end();
+                VEvent.findById(venueId)
+                .exec(function(err,venue){
+                    venue.chat.push(msg._id)
+                    venue.save(function(err,savedV){
+                        if(err){
+                            console.log('error saving venue w chat id', err);
+                        } else {
+                            console.log('saved the venue w chat id!')
+                            res.status(200).end();
+                        }
+                    })
+                })
             }
         })
     })
 })
 
-/*Render a page with all of the messages*/
+/*Render a page with the conversation for one venue*/
 router.get('/messages',function(req,res){
-    var venueId=req.query.venueId
-    Chat.find({chatOwner:venueId},function(err,msg){
-        if(err){
-            console.log('error find a chat with that venue id', err)
+    Event.find({eventOwner: req.user._id})
+    .populate('vEvent')
+    .exec(function(err,events){
+        var venueId=req.query.venueId
+        if(venueId){
+            Chat.find({chatOwner:venueId},function(err,msg){
+                if(err){
+                    console.log('error find a chat with that venue id', err)
+                } else {
+                    console.log('HI',msg);
+                    msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
+                    res.render('messages', {
+                        events: events,
+                        message: msg
+                    })
+                }
+            })
         } else {
-            console.log('HI',msg);
-            msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
-            res.render('messages', {message: msg })
+            console.log('events', events)
+            res.render('messages', {
+                events: events
+            })
         }
     })
 })

@@ -45,6 +45,15 @@ module.exports = function(passport) {
     failureRedirect: '/login'
   }));
 
+  //Sends the user to FB, to give us permission
+  router.get('/fb/login', passport.authenticate('facebook'))
+
+  //Upon giving permission, sends user back to this route
+  router.get('/fb/login/callback', passport.authenticate('facebook', {
+      successRedirect: '/',
+      failureRedirect: '/login'
+  }))
+
   // GET Logout page
   router.get('/logout', function(req, res) {
     req.logout();

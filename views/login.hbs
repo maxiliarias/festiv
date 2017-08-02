@@ -4,42 +4,15 @@
     <span class="sr-only">Error:</span> {{error}}
   </div>
 {{/if}}
-<div class="parallax-container valign-wrapper">
-  <div class="container">
-    <br><br>
-    <center>
-      <form id="form" method="post" action="/login">
-        <div class="divBox">
-          <input type='text' name="username" placeholder="Username" class="row center">
-        </div>
-        <div class="divBox" id="password">
-          <input name="password" type='password' placeholder="Password" class='row center'>
-        </div>
-        <div id="LoginBtn" class="row center">
-          <button class="btn waves-effect waves-light brown" type="submit">Submit<i class="material-icons right">send</i>
-          </button>
-        </div>
+<div class="row login">
+  <div class="col-sm-6 mx-auto p-4">
+      <form class="form text-right vertMid"method="post" action="/login">
+          <h3 class="text-center text-blue" >Login</h3>
+          <input type='text' name="username" placeholder="Username" class="form-control">
+          <input name="password" type='password' placeholder="Password" class='form-control'>
+          <a class="btn btn-yellow mt-3" href="/signup">Register</a>
+          <a class="btn btn-brightblue mt-3" href="/fb/login">Login with Facebook</a>
+           <button class="btn btn-primary mt-3" type="submit">Login</button>
       </form>
-      <a class="btn btn-primary" href="/signup">Register</a>
-    </center>
   </div>
-  <br><br>
-
-  <div class="parallax"><img src="../images/man-sunglasses-art-graffiti.jpg" alt="Unsplashed login background img"></div>
 </div>
-
-<!-- <form method="POST" style="max-width: 300px; margin: auto; margin-top: 50px; border: 0.5px solid gray; padding: 30px 30px 30px 30px">
-  <h3>Login</h3>
-  <div class="form-group">
-    <label>Username</label>
-    <input type="text" name="username" class="form-control">
-  </div>
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" name="password" class="form-control">
-  </div>
-  <div class="form-group">
-    <button class="btn btn-success">Login</button>
-    <a class="btn btn-primary" href="/signup">Register</a>
-  </div>
-</form> -->

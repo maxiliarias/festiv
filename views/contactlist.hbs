@@ -1,28 +1,27 @@
 <div class="row bg4 hero-image">
     <div class="col-sm-12 text-center hero-text ">
-    <h3 class="text-white">Contact List Details</h3>
-    <h5 class="text-white">Click, Click... Send!</h5>
+        <h3 class="text-white">Contact List Details</h3>
+        <h5 class="text-white">Click, Click... Send!</h5>
     </div>
 </div>
 <div class="row section-light pad-top">
-          <form class="form mx-auto" method="post" action="/contactlist">
-            <select class="form-control" name="eventId" required>
-                <option value="" disabled selected>Choose your event list</option>
-                {{#each events}}
-                    <option value={{this._id}}>{{this.name}}</option>
-                {{/each}}
-            </select>
-            <input type=hidden class="form-control" name='eventid' value={{this._id}} required>
-            <input type='text' class="form-control" name="guestCount" placeholder="Guest Count" required>
-            <input type="date" class="form-control datepicker" name="date" id="dateBox" data-provide="datepicker" data-date-startdate="0" required>
-            <input type="text" class="form-control" name="starttime" placeholder="Start Time"required>
-            <input type='text' class="form-control" name="hours" placeholder="Number of Hours" required>
-            <select class="form-control" name="price" required>
-                  <option id="choosePrice" value="" disabled selected>Choose Your Price Type</option>
-                  <option>Open Bar</option>
-                  <option>Minimum Spend</option>
-            </select>
-            <button class="btn btn-primary" type="submit">Submit</button>
-          </form>
-        </div>
-  </div>
+  <form class="form mx-auto" method="post" action="/contactlist">
+    <select class="form-control" name="eventId" required>
+        <option value="" disabled selected>Choose your event list</option>
+        {{#each events}}
+            <option value={{this._id}}>{{this.name}}</option>
+        {{/each}}
+    </select>
+    <input type=hidden class="form-control" name='eventid' value={{this._id}} required>
+    <input type='text' class="form-control" name="guestCount" placeholder="Guest Count" required>
+    <input type="date" class="form-control datepicker" name="date" id="dateBox" data-provide="datepicker" data-date-startdate="0" required>
+    <input type="text" class="form-control" name="starttime" placeholder="Start Time"required>
+    <input type='text' class="form-control" name="hours" placeholder="Number of Hours" required>
+    <select class="form-control" name="price" required>
+          <option value="" disabled selected>Choose Your Price Type</option>
+          <option>Open Bar</option>
+          <option>Minimum Spend</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </form>
+</div>

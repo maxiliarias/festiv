@@ -7,8 +7,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
+var FacebookStrategy= require('passport-facebook');
 var mongoose = require('mongoose');
 var connect = process.env.MONGODB_URI;
+var {User} = require('./models.js');
 
 // var REQUIRED_ENV = "SECRET MONGODB_URI".split(" ");
 //
@@ -49,14 +51,51 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-  done(null, user._id);
+    console.log('USER!!!', user);
+    done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
-  models.User.findById(id, function(err, user) {
-    done(err, user);
-  });
+    console.log('id: ', id);
+    models.User.findById(id, function(err, user) {
+        done(null, user);
+    });
 });
+
+//FACEBOOK LOGIN
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET,
+    callbackURL: 'http://localhost:3000/fb/login/callback'
+},
+function(accessToken,refreshToken,profile,done){
+    console.log('returning from FACEBOOK', accessToken)
+    console.log('rtoken',refreshToken)
+    console.log('profile',profile)
+    User.findOne({fbid:profile.id}, function(err,user){
+        if(err){
+            console.log('error finding user in fb login', err);
+        } else if (!user){
+            var u = new User({
+                rtoken: refreshToken,
+                fbid: profile.id,
+                email: profile.email,
+                fname: profile.first_name,
+                lname: profile.last_name
+            });
+            u.save(function(err, user) {
+              if (err) {
+                console.log(err);
+                res.status(500).redirect('/register');
+                return;
+              }
+              done(null,u)
+            });
+        } else {
+            done(null,user)
+        }
+    })
+}));
 
 // passport strategy
 passport.use(new LocalStrategy(function(username, password, done) {

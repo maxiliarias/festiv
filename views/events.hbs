@@ -1,23 +1,22 @@
 <div class="row bg5 hero-image">
     <div class="col-sm-12 text-center hero-text ">
     <h2 class= "text-white">My Events</h2>
-    <h5 class="text-white">Celebrate everything until further notice</h5>
+    <h5 class="text-white">celebrate everything  ... until further notice</h5>
     </div>
 </div>
 
-<a class="btn" name="button" href="/">Back to All Venues</a>
-    <div class="row pl-4 pad-top">
+    <div class="row pl-4 pad-top mx-auto">
     {{#each events}}
-            <div class="col-sm-2 offset-1 section-light pt-3">
+            <div class="col-sm-2 offset-1 section-light eventBorders pt-3 mb-3 ">
                 <form class="form mx-auto" method="post" action="/modifyEvent">
-                    <input type="text" class="form-control" name="name" value="{{this.name}}" required>
+                  <input type="text" class="form-control" name="name" value="{{this.name}}" required>
                   <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
-                  <input type="date" class="form-control datepicker" name="date" value="{{this.date}}" data-provide="datepicker" data-date-startdate="0" >
+                  <input type="date" class="form-control datepicker" name="date" value="{{this.date}}" data-provide="datepicker" data-date-start-date="0" >
                   <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="Start Time" >
                   <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Number of Hours" >
                   <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Guest Count" >
                   <select class="form-control" name="price" >
-                        <option id="choosePrice" value="{{this.price}}" disabled selected>Choose Your Price Type</option>
+                        <option disabled selected>{{this.price}}</option>
                         <option>Open Bar</option>
                         <option>Minimum Spend</option>
                   </select>
@@ -27,35 +26,14 @@
                         <button class="btn-yellow" type="submit" class="inline">Remove Event</button>
                     </a>
             </div>
-            <div class="col-sm-2 pad-top">
+            <div class="col-sm-2 section-light eventBorders pt-3 mr-4 mb-3">
+                <h5 class="section-subheading text-muted">Venue Contact List</h5>
                 {{#each this.vEvent}}
-                    <p>{{this.name}}
+                    <p class="text-blue">{{this.name}}
                     <a href="/removeVenue?vEventId={{this._id}}&eventid={{../this._id}}">
                         <button class="btn-yellow" type="submit" name="removeVEvent">x</button>
                     </a></p>
                 {{/each}}
             </div>
-
-        <!-- Modal to pick event -->
-        <div id="viewVenues" class="modal" style ={{this.modal}}>
-            <div class="modal-content">
-                <h3 class="section-heading pad-top pl-4">Modify Event Details</h3>
-                <form action="/modifyEvent?eventId={{this._id}}" method="post">
-                    <input type=text name=name placeholder="Your event name">
-                    <input type=date name=date placeholder="Your event date">
-                    <input type=Number name=time placeholder="What time will it start?">
-                    <input type=Number name=hours placeholder="How many hours would you like to reserve?">
-                    <input type=Number name=guestCount placeholder="How many guests are you expecting?">
-                    <select name="price">
-                        <option id="choosePrice" value="" disabled selected>Choose Your Price Type</option>
-                        <option>Open Bar</option>
-                        <option>Minimum Spend</option>
-                    </select>
-                    <button class="btn" type="submit" name="button">Submit</button>
-                </form>
-                <span id="closeMod" class="close">&times;</span>
-            </div>
-        </div>
     {{/each}}
     </div>
-<a class="btn" name="button" href="/">Back to All Venues</a>

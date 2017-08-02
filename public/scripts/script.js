@@ -5,16 +5,13 @@ $( document ).ready(function() {
     $('.close').on('click', function(){
       $(".viewVenues").hide()
     })
-});
-var dateBox= document.getElementById('dateBox')
 
+    var date = new Date();
+    date.setDate(date.getDate()-1);
 
-
-var date = new Date();
-date.setDate(date.getDate()-1);
-
-dateBox.datepicker({
-    startDate: date
+    $('datepicker').datepicker({
+        startDate: date
+    });
 });
 
 //Do something to indicate venue has been added to a particular list

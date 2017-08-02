@@ -3,12 +3,17 @@ body {
   min-width: 800px;
 }
 .container-fluid{
-    margin-top:85px;
+    margin-top:83px;
 }
 btn-primary, .btn-xl, h2 {
     font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
     text-transform: uppercase;
     font-weight: 700;
+}
+.btn-brightblue{
+    color: white;
+    background-color: rgb(51, 204, 255);
+    border-color: rgb(51, 204, 255);
 }
 .btn-yellow{
     color: white;
@@ -47,6 +52,9 @@ h3.section-subheading {
     text-transform: uppercase;
 }
 
+.login{
+    min-height: 500px;
+}
 .sidebar{
     height: 630px;
     width: 100%;
@@ -61,6 +69,9 @@ h3.section-subheading {
 }
 .venueSide{
     border: white solid 20px;
+}
+.eventBorders{
+    border: rgb(76, 219, 219) solid 5px;
 }
 .parallax {
     /* The image used */
@@ -107,7 +118,10 @@ h3.section-subheading {
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/man-sunglasses.jpg');
 }
 .bg5{
-    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/balloons.jpeg');
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/pinkflowers.jpeg');
+}
+.bg6{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/plandesk.jpeg');
 }
 
 .hero-image {
@@ -123,6 +137,9 @@ h3.section-subheading {
 .flex {
     display: flex;
     align-items: center;
+}
+.vertMid{
+    margin-top: 25%;
 }
 
 .text-white{
@@ -142,6 +159,7 @@ color: rgb(76, 219, 219);
 }
 a:hover{
     text-decoration: none;
+    color: rgb(19, 245, 245)
 }
 
 .btn-primary {
@@ -170,6 +188,7 @@ a:hover{
 
 #navbarNavDropdown{
     flex-direction: row-reverse;
+    padding-right: 7%;
 }
 
 ul.nav-item a:hover { color: red !important; }
@@ -185,9 +204,11 @@ footer{
     background-color: rgb(201, 226, 226);
     padding-bottom: 20px;
     position:relative;
+    border-top: rgb(242, 242, 242) solid 4px;
 }
 .nextPage{
-        z-index: 3;
+    z-index: 3;
+    padding-left: 47%;
 }
 form{
     margin-bottom: 20px;

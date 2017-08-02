@@ -12,10 +12,10 @@
     </div>
 </div> -->
     <div class="row">
-        <div class="col-sm-12 section-blue fixed-pos nextPage">
-            <form action="/venues" method="post">
-                <button class="btn btn-primary" type="submit" name="button">Next Page</button>
-            </form>
+        <div class="col-sm-12 section-blue fixed-pos nextPage inline">
+            <form class="inline" action="/venues?num=0" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 1</button></form>
+            <form class="inline" action="/venues?num=1" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 2</button></form>
+            <form class="inline" action="/venues?num=2" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 3</button></form>
         </div>
     </div>
     <div class="row">
@@ -37,7 +37,7 @@
                     </select>
                 </div>
                 <div id="locationField" class="form-group">
-                    <input type="text"  class="form-control" name="location" id="autocomplete" size= "50">
+                    <input type="text"  class="form-control" name="location" id="autocomplete2" size= "50">
                 </div>
                 <div class="form-group">
                     <select name="radius"  class="form-control">
@@ -88,7 +88,7 @@
                         </form>
                             <h4 class="card-title"></h4></a>
                             <p class="card-text text-muted">{{this.address}}</p>
-                            <p class="card-text"><small class="text-muted">hello</small></p>
+                            <p class="card-text"><small class="text-muted"></small></p>
                             <a href="/?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-primary" type="submit" name="button">Tag An Event</button></a>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
        var center = new google.maps.LatLng({{venues.0.lat}}, {{venues.0.long}});
 
        var map = new google.maps.Map(document.getElementById('map'), {
-         zoom: 12,
+         zoom: 15,
          center: center
        });
 
@@ -157,6 +157,6 @@
      }
      google.maps.event.addDomListener(window, 'load', initialize);
 
-    var input = document.getElementById('autocomplete');
+    var input = document.getElementById('autocomplete2');
     var autocomplete = new google.maps.places.Autocomplete(input,options);
 </script>

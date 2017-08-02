@@ -5,44 +5,18 @@
   {{error}}
 </div>
 {{/if}}
-<div class="parallax-container valign-wrapper">
-          <div class="container">
-            <center>
-<form method="POST" style="max-width: 300px; margin: auto; margin-top: 50px; border: 0px solid gray; padding: 30px 30px 30px 30px">
-  <h3 id="h3signuptag">Register</h3>
-  <div class="form-group">
-    <!-- <label >Username</label> -->
-    <input id ="regText" placeholder="Username"type="text" name="username" class="form-control">
-  </div>
-  <div class="form-group">
-    <!-- <label >First Name</label> -->
-    <input id ="regText"  placeholder="First Name"type="text" name="fname" class="form-control">
-  </div>
-  <div class="form-group">
-    <!-- <label >Last Name</label> -->
-    <input id ="regText"placeholder="Last Name"type="text" name="lname" class="form-control">
-  </div>
-  <div class="form-group">
-    <!-- <label >Email</label> -->
-    <input id ="regText" placeholder="Email"type="text" name="email" class="form-control">
-  </div>
-  <div class="form-group">
-    <!-- <label >Password</label> -->
-    <input id ="regText"placeholder="Password"type="password" name="password" class="form-control">
-  </div>
-  <div class="form-group">
-    <!-- <label >Verify Password</label> -->
-    <input id ="regText" placeholder="Verify Password"type="password" name="passwordRepeat" class="form-control">
-  </div>
-
-  <div class="form-group">
-    <button id="regBut" class="btn btn-success">Register</button>
-  </div>
-</form>
-</center>
-</div>
-<br><br>
-
-
-<div class="parallax"><img src="../images/background3.jpg" alt="Unsplashed signup background img"></div>
+<div class="row login">
+    <div class="col-sm-4 mx-auto p-4">
+    <form class="form text-right vertMid"method="POST" action="/signup">
+      <h3 class="text-center text-blue" >Register</h3>
+        <input placeholder="Username"type="text" name="username" class="form-control">
+        <input placeholder="First Name"type="text" name="fname" class="form-control">
+        <input placeholder="Last Name"type="text" name="lname" class="form-control">
+        <input placeholder="Email"type="text" name="email" class="form-control">
+        <input placeholder="Password"type="password" name="password" class="form-control">
+        <input placeholder="Verify Password"type="password" name="passwordRepeat" class="form-control">
+        <a class="btn btn-primary mt-3" href="/login">Login</a>
+        <button class="btn btn-yellow mt-3">Register</button>
+    </form>
+    </div>
 </div>
