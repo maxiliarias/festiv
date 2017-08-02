@@ -17,13 +17,14 @@ const simpleParser = require('mailparser').simpleParser;
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-
+    console.log('first one');
     req.session.search = req.session.search || [];
     if (req.session.search.length > 0) {
         Event.find({eventOwner: req.user._id})
             .populate('vEvent')
             .exec(function(err,ocassions){
         // assumption, i have req.query.placeId
+            console.log('SECOND ONE ');
             var temp = JSON.parse(JSON.stringify(req.session.search));
             temp.forEach(function(venue) {
                 if (venue.placeId === req.query.placeId) {
@@ -40,6 +41,7 @@ router.get('/', function(req, res, next) {
             })
         })
     } else {
+        console.log('THIRD ONE');
         res.render('home', {
             googleApi: process.env.GOOGLEPLACES
         });
