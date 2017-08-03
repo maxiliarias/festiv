@@ -321,7 +321,45 @@ router.post('/venue', function(req, res) {
     })
 })
 
-
+/* RECEIVE replies to our emails, and store the messages in mongoose*/
+router.post('/messages', upload.array(), function(req,res){
+    simpleParser(req.body.email, function(err, mail) {
+        console.log('MAIL To', mail.to.text);
+        console.log('MAIL TEXT',mail.text);
+        console.log('MAIL FROM', mail.from.text);
+        console.log('MAIL date', mail.date);
+        var atSign= mail.to.text.indexOf("@")
+        var idSpot= mail.to.text.indexOf("<id") + 3
+        console.log('MANGO',mail.to.text.slice(idSpot,atSign))
+        var venueId= mail.to.text.slice(idSpot,atSign)
+        var chat = new Chat({
+            chatOwner: venueId,
+            date: helper.formatDate(mail.date),
+            from: mail.from.text,
+            content: mail.text
+        });
+        console.log('BANANAS',chat)
+        chat.save(function(err, msg) {
+            if(err){
+                console.log('Error saving the chat',err);
+            } else {
+                console.log('saved the chat!');
+                VEvent.findById(venueId)
+                .exec(function(err,venue){
+                    venue.chat.push(msg._id)
+                    venue.save(function(err,savedV){
+                        if(err){
+                            console.log('error saving venue w chat id', err);
+                        } else {
+                            console.log('saved the venue w chat id!')
+                            res.status(200).end();
+                        }
+                    })
+                })
+            }
+        })
+    })
+})
 
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
@@ -570,46 +608,6 @@ router.post('/contactlist', function(req, res) {
                     })
                 })
                 res.redirect('/contactlist')
-            }
-        })
-    })
-})
-
-/* RECEIVE replies to our emails, and store the messages in mongoose*/
-router.post('/messages', upload.array(), function(req,res){
-    simpleParser(req.body.email, function(err, mail) {
-        console.log('MAIL To', mail.to.text);
-        console.log('MAIL TEXT',mail.text);
-        console.log('MAIL FROM', mail.from.text);
-        console.log('MAIL date', mail.date);
-        var atSign= mail.to.text.indexOf("@")
-        var idSpot= mail.to.text.indexOf("<id") + 3
-        console.log('MANGO',mail.to.text.slice(idSpot,atSign))
-        var venueId= mail.to.text.slice(idSpot,atSign)
-        var chat = new Chat({
-            chatOwner: venueId,
-            date: helper.formatDate(mail.date),
-            from: mail.from.text,
-            content: mail.text
-        });
-        console.log('BANANAS',chat)
-        chat.save(function(err, msg) {
-            if(err){
-                console.log('Error saving the chat',err);
-            } else {
-                console.log('saved the chat!');
-                VEvent.findById(venueId)
-                .exec(function(err,venue){
-                    venue.chat.push(msg._id)
-                    venue.save(function(err,savedV){
-                        if(err){
-                            console.log('error saving venue w chat id', err);
-                        } else {
-                            console.log('saved the venue w chat id!')
-                            res.status(200).end();
-                        }
-                    })
-                })
             }
         })
     })
