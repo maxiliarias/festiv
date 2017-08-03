@@ -9,7 +9,7 @@ $( document ).ready(function() {
     var date = new Date();
     date.setDate(date.getDate()-1);
 
-    $('datepicker').datepicker({
+    $('.datepicker').datepicker({
         startDate: date
     });
 });
