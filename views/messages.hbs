@@ -13,8 +13,7 @@
                 <p class="text-white pl-2">
                     <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
                     {{#if this.chat}}
-                        <p> {{this.chat}} here</p>
-                        <span class="fa fa-heart" aria-hidden="true"></span>
+                        <span class="fa fa-envelope" aria-hidden="true"></span>
                     {{/if}}
                 </p>
             {{/each}}
@@ -31,7 +30,7 @@
                 </div>
             {{/each}}
         {{else}}
-            <h6 class="pad-top text-center text-blue"><b>Click on a Venue to See Your Conversation History</b></h6>
+            <h4 class="pad-top text-center text-blue vertMid"><b>Click on a Venue to See Your Conversation History</b></h4>
         {{/if}}
     </div>
 </div>

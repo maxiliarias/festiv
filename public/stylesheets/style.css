@@ -52,7 +52,7 @@ h3.section-subheading {
     text-transform: uppercase;
 }
 
-.login{
+.height{
     min-height: 500px;
 }
 .sidebar{
@@ -66,6 +66,9 @@ h3.section-subheading {
     min-height: 250px;
     border: rgb(76, 219, 219) solid 10px;
     color: rgb(76, 219, 219);
+}
+.noborder{
+    border:0;
 }
 .venueSide{
     border: white solid 20px;
@@ -150,6 +153,9 @@ h3.section-subheading {
 }
 .text-light{
     color: #FAF9F9
+}
+.text-yellow{
+    color: #EEDE76;
 }
 .inline{
     display: inline;
@@ -252,7 +258,7 @@ form{
 margin-top: 4%;
 }
 #results{
-    margin-left: 9%;
+    margin-left: 17%;
 }
 #resultsmap{
     position: fixed;

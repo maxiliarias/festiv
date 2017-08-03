@@ -98,7 +98,7 @@ var helper = {
         if (month < 10) {
           month = '0' + month;
         }
-        return (month + " " + dt + " " + year)
+        return (year+ "-" + month + "-" + dt)
     }
 }
 

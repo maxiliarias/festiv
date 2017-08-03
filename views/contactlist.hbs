@@ -4,24 +4,40 @@
         <h5 class="text-white">Click, Click... Send!</h5>
     </div>
 </div>
-<div class="row section-light pad-top">
-  <form class="form mx-auto" method="post" action="/contactlist">
-    <select class="form-control" name="eventId" required>
-        <option value="" disabled selected>Choose your event list</option>
-        {{#each events}}
-            <option value={{this._id}}>{{this.name}}</option>
-        {{/each}}
-    </select>
-    <input type=hidden class="form-control" name='eventid' value={{this._id}} required>
-    <input type='text' class="form-control" name="guestCount" placeholder="Guest Count" required>
-    <input type="date" class="form-control datepicker" name="date"  required>
-    <input type="text" class="form-control" name="starttime" placeholder="Start Time"required>
-    <input type='text' class="form-control" name="hours" placeholder="Number of Hours" required>
-    <select class="form-control" name="price" required>
-          <option value="" disabled selected>Choose Your Price Type</option>
-          <option>Open Bar</option>
-          <option>Minimum Spend</option>
-    </select>
-    <button class="btn btn-primary" type="submit">Submit</button>
-  </form>
+<div class="row pad-top mb-4 d-flex justify-content-around mx-auto">
+    {{#if events}}
+        <div class="col-sm-2 m-2">
+            <h2 class="section-heading text-yellow vertMid"> Select an Event
+                <span class="fa fa-arrow-right" aria-hidden="true"></span>
+            </h2>
+        </div>
+        <div class="col-sm-8">
+        <div class="row">
+            {{#each events}}
+                <div class="col-sm-5 section-blue m-2 card noborder">
+                    <a href="/contactlist?eventId={{this._id}}">
+                        <h3 class="text-white text-center p-2">{{this.name}}</h3>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+        </div>
+    {{/if}}
+    <div class="col-sm-4 text-center">
+    {{#if party}}
+        <h3 class="text-blue text-center mb-2">{{party.name}}</h3>
+      <form class="form text-right mx-auto" method="post" action="/contactlist?eventId={{party._id}}">
+        <input type="date" class="form-control" name="date" value="{{party.date}}" min={{min}} required>
+        <input type="text" class="form-control" name="starttime" value="{{party.time}}"  placeholder="Start Time"required>
+        <input type='text' class="form-control" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required>
+        <input type='text' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Guest Count" required>
+        <select class="form-control" name="price" required>
+              <option value="{{party.price}}" disabled selected>{{party.price}}</option>
+              <option>Open Bar</option>
+              <option>Minimum Spend</option>
+        </select>
+        <button class="btn btn-primary mt-2" type="submit">Send Emails</button>
+      </form>
+    {{/if}}
+  </div>
 </div>

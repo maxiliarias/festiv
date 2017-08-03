@@ -1,17 +1,27 @@
 $( document ).ready(function() {
     console.log( "jQuery ready!" );
 
-    //Close modals in venue list view
+    //When you click "x" button, closes the modal in venue list view
     $('.close').on('click', function(){
       $(".viewVenues").hide()
     })
+    //When you tag a venue to an event, close the modal
+    $('.taggedEvent').on('click', function(){
+      $(".viewVenues").hide()
+    })
 
-    var date = new Date();
-    date.setDate(date.getDate()-1);
+    if(window.location.href.split("?")[1] === "needsearch=true"){
+        alert("Please make an initial search")
+    }
 
-    $('.datepicker').datepicker({
-        startDate: date
-    });
+    // $('#venueLink').on('click', function(){
+    //     console.log('in here');
+    //
+    //     if(!req.session.search){
+    //         alert("Please make an initial search")
+    //     }
+    // })
+
 });
 
 //Do something to indicate venue has been added to a particular list

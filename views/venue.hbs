@@ -15,18 +15,21 @@
     <div class="col-sm-8 pad-top pl-5">
         <div class="row">
             <div class="col-sm-4 text-center">
-                <form action="/cart?name={{this.name}}&address={{this.address}}" method="post">
-                    <button class="btn btn-primary" type="submit" name="button">Tag An Event</button>
-                </form>
                 <a href="/questionnaire">
                     <button class="btn btn-yellow" type="submit" name="button">All Set? Request Bids</button>
                 </a>
+                <button class="btn btn-primary" type="submit" name="button">Tag An Event Below</button>
+
                 <div class="contactSide text-left">
                     <h6>Your Events</h6>
                     {{#each events}}
                         <span class="fa fa-heart" aria-hidden="true">
                             <a href="/addVenue?/eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}">{{this.name}}</a>
                         </span> </br>
+                        {{#if events.vEvent}}
+                        {{#each events.vEvent}}
+                            <p>{{this.name}}</p>
+                        {{/each}}
                     {{/each}}
                 </div>
             </div>

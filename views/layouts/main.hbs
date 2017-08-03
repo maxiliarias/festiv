@@ -24,10 +24,10 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/refresh">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Venues</a>
+                <li class="nav-item" id="venueLink" >
+                    <a class="nav-link" href="/venues">Venues</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/blog">Blog</a>
@@ -36,13 +36,17 @@
                     <a class="nav-link" href="/contactlist">Get Bids</a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="/login" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Login
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Account
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item" href="/events">My Events</a>
                         <a class="dropdown-item" href="/messages">Inbox</a>
+                        {{#if loggedin}}
                         <a class="dropdown-item" href="/logout">Logout</a>
+                        {{else}}
+                        <a class="dropdown-item" href="/login">Login</a>
+                        {{/if}}
                     </div>
                 </li>
             </ul>

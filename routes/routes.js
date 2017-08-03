@@ -17,36 +17,53 @@ const simpleParser = require('mailparser').simpleParser;
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-    console.log('first one');
-    req.session.search = req.session.search || [];
-    if (req.session.search.length > 0) {
+    delete req.session.search
+    delete req.session.pagetoken
+    console.log('second', req.session.search);
+    console.log('pagetoken', req.session.pagetoken);
+
+    res.render('home', {
+        googleApi: process.env.GOOGLEPLACES,
+        loggedin: req.user ? true: false
+    });
+});
+
+router.get('/venues',function(req,res){
+    if(!req.session.search){
+        res.redirect('/?needsearch=true')
+    } else {
         Event.find({eventOwner: req.user._id})
             .populate('vEvent')
             .exec(function(err,ocassions){
-        // assumption, i have req.query.placeId
-            console.log('SECOND ONE ');
-            var temp = JSON.parse(JSON.stringify(req.session.search));
-            temp.forEach(function(venue) {
-                if (venue.placeId === req.query.placeId) {
-                    venue.modal = "display:block";
-                } else {
-                    venue.modal = "";
-                }
-            });
-            console.log('my events', ocassions);
-            res.render('list', {
-                venues: temp,
-                googleApi: process.env.GOOGLEPLACES,
-                events: ocassions
-            })
+            if(req.query.placeId){
+                var temp = JSON.parse(JSON.stringify(req.session.search));
+                temp.forEach(function(venue) {
+                    if (venue.placeId === req.query.placeId) {
+                        venue.modal = "display:block";
+                    } else {
+                        venue.modal = "";
+                    }
+                });
+                res.render('list', {
+                    venues: temp,
+                    googleApi: process.env.GOOGLEPLACES,
+                    events: ocassions,
+                    page2: req.session.pagetoken[1]? 'true': null,
+                    page3: req.session.pagetoken[2]? 'true': null,
+                    loggedin: req.user ? true: false
+                })
+            } else {
+                res.render('list', {
+                    venues: req.session.search,
+                    googleApi: process.env.GOOGLEPLACES,
+                    page2: req.session.pagetoken[1]? 'true': null,
+                    page3: req.session.pagetoken[2]? 'true': null,
+                    loggedin: req.user ? true: false
+                })
+            }
         })
-    } else {
-        console.log('THIRD ONE');
-        res.render('home', {
-            googleApi: process.env.GOOGLEPLACES
-        });
     }
-});
+})
 
 /* Blog Routes public*/
 router.get('/blog',function(req,res){
@@ -54,156 +71,141 @@ router.get('/blog',function(req,res){
         if(err){
             console.log('error finding blogs',err);
         } else {
-            res.render('blog',{blog:blogs})
+            res.render('blog',{
+                blog:blogs,
+                loggedin: req.user ? true: false
+            })
         }
     })
 })
 router.get('/pumpkinflair',function(req,res){
-    res.render('pumpkinflair')
+    res.render('pumpkinflair',{loggedin: req.user ? true: false})
 })
 router.get('/macaroonsBlooms',function(req,res){
-    res.render('macaroonsBlooms')
+    res.render('macaroonsBlooms',{loggedin: req.user ? true: false})
 })
 router.get('/whiskyaficionados',function(req,res){
-    res.render('whiskyaficionados')
+    res.render('whiskyaficionados',{loggedin: req.user ? true: false})
 })
+
 /* VENUES creates session venues */
 router.post('/venues', function(req, res) {
-    if (req.session.search && req.session.search.length > 0 && req.session.pagetoken.length === 0) {
-        res.render('list', {
-            venues: req.session.search,
-            googleApi: process.env.GOOGLEPLACES
-        })
-    } else {
-        var options = {
-            provider: 'google',
-            httpAdapter: 'https', // Default
-            apiKey: process.env.GOOGLEPLACES
-        };
-        var geocoder = NodeGeocoder(options);
-        let placeId= [];
-        let venues = [];
-        let lat;
-        let lng;
+    var options = {
+        provider: 'google',
+        httpAdapter: 'https', // Default
+        apiKey: process.env.GOOGLEPLACES
+    };
+    var geocoder = NodeGeocoder(options);
+    let placeId= [];
+    let venues = [];
+    let lat;
+    let lng;
 
-        //need this dummy address and type for the next page button
-        req.session.location = req.body.location || req.session.location;
-        req.body.type = req.body.type || " "
-        geocoder.geocode(req.session.location)
-        .then(function(response) {
-            console.log('outside if', req.query.num);
-
-            // if(req.query.num === "0"){
-            //     console.log('inside if', req.query.num);
-            //     req.session.lat = response[0].latitude || req.session.lat;
-            //     req.session.long = response[0].longitude || req.session.long;
-            // }
-            lat= response[0].latitude
-            lng= response[0].longitude
-            console.log('LAT REQ.SESSION', lat)
-            console.log('LAT response', response[0].latitude)
-        })
-        .then(function() {
-            // let radius = (parseInt(req.body.radius) * 1609.34).toString();
-            req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
-            let keyword= req.session.keyword
-            req.session.pagetoken= req.session.pagetoken || [""];
-
-            console.log('APPLES', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
-            console.log('LAT IS', lat)
-            console.log('LONG IS', lng);
-            return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
-            .then(resp => JSON.parse(resp))
-            .then(obj => {
-                if(obj.next_page_token){
-                    console.log('inside FIRST PAGE IF')
-                    if(req.session.pagetoken.length<= 3){
-                        console.log('inside Second PAGE IF')
-                        req.session.pagetoken.push(obj.next_page_token)
-                    }
+    req.session.location = req.body.location || req.session.location;
+    req.body.type = req.body.type || " "
+    geocoder.geocode(req.session.location)
+    .then(function(response) {
+        lat= response[0].latitude
+        lng= response[0].longitude
+    })
+    .then(function() {
+        // let radius = (parseInt(req.body.radius) * 1609.34).toString();
+        req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
+        let keyword= req.session.keyword
+        req.session.pagetoken= req.session.pagetoken || [""];
+        return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
+        .then(resp => JSON.parse(resp))
+        .then(obj => {
+            console.log('REQUEST', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
+            console.log('pagetoken before', req.session.pagetoken);
+            if(obj.next_page_token){
+                if(req.session.pagetoken.length<= 3){
+                    req.session.pagetoken.push(obj.next_page_token)
                 }
-                console.log('page token is', req.session.pagetoken);
-                obj.results.forEach(item => {
-                    placeId.push(item.place_id)
-                });
-                for (var i = 0; i < placeId.length; i++) {
-                    var venueId = placeId[i]
-                    venues.push(
-                    request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
-                    .then(resp => JSON.parse(resp))
-                    .then(
-                        (function(v){
-                            return function(obj2) {
-                                return VData.find()
-                                .then(function(storedVenues){
-                                    for (var j=0; j< storedVenues.length; j++){
-                                        if(storedVenues[j].placeId === v){
-                                            console.log('found vdata');
-                                            return true;
-                                        }
+            }
+            console.log('page token after', req.session.pagetoken);
+            obj.results.forEach(item => {
+                placeId.push(item.place_id)
+            });
+            for (var i = 0; i < placeId.length; i++) {
+                var venueId = placeId[i]
+                venues.push(
+                request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
+                .then(resp => JSON.parse(resp))
+                .then(
+                    (function(v){
+                        return function(obj2) {
+                            return VData.find()
+                            .then(function(storedVenues){
+                                for (var j=0; j< storedVenues.length; j++){
+                                    if(storedVenues[j].placeId === v){
+                                        console.log('found vdata');
+                                        return true;
                                     }
-                                return false
-                                })
-                                .then(function(exists){
-                                    if(!exists){
-                                        var newVen = new VData({
-                                            placeId: v,
-                                            name: obj2.result.name,
-                                            domain: obj2.result.website
-                                        })
-                                        newVen.save();
-                                    }
-                                    return ({
+                                }
+                            return false
+                            })
+                            .then(function(exists){
+                                if(!exists){
+                                    var newVen = new VData({
                                         placeId: v,
                                         name: obj2.result.name,
-                                        address: obj2.result.formatted_address,
-                                        phone: obj2.result.formatted_phone_number,
-                                        photo1: obj2.result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES : '',
-                                        photo2: obj2.result.photos ?   (obj2.result.photos[1] ? obj2.result.photos[1].photo_reference : "") : "",
-                                        photo3: obj2.result.photos ?   (obj2.result.photos[2] ? obj2.result.photos[2].photo_reference : "") : "",
-                                        photo4: obj2.result.photos ?   (obj2.result.photos[3] ? obj2.result.photos[3].photo_reference : "") : "",
-                                        photo5: obj2.result.photos ?   (obj2.result.photos[4] ? obj2.result.photos[4].photo_reference : "") : "",
-                                        photo6: obj2.result.photos ?   (obj2.result.photos[5] ? obj2.result.photos[5].photo_reference : "") : "",
-                                        photo7: obj2.result.photos ?   (obj2.result.photos[6] ? obj2.result.photos[6].photo_reference : "") : "",
-                                        photo8: obj2.result.photos ?   (obj2.result.photos[7] ? obj2.result.photos[7].photo_reference : "") : "",
-                                        photo9: obj2.result.photos ?   (obj2.result.photos[8] ? obj2.result.photos[8].photo_reference : "") : "",
-                                        photo10:obj2.result.photos ?   (obj2.result.photos[9] ? obj2.result.photos[9].photo_reference : "") : "",
-                                        rating: obj2.result.rating,
-                                        lat: obj2.result.geometry.location.lat,
-                                        long: obj2.result.geometry.location.lng,
-                                        hours: obj2.result.opening_hours
-                                        ? obj2.result.opening_hours.weekday_text
-                                        : ["Opening Hours Unavailable"],
-                                        type: obj2.result.types,
-                                        url: obj2.result.url,
-                                        website: obj2.result.website
+                                        domain: obj2.result.website
                                     })
+                                    newVen.save();
+                                }
+                                return ({
+                                    placeId: v,
+                                    name: obj2.result.name,
+                                    address: obj2.result.formatted_address,
+                                    phone: obj2.result.formatted_phone_number,
+                                    photo1: obj2.result.photos ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + obj2.result.photos[0].photo_reference + '&key=' + process.env.GOOGLEPLACES : '',
+                                    photo2: obj2.result.photos ?   (obj2.result.photos[1] ? obj2.result.photos[1].photo_reference : "") : "",
+                                    photo3: obj2.result.photos ?   (obj2.result.photos[2] ? obj2.result.photos[2].photo_reference : "") : "",
+                                    photo4: obj2.result.photos ?   (obj2.result.photos[3] ? obj2.result.photos[3].photo_reference : "") : "",
+                                    photo5: obj2.result.photos ?   (obj2.result.photos[4] ? obj2.result.photos[4].photo_reference : "") : "",
+                                    photo6: obj2.result.photos ?   (obj2.result.photos[5] ? obj2.result.photos[5].photo_reference : "") : "",
+                                    photo7: obj2.result.photos ?   (obj2.result.photos[6] ? obj2.result.photos[6].photo_reference : "") : "",
+                                    photo8: obj2.result.photos ?   (obj2.result.photos[7] ? obj2.result.photos[7].photo_reference : "") : "",
+                                    photo9: obj2.result.photos ?   (obj2.result.photos[8] ? obj2.result.photos[8].photo_reference : "") : "",
+                                    photo10:obj2.result.photos ?   (obj2.result.photos[9] ? obj2.result.photos[9].photo_reference : "") : "",
+                                    rating: obj2.result.rating,
+                                    lat: obj2.result.geometry.location.lat,
+                                    long: obj2.result.geometry.location.lng,
+                                    hours: obj2.result.opening_hours
+                                    ? obj2.result.opening_hours.weekday_text
+                                    : ["Opening Hours Unavailable"],
+                                    type: obj2.result.types,
+                                    url: obj2.result.url,
+                                    website: obj2.result.website
                                 })
-                            }
-                        })(venueId)
-                    ))
-                }
-                return Promise.all(venues)
-            })
-            .then(arrayOfResults => {
-                console.log('array of results', arrayOfResults[0].name);
-                var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
-                var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
-                var filteredVenues2 = filteredVenues.filter(place => {return place.photo5 !== ""})
-                console.log(filteredVenues.length-filteredVenues2.length, ' # of venues removed')
-                req.session.search = filteredVenues2;
-                console.log('in my session', req.session.search[0].name);
-                res.render('list', {
-                    venues: filteredVenues2,
-                    googleApi: process.env.GOOGLEPLACES
-                });
-            })
-            .catch(err => console.log("ERR", err))
+                            })
+                        }
+                    })(venueId)
+                ))
+            }
+            return Promise.all(venues)
         })
-        .catch(function(err) {
-            console.log(err);
-        });
-    }
+        .then(arrayOfResults => {
+            var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
+            var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
+            var filteredVenues2 = filteredVenues.filter(place => {return place.photo5 !== ""})
+            console.log(filteredVenues.length-filteredVenues2.length, ' # of venues removed')
+            req.session.search = filteredVenues2;
+            console.log('session saved', req.session.search[0].name);
+            res.render('list', {
+                venues: filteredVenues2,
+                googleApi: process.env.GOOGLEPLACES,
+                page2: req.session.pagetoken[1]? 'true': null,
+                page3: req.session.pagetoken[2]? 'true': null,
+                loggedin: req.user ? true: false
+            });
+        })
+        .catch(err => console.log("ERR", err))
+    })
+    .catch(function(err) {
+        console.log(err);
+    });
 })
 
 /*Receive user id and venue names from Event API and create new Message in Mongoose for user */
@@ -216,27 +218,20 @@ router.post('/createMsg',function(req,res){
     res.send('OK')
 })
 
-/* REFRESH allows you to restart your search */
-router.get('/refresh', function(req, res) {
-    console.log('session',res.session);
-    delete req.session.search;
-    delete req.session.pagetoken;
-    console.log('keyword',res.session);
-    // delete req.session.lat;
-    // delete req.session.long;
-    res.redirect('/');
-})
-
 /* NEW SEARCH goes here after search within venues is pinged*/
 router.post('/newSearch', function(req, res) {
-    delete req.session.search;
+    req.session.search =[]
+    req.session.pagetoken=[""]
+    console.log('clear pg token', req.session.pagetoken);
     res.redirect(307, '/venues');
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
 /* still can be public*/
 router.post('/venue', function(req, res) {
-    Event.find({eventOwner: req.user._id},function(err,events){
+    Event.find({eventOwner: req.user._id})
+    .populate('vEvent')
+    .exec(function(err,events){
         if(err){
             console.log('error finding events in venue profile page',err);
         } else {
@@ -245,6 +240,7 @@ router.post('/venue', function(req, res) {
               .then(function (company) {
                 console.log('inside clearbit ', company);
                 VData.findOne({placeId: req.body.placeId}, function(err, foundVdata){
+                    console.log('MY EVENTS', events[0].vEvent)
                     if(err){
                         console.log('err finding vData',err);
                     } else {
@@ -300,7 +296,8 @@ router.post('/venue', function(req, res) {
                                     lng: req.body.lng,
                                     hours: req.body.hours.split(','),
                                     url: req.body.url, //
-                                    website: req.body.website
+                                    website: req.body.website,
+                                    loggedin: req.user ? true: false
                                 })
                             }
                         })
@@ -321,7 +318,7 @@ router.post('/venue', function(req, res) {
     })
 })
 
-/* RECEIVE replies to our emails, and store the messages in mongoose*/
+/* Allows Sendgrid to post replies to our emails, and we then store the messages in mongoose*/
 router.post('/messages', upload.array(), function(req,res){
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail.to.text);
@@ -401,7 +398,7 @@ router.post('/addEvent',function(req,res){
                     console.log("Successfully saved the venue")
                     event.vEvent.push(newVen._id)
                     event.save(function(err,savedE){
-                        res.redirect('/');
+                        res.redirect('/venues');
                     })
                 }
             })
@@ -409,8 +406,8 @@ router.post('/addEvent',function(req,res){
     })
 })
 
-/*Modify event details*/
-router.post('/modifyEvent', function(req,res){
+/*Update event details*/
+router.post('/updateEvent', function(req,res){
     Event.findById(req.body.eventId)
     .exec(function(err,event){
         console.log('name', req.body.name);
@@ -478,7 +475,7 @@ router.get('/addVenue',function(req,res){
                         event.vEvent.push(newVen._id)
                         event.save(function(err,savedE){
                             console.log('Saved venue Id to event',err);
-                            res.redirect('/');
+                            res.redirect('/venues');
                         })
                     }
                 })
@@ -495,7 +492,11 @@ router.get('/events', function(req, res) {
     Event.find({eventOwner:req.user._id})
     .populate('vEvent')
     .exec(function(err,events){
-        res.render('events',{events: events})
+        res.render('events',({
+            events: events,
+            min: helper.formatDate(new Date()),
+            loggedin: req.user ? true: false
+        }))
     })
 })
 
@@ -544,14 +545,29 @@ router.get('/removeVenue', function(req, res) {
 
 /* CONTACTLIST is the link to the questionnaire*/
 router.get('/contactlist', function(req, res, next) {
-    Event.find({eventOwner:req.user._id},function(err,ocassions){
-        res.render('contactlist', ({events: ocassions}))
-    })
+    if(req.query.eventId){
+        Event.findById(req.query.eventId)
+        .exec(function(err,party){
+            res.render('contactlist', ({
+                party: party,
+                min: helper.formatDate(new Date()),
+                loggedin: req.user ? true: false
+            }))
+        })
+    } else {
+        Event.find({eventOwner:req.user._id},function(err,ocassions){
+            console.log('in here');
+            res.render('contactlist', ({
+                events: ocassions,
+                loggedin: req.user ? true: false
+            }))
+        })
+    }
 })
 
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
-    var eventId=req.body.eventId
+    var eventId=req.query.eventId
     Event.findById(eventId, function(err,event){
         event.date=req.body.date
         event.time=req.body.starttime
@@ -628,14 +644,16 @@ router.get('/messages',function(req,res){
                     msg.forEach((x) => {x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')})
                     res.render('messages', {
                         events: events,
-                        message: msg
+                        message: msg,
+                        loggedin: req.user ? true: false
                     })
                 }
             })
         } else {
             console.log('events', events)
             res.render('messages', {
-                events: events
+                events: events,
+                loggedin: req.user ? true: false
             })
         }
     })
