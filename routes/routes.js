@@ -318,7 +318,8 @@ router.post('/venue', function(req, res) {
     })
 })
 
-/* Allows Sendgrid to post replies to our emails, and we then store the messages in mongoose*/
+/* Allows Sendgrid to post venue replies to our emails, then we store the messages
+/*in mongoose and alert our client*/
 router.post('/messages', upload.array(), function(req,res){
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail.to.text);
@@ -335,7 +336,7 @@ router.post('/messages', upload.array(), function(req,res){
             from: mail.from.text,
             content: mail.text
         });
-        console.log('BANANAS',chat)
+        console.log('Chat saved is ',chat)
         chat.save(function(err, msg) {
             if(err){
                 console.log('Error saving the chat',err);
@@ -343,52 +344,54 @@ router.post('/messages', upload.array(), function(req,res){
                 console.log('saved the chat!');
                 VEvent.findById(venueId)
                 .exec(function(err,venue){
-                    venue.chat.push(msg._id)
-                    venue.lastFrom= mail.from.text
-                    venue.save(function(err,savedV){
-                        if(err){
-                            console.log('error saving venue w chat id', err);
-                        } else {
-                            console.log('saved the venue w chat id!')
-                            //alert the user, they've received a response/bid
-                            var b = {
-                                    personalizations: [{
-                                        'substitutions': {
-                                            businessName: venue.name,
-                                            venueId: venueId,
-                                            fname: req.user.fname
-                                        },
-                                        custom_args: {
-                                            "vEventid": venue._id,
+                    Event.findById(venue.venueOption)
+                    .exec(function(err,foundEvent){
+                        User.findById(foundEvent.EventOwner)
+                        .exec(function(err,user){
+                            venue.chat.push(msg._id)
+                            venue.lastFrom= mail.from.text
+                            venue.save(function(err,savedV){
+                                if(err){
+                                    console.log('error saving venue w chat id', err);
+                                } else {
+                                    console.log('saved the venue w chat id!')
+                                    //alert the user, they've received a response/bid
+                                    var b = {
+                                            personalizations: [{
+                                                'substitutions': {
+                                                    businessName: venue.name,
+                                                    link: `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+                                                    fname: user.fname
+                                                },
+                                                custom_args: {
+                                                    "vEventid": venue._id,
+                                                }
+                                            }],
+                                            from: {
+                                                email: 'alert@hello.festivspaces.com',
+                                                name: 'Festiv'
+                                            },
+                                            template_id: process.env.TEMPLATE_ID_ALERT
                                         }
-                                    }],
-                                    from: {
-                                        email: 'alert@hello.festivspaces.com',
-                                        name: req.user.fname + ' (Festiv)'
-                                    },
-                                    reply_to:{
-                                        email: 'id'+ venue._id + '@reply.festivspaces.com',
-                                        name: req.user.fname + ' (Festiv)'
-                                    },
-                                    template_id: process.env.TEMPLATE_ID_ALERT
-                                }
 
-                            var request = sg.emptyRequest({
-                                method: 'POST',
-                                path: '/v3/mail/send',
-                                body: b
-                            });
-                            sg.API(request, function(error, response) {
-                                if (error) {
-                                    console.log('Error response received');
-                                }
-                                console.log('STATUS HERE' ,response.statusCode);
-                                console.log('BODY HERE', response.body);
-                                console.log('HEADERS HERE', response.headers);
-                            });
+                                    var request = sg.emptyRequest({
+                                        method: 'POST',
+                                        path: '/v3/mail/send',
+                                        body: b
+                                    });
+                                    sg.API(request, function(error, response) {
+                                        if (error) {
+                                            console.log('Error response received');
+                                        }
+                                        console.log('STATUS HERE' ,response.statusCode);
+                                        console.log('BODY HERE', response.body);
+                                        console.log('HEADERS HERE', response.headers);
+                                    });
 
-                            res.status(200).end();
-                        }
+                                    res.status(200).end();
+                                }
+                            })
+                        })
                     })
                 })
             }
