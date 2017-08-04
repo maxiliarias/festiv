@@ -608,31 +608,32 @@ router.get('/contactlist', function(req, res, next) {
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
     console.log('in contactlist', req.body)
-    // var eventId=req.query.eventId
-    // Event.findById(eventId, function(err,event){
-    //     event.date=req.body.date
-    //     event.time=req.body.starttime
-    //     event.hours=req.body.hours
-    //     event.guestCount=req.body.guestCount
-    //     event.price=req.body.price
-    //
-    //     event.save(function(err,savedEvent){
-    //         if(err){
-    //             console.log('Error saving event paramaters', err );
-    //         } else {
-    //             console.log('Successfully saved event parameters');
-    //             VEvent.find({venueOption: eventId},function(err,venues){
-    //                 console.log('VENUES FOR THAT EVENT',venues)
-    //                 venues.forEach(venue => {
-    //                     VData.find({placeId:venue.placeId}, function(err,matches){
-    //                         matches.forEach(match => {
-    //                             var web = match.domain
-    //                             var b;
-    //                             console.log('THE VENUE',venue)
-    //                             console.log('WEBSITE', web);
+    var eventId=req.query.eventId
+    Event.findById(eventId, function(err,event){
+        event.date=req.body.date
+        event.time=req.body.starttime
+        event.hours=req.body.hours
+        event.guestCount=req.body.guestCount
+        event.price=req.body.price
+
+        event.save(function(err,savedEvent){
+            if(err){
+                console.log('Error saving event paramaters', err );
+            } else {
+                console.log('Successfully saved event parameters');
+                VEvent.find({venueOption: eventId},function(err,venues){
+                    console.log('VENUES FOR THAT EVENT',venues)
+                    venues.forEach(venue => {
+                        VData.find({placeId:venue.placeId}, function(err,matches){
+                            matches.forEach(match => {
+                                var web = match.domain
+                                var b;
+                                console.log('THE VENUE',venue)
+                                console.log('WEBSITE', web);
     //                             // Check database to see if there's an email for that venue already
     //                             //if not, retrieve email using hunter
-    //                             if(!match.email){
+                                if(!match.email){
+                                    console.log('no match.email', match)
     //                                 // helper.collectEmail(web)
     //                                 // .then((emails) => {
     //                                 //     console.log('RETRIEVED EMAILS', emails)
@@ -655,19 +656,19 @@ router.post('/contactlist', function(req, res) {
     //                                 //     })
     //                                 // })
     //                                 console.log('bananas')
-    //                             }
-    //                             else{
-    //                                 console.log('MATCH IS', match)
-    //                                 helper.sendMail(req, match, venue)
-    //                             }
-    //                         })
-    //                     })
-    //                 })
-    //             })
-    //             res.redirect('whatsnext')
-    //         }
-    //     })
-    // })
+                                }
+                                else{
+                                    console.log('MATCH IS', match)
+                                    helper.sendMail(req, match, venue)
+                                }
+                            })
+                        })
+                    })
+                })
+                res.redirect('nextsteps')
+            }
+        })
+    })
 })
 
 router.get('/nextsteps',function(req,res){
