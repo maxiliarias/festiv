@@ -344,10 +344,13 @@ router.post('/messages', upload.array(), function(req,res){
                 console.log('saved the chat!');
                 VEvent.findById(venueId)
                 .exec(function(err,venue){
+                        console.log('vEvent is', venue);
                     Event.findById(venue.venueOption)
                     .exec(function(err,foundEvent){
+                        console.log("Event is", foundEvent);
                         User.findById(foundEvent.EventOwner)
                         .exec(function(err,user){
+                            console.log('User is', user);
                             venue.chat.push(msg._id)
                             venue.lastFrom= mail.from.text
                             venue.save(function(err,savedV){
