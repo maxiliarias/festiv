@@ -362,9 +362,9 @@ router.post('/messages', upload.array(), function(req,res){
                                     var b = {
                                             personalizations: [{
                                                 'substitutions': {
-                                                    businessName: venue.name,
-                                                    link: `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
-                                                    fname: user.fname
+                                                    '-businessName-': venue.name,
+                                                    '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+                                                    '-fname-': user.fname
                                                 },
                                                 "to": [{
                                                       "email": user.email
