@@ -366,6 +366,10 @@ router.post('/messages', upload.array(), function(req,res){
                                                     link: `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
                                                     fname: user.fname
                                                 },
+                                                "to": [{
+                                                      "email": user.email
+                                                    }],
+                                                subject: "You've received a message from " + venue.name,
                                                 custom_args: {
                                                     "vEventid": venue._id,
                                                 }
