@@ -770,7 +770,7 @@ router.post('/msgresponse',function(req,res){
                     console.log('STATUS HERE' ,response.statusCode);
                     console.log('BODY HERE', response.body);
                 });
-                res.render('messages')
+                res.redirect(`/messages?venueId=${venueId}`)
             })
         })
 })
