@@ -1,3 +1,4 @@
+<!-- PICTURE SCROLL -->
 <div class="row">
     <div class="col-sm-12">
         <div class="cover-container">
@@ -14,26 +15,29 @@
 <div class="row">
     <div class="col-sm-8 pad-top pl-5">
         <div class="row">
-            <div class="col-sm-4 text-center">
-                <a href="/questionnaire">
-                    <button class="btn btn-yellow" type="submit" name="button">All Set? Request Bids</button>
+            <div class="col-sm-6 text-center">
+                <a href="/contactlist">
+                    <button class="btn btn-yellow" type="submit" name="button">All Set? Request Bids
+                    </button>
                 </a>
                 <button class="btn btn-primary" type="submit" name="button">Tag An Event Below</button>
-
-                <div class="contactSide text-left">
-                    <h6>Your Events</h6>
+                <div class="contactSide mb-4 text-left">
+                    <h6 class="mb-3"><b>My Events</b></h6>
                     {{#each events}}
-                        <span class="fa fa-heart" aria-hidden="true">
-                            <a href="/addVenue?/eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}">{{this.name}}</a>
-                        </span> </br>
-                        {{#if events.vEvent}}
-                        {{#each events.vEvent}}
-                            <p>{{this.name}}</p>
-                        {{/each}}
+                        <h6>
+                            <a href="/addVenue?/eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}">{{this.name}}
+                                <span class="fa fa-heart" aria-hidden="true"></span>
+                            </a>
+                        </h6>
+                        {{#if this.vEvent}}
+                            {{#each this.vEvent}}
+                                <p class="ml-2">{{this.name}}</p>
+                            {{/each}}
+                        {{/if}}
                     {{/each}}
                 </div>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-6">
                 <h2 class="section-heading text-blue text-left">{{this.name}}</h2>
                 <h3 class="section-subheading text-muted">{{this.company.twitter.bio}}</h2>
                 <div class="row">
@@ -49,16 +53,29 @@
                     </div>
                 </div>
                 <p class="pad-top">{{this.company.description}} </p>
+                <!-- <div class="row "> -->
+                    <!-- <div class="col-sm-8 sidebar pad-top">
+
+                    </div>
+                    <div class="col-sm-4 pad-top venueSide section-light"> -->
+                        <h6 class="text-blue">Hours: <span class="fa fa-clock-o" aria-hidden="true"></span></h6>
+                        <div style="padding: 5px; border-radius: 3px">
+                            {{#each this.hours}}
+                            <p>{{this}}</p>
+                            {{/each}}
+                        </div>
+                    <!-- </div> -->
+                <!-- </div> -->
             </div>
         </div>
     </div>
 
-    <div class="col-sm-4 pad-top section-primary">
+    <div class="col-sm-4 pad-top mt-4 mb-4 section-primary">
                 <div id="venueMap" class="sidebar"></div>
-                <p class="text-white text-center"><b>{{this.address}}</b></p>
+                <h6 class="text-white text-center"><b>{{this.address}}</b></h6>
     </div>
 </div>
-<div class="row ">
+<!-- <div class="row ">
         <div class="col-sm-8 sidebar pad-top">
 
         </div>
@@ -70,7 +87,7 @@
                 {{/each}}
             </div>
         </div>
-</div>
+</div> -->
 
 <script>
 function initMap() {

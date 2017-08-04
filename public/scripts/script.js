@@ -9,18 +9,20 @@ $( document ).ready(function() {
     $('.taggedEvent').on('click', function(){
       $(".viewVenues").hide()
     })
-
+    // for when venues renders nothing
     if(window.location.href.split("?")[1] === "needsearch=true"){
-        alert("Please make an initial search")
+        alert("Please make a new search first")
     }
+    // Confirmation modal on contactlist page
+    $( "#contactBtn" ).click(function( event ) {
+      event.preventDefault();
+      $('#confirmModal').modal('show');
+    });
 
-    // $('#venueLink').on('click', function(){
-    //     console.log('in here');
-    //
-    //     if(!req.session.search){
-    //         alert("Please make an initial search")
-    //     }
-    // })
+    $( "#request-bids" ).click(function() {
+        $('#confirmModal').modal('hide');
+        $( "#contactForm" ).submit();
+    });
 
 });
 

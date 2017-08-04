@@ -28,6 +28,7 @@ var vEventSchema = mongoose.Schema({
     venueOption:{type: Schema.Types.ObjectId, ref: 'Event' },
     placeId: String,
     name: String,
+    lastFrom: String,
     chat:[{ type: Schema.Types.ObjectId, ref: 'Chat' }]
 })
 

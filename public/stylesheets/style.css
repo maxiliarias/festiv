@@ -76,10 +76,16 @@ h3.section-subheading {
 .eventBorders{
     border: rgb(76, 219, 219) solid 5px;
 }
-.parallax {
+.parallaxHome{
     /* The image used */
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/front-page/max.jpeg");
+}
+.parallaxNextSteps{
+    /* The image used */
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/vases.jpeg");
+}
 
+.parallax {
     /* Set a specific height */
     height: 600px;
 
@@ -150,6 +156,9 @@ h3.section-subheading {
 }
 .text-blue{
     color: rgb(76, 219, 219);
+}
+.text-darkerBlue{
+    color:rgb(0, 204, 204)
 }
 .text-light{
     color: #FAF9F9
@@ -225,8 +234,11 @@ form{
 .section-light{
     background-color:#FAF9F9;
 }
+.section-transparent{
+    background-color:rgba(250, 249, 249,0.8);
+}
 .section-blue{
-    background-color: rgb(76, 219, 219);
+    background-color:rgb(76, 219, 219);
 }
 
 .card{

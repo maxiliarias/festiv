@@ -227,11 +227,12 @@ router.post('/newSearch', function(req, res) {
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
-/* still can be public*/
 router.post('/venue', function(req, res) {
     Event.find({eventOwner: req.user._id})
     .populate('vEvent')
     .exec(function(err,events){
+        console.log('BODY', req.body);
+        console.log('queries', req.query.name, req.query.address);
         if(err){
             console.log('error finding events in venue profile page',err);
         } else {
@@ -240,11 +241,10 @@ router.post('/venue', function(req, res) {
               .then(function (company) {
                 console.log('inside clearbit ', company);
                 VData.findOne({placeId: req.body.placeId}, function(err, foundVdata){
-                    console.log('MY EVENTS', events[0].vEvent)
+                    console.log('MY EVENTS', events)
                     if(err){
                         console.log('err finding vData',err);
                     } else {
-
                         foundVdata.facebook = company.facebook.handle || ""
                         foundVdata.twitter = company.twitter.handle || ""
                         foundVdata.description= company.description || ""
@@ -344,11 +344,49 @@ router.post('/messages', upload.array(), function(req,res){
                 VEvent.findById(venueId)
                 .exec(function(err,venue){
                     venue.chat.push(msg._id)
+                    venue.lastFrom= mail.from.text
                     venue.save(function(err,savedV){
                         if(err){
                             console.log('error saving venue w chat id', err);
                         } else {
                             console.log('saved the venue w chat id!')
+                            //alert the user, they've received a response/bid
+                            var b = {
+                                    personalizations: [{
+                                        'substitutions': {
+                                            businessName: venue.name,
+                                            venueId: venueId,
+                                            fname: req.user.fname
+                                        },
+                                        custom_args: {
+                                            "vEventid": venue._id,
+                                        }
+                                    }],
+                                    from: {
+                                        email: 'alert@hello.festivspaces.com',
+                                        name: req.user.fname + ' (Festiv)'
+                                    },
+                                    reply_to:{
+                                        email: 'id'+ venue._id + '@reply.festivspaces.com',
+                                        name: req.user.fname + ' (Festiv)'
+                                    },
+                                    template_id: process.env.TEMPLATE_ID_ALERT
+                                }
+
+                            var request = sg.emptyRequest({
+                                method: 'POST',
+                                path: '/v3/mail/send',
+                                body: b
+                            });
+                            sg.API(request, function(error, response) {
+                                if (error) {
+                                    console.log('Error response received');
+                                }
+                                console.log('STATUS HERE' ,response.statusCode);
+                                console.log('BODY HERE', response.body);
+                                console.log('HEADERS HERE', response.headers);
+                            });
+
                             res.status(200).end();
                         }
                     })
@@ -502,6 +540,7 @@ router.get('/events', function(req, res) {
 
 /* REMOVE a specific event from the database*/
 router.get('/removeEvent', function(req, res) {
+    console.log('req.query here', req.query);
     var eventId= req.query.eventId;
     Event.findById(eventId)
     .exec(function(err, event){
@@ -547,6 +586,7 @@ router.get('/removeVenue', function(req, res) {
 router.get('/contactlist', function(req, res, next) {
     if(req.query.eventId){
         Event.findById(req.query.eventId)
+        .populate("vEvent")
         .exec(function(err,party){
             res.render('contactlist', ({
                 party: party,
@@ -567,66 +607,71 @@ router.get('/contactlist', function(req, res, next) {
 
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
-    var eventId=req.query.eventId
-    Event.findById(eventId, function(err,event){
-        event.date=req.body.date
-        event.time=req.body.starttime
-        event.hours=req.body.hours
-        event.guestCount=req.body.guestCount
-        event.price=req.body.price
+    console.log('in contactlist', req.body)
+    // var eventId=req.query.eventId
+    // Event.findById(eventId, function(err,event){
+    //     event.date=req.body.date
+    //     event.time=req.body.starttime
+    //     event.hours=req.body.hours
+    //     event.guestCount=req.body.guestCount
+    //     event.price=req.body.price
+    //
+    //     event.save(function(err,savedEvent){
+    //         if(err){
+    //             console.log('Error saving event paramaters', err );
+    //         } else {
+    //             console.log('Successfully saved event parameters');
+    //             VEvent.find({venueOption: eventId},function(err,venues){
+    //                 console.log('VENUES FOR THAT EVENT',venues)
+    //                 venues.forEach(venue => {
+    //                     VData.find({placeId:venue.placeId}, function(err,matches){
+    //                         matches.forEach(match => {
+    //                             var web = match.domain
+    //                             var b;
+    //                             console.log('THE VENUE',venue)
+    //                             console.log('WEBSITE', web);
+    //                             // Check database to see if there's an email for that venue already
+    //                             //if not, retrieve email using hunter
+    //                             if(!match.email){
+    //                                 // helper.collectEmail(web)
+    //                                 // .then((emails) => {
+    //                                 //     console.log('RETRIEVED EMAILS', emails)
+    //                                 //     //STORE THE EMAILS IN THE DATABASE
+    //                                 //
+    //                                 //     if (emails[0]){
+    //                                 //         match.email.push(emails[0])
+    //                                 //     }
+    //                                 //     if(emails[1]){
+    //                                 //         match.email.push(emails[1])
+    //                                 //     }
+    //                                 //
+    //                                 //     match.save(function(err,savedV){
+    //                                 //         if(err){
+    //                                 //             console.log('error saving venue email', err)
+    //                                 //         } else {
+    //                                 //             console.log('Successfully saved venue w emails')
+    //                                 //             helper.sendMail(req, match, venue)
+    //                                 //         }
+    //                                 //     })
+    //                                 // })
+    //                                 console.log('bananas')
+    //                             }
+    //                             else{
+    //                                 console.log('MATCH IS', match)
+    //                                 helper.sendMail(req, match, venue)
+    //                             }
+    //                         })
+    //                     })
+    //                 })
+    //             })
+    //             res.redirect('whatsnext')
+    //         }
+    //     })
+    // })
+})
 
-        event.save(function(err,savedEvent){
-            if(err){
-                console.log('Error saving event paramaters', err );
-            } else {
-                console.log('Successfully saved event parameters');
-                VEvent.find({venueOption: eventId},function(err,venues){
-                    console.log('VENUES FOR THAT EVENT',venues)
-                    venues.forEach(venue => {
-                        VData.find({placeId:venue.placeId}, function(err,matches){
-                            matches.forEach(match => {
-                                var web = match.domain
-                                var b;
-                                console.log('THE VENUE',venue)
-                                console.log('WEBSITE', web);
-                                // Check database to see if there's an email for that venue already
-                                //if not, retrieve email using hunter
-                                if(!match.email){
-                                    // helper.collectEmail(web)
-                                    // .then((emails) => {
-                                    //     console.log('RETRIEVED EMAILS', emails)
-                                    //     //STORE THE EMAILS IN THE DATABASE
-                                    //
-                                    //     if (emails[0]){
-                                    //         match.email.push(emails[0])
-                                    //     }
-                                    //     if(emails[1]){
-                                    //         match.email.push(emails[1])
-                                    //     }
-                                    //
-                                    //     match.save(function(err,savedV){
-                                    //         if(err){
-                                    //             console.log('error saving venue email', err)
-                                    //         } else {
-                                    //             console.log('Successfully saved venue w emails')
-                                    //             helper.sendMail(req, match, venue)
-                                    //         }
-                                    //     })
-                                    // })
-                                    console.log('bananas')
-                                }
-                                else{
-                                    console.log('MATCH IS', match)
-                                    helper.sendMail(req, match, venue)
-                                }
-                            })
-                        })
-                    })
-                })
-                res.redirect('/contactlist')
-            }
-        })
-    })
+router.get('/nextsteps',function(req,res){
+    res.render('nextsteps')
 })
 
 /*Render a page with the conversation for one venue*/
@@ -645,6 +690,7 @@ router.get('/messages',function(req,res){
                     res.render('messages', {
                         events: events,
                         message: msg,
+                        venueId: venueId,
                         loggedin: req.user ? true: false
                     })
                 }
@@ -659,7 +705,64 @@ router.get('/messages',function(req,res){
     })
 })
 
+/* Save user's email, send the email to last person to respond */
+/* or to official business email on file if other is not available */
+router.post('/msgresponse',function(req,res){
+    var venueId= req.query.venueId
+    console.log('in msg response', venueId);
+        var newMsg = new Chat({
+            chatOwner: venueId,
+            from: req.user.email,
+            date: helper.formatDate(new Date()),
+            content: req.body.response
+        })
+        newMsg.save()
 
+        VEvent.findById(venueId,function(err,venue){
+            VData.findOne({placeId: venue.placeId})
+            .exec(function(err,vSource){
+            var b={
+                "personalizations": [{
+                    //Send email to the last person to respond or the original email it was sent to
+                    // if no response from the business yet
+                      "to": [{
+                          "email": venue.lastFrom || vSource.email[0]
+                        }],
+                        subject: req.body.subject,
+                        custom_args: {
+                            "vEventid": venueId
+                        }
+                }],
+                "from": {
+                    email: req.user.email,
+                    name: req.user.fname + ' (Festiv)'
+                },
+                "content": [{
+                      "type": "text/plain",
+                      "value": req.body.response
+                  }],
+                reply_to:{
+                      email: 'id'+ venueId + '@reply.festivspaces.com',
+                      name: req.user.fname + ' (Festiv)'
+                  },
+                }
+
+                var request = sg.emptyRequest({
+                    method: 'POST',
+                    path: '/v3/mail/send',
+                    body: b
+                });
+                sg.API(request, function(error, response) {
+                    if (error) {
+                        console.log('Error response received');
+                    }
+                    console.log('STATUS HERE' ,response.statusCode);
+                    console.log('BODY HERE', response.body);
+                });
+                res.render('/messages')
+            })
+        })
+})
 ///////////////////////////// END OF PRIVATE ROUTES /////////////////////////////
 
 module.exports = router;

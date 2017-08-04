@@ -10,20 +10,25 @@
         {{#each events}}
             <h6 class="text-white"><b>{{this.name}}</b></h6>
             {{#each this.vEvent}}
-                <p class="text-white pl-2">
+                <b><p class="text-white pl-2">
                     <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
                     {{#if this.chat}}
                         <span class="fa fa-envelope" aria-hidden="true"></span>
                     {{/if}}
-                </p>
+                </p></b>
             {{/each}}
         {{/each}}
     </div>
     <div class="col-sm 8 mr-4 mb-4 section-light mx-auto">
         {{#if message}}
-            <h6 class="text-blue"> Conversation History </h6>
+            <h5 class="text-blue pl-1 pt-3 pb-3"> Conversation History </h5>
+            <form class="form-group text-right" method="post" action="/msgresponse?venueId={{venueId}}">
+                <input class="form-control mb-2" name="subject" placeholder="Subject" required>
+                <textarea rows="5" class="form-control" name="response" placeholder="Type a response here" id="message" required></textarea>
+                <button class="btn btn-primary m-2"> Send </button>
+            </form>
             {{#each message}}
-                <div class="p-2 section-blue">
+                <div class="p-2">
                     <p><b>From:</b> {{this.from}}</p>
                     <p><b>Date:</b> {{this.date}}</p>
                     <p></br> {{{this.content}}}</p>

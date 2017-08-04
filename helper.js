@@ -47,7 +47,6 @@ var helper = {
                     custom_args: {
                         "vEventid": venue._id,
                         "vDataid": match._id
-
                     }
                 }],
                 from: {
