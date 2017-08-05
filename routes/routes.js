@@ -1,8 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var models = require('../models');
-var {Blog, User, Event,VEvent, VData, Chat } = require('../models');
-var {helper} = require('../helper');
+var { Blog, User, Event, VEvent, VData, Chat } = require('../models');
+var { helper } = require('../helper');
 var request = require('request-promise');
 var fs = require('fs');
 var NodeGeocoder = require('node-geocoder');
@@ -10,7 +9,7 @@ var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 var clearbit = require('clearbit')(process.env.CLEARBIT);
 var multer  = require('multer');
 var upload = multer();
-const simpleParser = require('mailparser').simpleParser;
+var simpleParser = require('mailparser').simpleParser;
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
 // Users who are not logged in can see these routes
@@ -28,51 +27,56 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/venues',function(req,res){
-    if(!req.session.search){
+router.get('/venues',function(req, res){
+    if (!req.session.search){
         res.redirect('/?needsearch=true')
-    } else {
-        Event.find({eventOwner: req.user._id})
-            .populate('vEvent')
-            .exec(function(err,ocassions){
-            if(req.query.placeId){
-                var temp = JSON.parse(JSON.stringify(req.session.search));
-                temp.forEach(function(venue) {
-                    if (venue.placeId === req.query.placeId) {
-                        venue.modal = "display:block";
-                    } else {
-                        venue.modal = "";
-                    }
-                });
-                res.render('list', {
-                    venues: temp,
-                    googleApi: process.env.GOOGLEPLACES,
-                    events: ocassions,
-                    page2: req.session.pagetoken[1]? 'true': null,
-                    page3: req.session.pagetoken[2]? 'true': null,
-                    loggedin: req.user ? true: false
-                })
-            } else {
-                res.render('list', {
-                    venues: req.session.search,
-                    googleApi: process.env.GOOGLEPLACES,
-                    page2: req.session.pagetoken[1]? 'true': null,
-                    page3: req.session.pagetoken[2]? 'true': null,
-                    loggedin: req.user ? true: false
-                })
-            }
-        })
+        return;
     }
+    Event.find({eventOwner: req.user._id})
+        .populate('vEvent')
+        .exec(function(err, ocassions){
+        if (err) {
+            res.status(500).send('Error finding blogs');
+            return;
+        }
+        if (req.query.placeId) {
+            var temp = JSON.parse(JSON.stringify(req.session.search));
+            temp.forEach(function(venue) {
+                if (venue.placeId === req.query.placeId) {
+                    venue.modal = "display:block";
+                } else {
+                    venue.modal = "";
+                }
+            });
+            res.render('list', {
+                venues: temp,
+                googleApi: process.env.GOOGLEPLACES,
+                events: ocassions,
+                page2: req.session.pagetoken[1] ? 'true' : null,
+                page3: req.session.pagetoken[2] ? 'true' : null,
+                loggedin: req.user ? true: false
+            })
+        } else {
+            res.render('list', {
+                venues: req.session.search,
+                googleApi: process.env.GOOGLEPLACES,
+                page2: req.session.pagetoken[1] ? 'true' : null,
+                page3: req.session.pagetoken[2] ? 'true' : null,
+                loggedin: req.user ? true: false
+            })
+        }
+    })
 })
 
 /* Blog Routes public*/
-router.get('/blog',function(req,res){
-    Blog.find(function(err,blogs){
-        if(err){
+router.get('/blog', function(req, res){
+    Blog.find(function(err, blogs){
+        if (err){
             console.log('error finding blogs',err);
+            res.status(500).send('Error finding blogs');
         } else {
             res.render('blog',{
-                blog:blogs,
+                blog: blogs,
                 loggedin: req.user ? true: false
             })
         }
@@ -100,6 +104,7 @@ router.post('/venues', function(req, res) {
     let venues = [];
     let lat;
     let lng;
+    let keyword;
 
     req.session.location = req.body.location || req.session.location;
     req.body.type = req.body.type || " "
@@ -111,25 +116,24 @@ router.post('/venues', function(req, res) {
     .then(function() {
         // let radius = (parseInt(req.body.radius) * 1609.34).toString();
         req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
-        let keyword= req.session.keyword
+        keyword= req.session.keyword
         req.session.pagetoken= req.session.pagetoken || [""];
-        return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
-        .then(resp => JSON.parse(resp))
-        .then(obj => {
-            console.log('REQUEST', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
-            console.log('pagetoken before', req.session.pagetoken);
-            if(obj.next_page_token){
-                if(req.session.pagetoken.length<= 3){
-                    req.session.pagetoken.push(obj.next_page_token)
-                }
-            }
-            console.log('page token after', req.session.pagetoken);
-            obj.results.forEach(item => {
-                placeId.push(item.place_id)
-            });
-            for (var i = 0; i < placeId.length; i++) {
-                var venueId = placeId[i]
-                venues.push(
+        return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``));
+    })
+    .then(resp => JSON.parse(resp))
+    .then(obj => {
+        console.log('REQUEST', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
+        console.log('pagetoken before', req.session.pagetoken);
+        if(obj.next_page_token && req.session.pagetoken.length<= 3){
+            req.session.pagetoken.push(obj.next_page_token);
+        }
+        console.log('page token after', req.session.pagetoken);
+        obj.results.forEach(item => {
+            placeId.push(item.place_id)
+        });
+        for (var i = 0; i < placeId.length; i++) {
+            var venueId = placeId[i]
+            venues.push(
                 request(`https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLEPLACES}&placeid=${placeId[i]}`)
                 .then(resp => JSON.parse(resp))
                 .then(
@@ -143,7 +147,7 @@ router.post('/venues', function(req, res) {
                                         return true;
                                     }
                                 }
-                            return false
+                                return false
                             })
                             .then(function(exists){
                                 if(!exists){
@@ -152,7 +156,9 @@ router.post('/venues', function(req, res) {
                                         name: obj2.result.name,
                                         domain: obj2.result.website
                                     })
-                                    newVen.save();
+                                    newVen.save(function(err, ven) {
+                                        console.log(err); // ignore
+                                    });
                                 }
                                 return ({
                                     placeId: v,
@@ -182,40 +188,36 @@ router.post('/venues', function(req, res) {
                             })
                         }
                     })(venueId)
-                ))
-            }
-            return Promise.all(venues)
-        })
-        .then(arrayOfResults => {
-            var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
-            var filteredVenues = arrayOfResults.filter(place => {return place.type.every(function(elem){return arr.indexOf(elem) === -1})})
-            var filteredVenues2 = filteredVenues.filter(place => {return place.photo5 !== ""})
-            console.log(filteredVenues.length-filteredVenues2.length, ' # of venues removed')
-            req.session.search = filteredVenues2;
-            console.log('session saved', req.session.search[0].name);
-            res.render('list', {
-                venues: filteredVenues2,
-                googleApi: process.env.GOOGLEPLACES,
-                page2: req.session.pagetoken[1]? 'true': null,
-                page3: req.session.pagetoken[2]? 'true': null,
-                loggedin: req.user ? true: false
-            });
-        })
-        .catch(err => console.log("ERR", err))
+                )
+            )
+        }
+        return Promise.all(venues)
+    })
+    .then(arrayOfResults => {
+        var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
+        var arrayOfResults = arrayOfResults.filter(place => {
+            // do not do
+            // return
+            // place.type....
+            return place.type.every(function(elem){
+                return arr.indexOf(elem) === -1;
+            }) && place.photo5 !== "";
+        });
+        console.log(arrayOfResults.length-arrayOfResults.length, ' # of venues removed')
+        req.session.search = arrayOfResults;
+        console.log('session saved', req.session.search[0].name);
+        res.render('list', {
+            venues: arrayOfResults,
+            googleApi: process.env.GOOGLEPLACES,
+            page2: req.session.pagetoken[1]? 'true': null,
+            page3: req.session.pagetoken[2]? 'true': null,
+            loggedin: req.user ? true: false
+        });
     })
     .catch(function(err) {
         console.log(err);
+        // TODO: render res.render error page?
     });
-})
-
-/*Receive user id and venue names from Event API and create new Message in Mongoose for user */
-router.post('/createMsg',function(req,res){
-    console.log('CREATE MSG POST',req.body);
-    var userId = req.body.userid
-    User.findById(userId,function(req,res){
-
-    })
-    res.send('OK')
 })
 
 /* NEW SEARCH goes here after search within venues is pinged*/
@@ -223,104 +225,105 @@ router.post('/newSearch', function(req, res) {
     req.session.search =[]
     req.session.pagetoken=[""]
     console.log('clear pg token', req.session.pagetoken);
+    //TODO  LOOK UP 307 AGAIN WHY I NEED IT
     res.redirect(307, '/venues');
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
 router.post('/venue', function(req, res) {
+    let events;
+    let company;
     Event.find({eventOwner: req.user._id})
     .populate('vEvent')
-    .exec(function(err,events){
-        console.log('BODY', req.body);
-        console.log('queries', req.query.name, req.query.address);
-        if(err){
-            console.log('error finding events in venue profile page',err);
-        } else {
-            console.log('found events in venue profile!');
-            clearbit.Company.find({domain: req.body.website})
-              .then(function (company) {
-                console.log('inside clearbit ', company);
-                VData.findOne({placeId: req.body.placeId}, function(err, foundVdata){
-                    console.log('MY EVENTS', events)
-                    if(err){
-                        console.log('err finding vData',err);
-                    } else {
-                        foundVdata.facebook = company.facebook.handle || ""
-                        foundVdata.twitter = company.twitter.handle || ""
-                        foundVdata.description= company.description || ""
-                        foundVdata.metaD= company.site.metaDescription || ""
-                        foundVdata.twitterBio= company.twitter.Bio || ""
-                        console.log('found vData, updating', foundVdata);
-                        foundVdata.save(function(err,savedVdata){
-                            if(err){
-                                console.log('error saving Vdata after update');
-                            } else {
-                                console.log('Successfully saved vData, now rendering venues.hbs');
-                                res.render('venue',{
-                                    company: company,
-                                    events: events,
-                                    placeId: req.body.placeId,
-                                    name: req.query.name,
-                                    address: req.query.address,
-                                    phone: req.body.phone,
-                                    photo1: req.body.photo1,
-                                    photo2: req.body.photo2
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo2 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo3: req.body.photo3
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo3 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo4: req.body.photo4
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo4 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo5: req.body.photo5
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo5 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo6: req.body.photo6
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo6 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo7: req.body.photo7
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo7 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo8: req.body.photo8
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo8 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo9: req.body.photo9
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo9 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    photo10: req.body.photo10
-                                    ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + req.body.photo10 + '&key=' + process.env.GOOGLEPLACES
-                                    : '',
-                                    rating: req.body.rating,
-                                    lat: req.body.lat,
-                                    lng: req.body.lng,
-                                    hours: req.body.hours.split(','),
-                                    url: req.body.url, //
-                                    website: req.body.website,
-                                    loggedin: req.user ? true: false
-                                })
-                            }
-                        })
-                    }
-                })
-              })
-              .catch(clearbit.Company.QueuedError, function (err) {
-                // Company lookup queued - try again later
-              })
-              .catch(clearbit.Company.NotFoundError, function (err) {
-                // Company could not be found
-                console.log(err);
-              })
-              .catch(function (err) {
-                console.error(err);
-              });
-        }
+    .exec()
+    .then(function(e){
+        // console.log('BODY', req.body);
+        // console.log('queries', req.query.name, req.query.address);
+        console.log('found events in venue profile!');
+        console.log('MY EVENTS', e)
+        events = e;
+        return clearbit.Company.find({domain: req.body.website});
     })
+    .then(function (c) {
+        console.log('inside clearbit ', c);
+        company = c;
+        return VData.findOne({placeId: req.body.placeId});
+    })
+    .then(function(foundVdata){
+        foundVdata.facebook = company.facebook.handle || ""
+        foundVdata.twitter = company.twitter.handle || ""
+        foundVdata.description= company.description || ""
+        foundVdata.metaD= company.site.metaDescription || ""
+        foundVdata.twitterBio= company.twitter.Bio || ""
+        console.log('found vData, updating', foundVdata);
+        return foundVdata.save();
+    })
+    .then(function(savedVdata){
+        console.log('Successfully saved vData, now rendering venues.hbs');
+        req.session.venueRedirect = {
+            company: company,
+            events: events,
+            placeId: req.body.placeId,
+            name: req.query.name,
+            address: req.query.address,
+            phone: req.body.phone,
+            photo1: req.body.photo1,
+            photo2: generateGooglePlacesLink(req.body.photo2),
+            photo3: generateGooglePlacesLink(req.body.photo3),
+            photo4: generateGooglePlacesLink(req.body.photo4),
+            photo5: generateGooglePlacesLink(req.body.photo5),
+            photo6: generateGooglePlacesLink(req.body.photo6),
+            photo7: generateGooglePlacesLink(req.body.photo7),
+            photo8: generateGooglePlacesLink(req.body.photo8),
+            photo9: generateGooglePlacesLink(req.body.photo9),
+            photo10: generateGooglePlacesLink(req.body.photo10),
+            rating: req.body.rating,
+            lat: req.body.lat,
+            lng: req.body.lng,
+            hours: req.body.hours.split(','),
+            url: req.body.url, //
+            website: req.body.website,
+            loggedin: req.user ? true: false
+        };
+        res.redirect('/venue')
+    })
+    .catch(clearbit.Company.QueuedError, function (err) {
+        // Company lookup queued - try again later
+    })
+    .catch(clearbit.Company.NotFoundError, function (err) {
+        // Company could not be found
+        console.log(err);
+    })
+    .catch(function (err) {
+        console.error(err);
+    });
+});
+
+router.get('/venue', function(req, res) {
+    var temp = req.session.venueRedirect;
+    if (!temp) {
+        res.redirect('/venues');
+        return;
+    }
+    res.render('venue', temp);
 })
+
+// TODO: put in helpers..
+function generateGooglePlacesLink(data) {
+    if (!data) {
+        return '';
+    }
+    return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + data + '&key=' + process.env.GOOGLEPLACES;
+}
 
 /* Allows Sendgrid to post venue replies to our emails, then we store the messages
 /*in mongoose and alert our client*/
 router.post('/messages', upload.array(), function(req,res){
+    let msg;
+    let venue;
+    let foundEvent;
+    let user;
+    let venueId;
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail.to.text);
         console.log('MAIL TEXT',mail.text);
@@ -329,7 +332,7 @@ router.post('/messages', upload.array(), function(req,res){
         var atSign= mail.to.text.indexOf("@")
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('MANGO',mail.to.text.slice(idSpot,atSign))
-        var venueId= mail.to.text.slice(idSpot,atSign)
+        venueId= mail.to.text.slice(idSpot,atSign)
         var chat = new Chat({
             chatOwner: venueId,
             date: helper.formatDate(mail.date),
@@ -337,72 +340,73 @@ router.post('/messages', upload.array(), function(req,res){
             content: mail.text
         });
         console.log('Chat saved is ',chat)
-        chat.save(function(err, msg) {
-            if(err){
-                console.log('Error saving the chat',err);
-            } else {
-                console.log('saved the chat!');
-                VEvent.findById(venueId)
-                .exec(function(err,venue){
-                        console.log('vEvent is', venue);
-                    Event.findById(venue.venueOption)
-                    .exec(function(err,foundEvent){
-                        console.log("Event is", foundEvent);
-                        User.findById(foundEvent.eventOwner)
-                        .exec(function(err,user){
-                            console.log('User is', user);
-                            venue.chat.push(msg._id)
-                            venue.lastFrom= mail.from.text
-                            venue.save(function(err,savedV){
-                                if(err){
-                                    console.log('error saving venue w chat id', err);
-                                } else {
-                                    console.log('saved the venue w chat id!')
-                                    //alert the user, they've received a response/bid
-                                    var b = {
-                                            personalizations: [{
-                                                'substitutions': {
-                                                    '-businessName-': venue.name,
-                                                    '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
-                                                    '-fname-': user.fname
-                                                },
-                                                "to": [{
-                                                      "email": user.email
-                                                    }],
-                                                subject: "You've received a message from " + venue.name,
-                                                custom_args: {
-                                                    "vEventid": venue._id,
-                                                }
-                                            }],
-                                            from: {
-                                                email: 'alert@hello.festivspaces.com',
-                                                name: 'Festiv'
-                                            },
-                                            template_id: process.env.TEMPLATE_ID_ALERT
-                                        }
+        return chat.save();
+    })
+    .then(function(m) {
+        msg = m;
+        console.log('saved the chat!');
+        return VEvent.findById(venueId);
+    })
+    .then(function(v){
+        venue = v;
+        console.log('vEvent is', venue);
+        return Event.findById(venue.venueOption);
+    })
+    .then(function(fe){
+        foundEvent = fe;
+        console.log("Event is", foundEvent);
+        return User.findById(foundEvent.eventOwner);
+    })
+    .then(function(u){
+        user = u;
+        console.log('User is', user);
+        venue.chat.push(msg._id)
+        venue.lastFrom= mail.from.text
+        return venue.save();
+    })
+    .then(function(savedV) {
+        console.log('saved the venue w chat id!')
+        //alert the user, they've received a response/bid
+        var b = {
+            personalizations: [{
+                'substitutions': {
+                    '-businessName-': venue.name,
+                    '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+                    '-fname-': user.fname
+                },
+                "to": [{
+                      "email": user.email
+                    }],
+                subject: "You've received a message from " + venue.name,
+                custom_args: {
+                    "vEventid": venue._id,
+                }
+            }],
+            from: {
+                email: 'alert@hello.festivspaces.com',
+                name: 'Festiv'
+            },
+            template_id: process.env.TEMPLATE_ID_ALERT
+        }
 
-                                    var request = sg.emptyRequest({
-                                        method: 'POST',
-                                        path: '/v3/mail/send',
-                                        body: b
-                                    });
-                                    sg.API(request, function(error, response) {
-                                        if (error) {
-                                            console.log('Error response received');
-                                        }
-                                        console.log('STATUS HERE' ,response.statusCode);
-                                        console.log('BODY HERE', response.body);
-                                        console.log('HEADERS HERE', response.headers);
-                                    });
-
-                                    res.status(200).end();
-                                }
-                            })
-                        })
-                    })
-                })
+        var request = sg.emptyRequest({
+            method: 'POST',
+            path: '/v3/mail/send',
+            body: b
+        });
+        sg.API(request, function(error, response) {
+            if (error) {
+                console.log('Error response received');
             }
-        })
+            console.log('STATUS HERE' ,response.statusCode);
+            console.log('BODY HERE', response.body);
+            console.log('HEADERS HERE', response.headers);
+        });
+        res.status(200).end();
+    })
+    .catch(function(err) {
+        console.log('sendgrid error', err);
+        res.status(500).end();
     })
 })
 
