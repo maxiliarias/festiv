@@ -21,6 +21,7 @@ var eventSchema = mongoose.Schema({
     hours: Number,
     guestCount: Number,
     price: String,
+    additional: String,
     vEvent: [{ type: Schema.Types.ObjectId, ref: 'VEvent' }]//pulls in all the venue ids related to this specific event of a user
 })
 

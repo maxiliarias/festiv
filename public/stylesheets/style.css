@@ -55,6 +55,9 @@ h3.section-subheading {
 .height{
     min-height: 500px;
 }
+.threeHeight{
+    min-height: 300px;
+}
 .sidebar{
     height: 630px;
     width: 100%;
@@ -236,6 +239,9 @@ form{
 }
 .section-transparent{
     background-color:rgba(250, 249, 249,0.8);
+}
+.section-transparentB{
+    background-color:rgba(76, 219, 219,0.5);
 }
 .section-blue{
     background-color:rgb(76, 219, 219);

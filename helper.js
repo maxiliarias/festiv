@@ -43,6 +43,7 @@ var helper = {
                         '-guestCount-':req.body.guestCount,
                         '-price-':req.body.price,
                         '-hours-':req.body.hours,
+                        '-additional-': req.body.additional
                     },
                     custom_args: {
                         "vEventid": venue._id,

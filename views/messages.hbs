@@ -6,36 +6,49 @@
 </div>
 
 <div class="row pl-4 pad-top mx-auto">
-    <div class="col-sm-4 ml-4 mb-4 section-primary pad-top">
-        {{#each events}}
-            <h6 class="text-white"><b>{{this.name}}</b></h6>
-            {{#each this.vEvent}}
-                <b><p class="text-white pl-2">
-                    <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
-                    {{#if this.chat}}
-                        <span class="fa fa-envelope" aria-hidden="true"></span>
-                    {{/if}}
-                </p></b>
+{{#if events }}
+        <div class="col-sm-4 ml-4 mb-4 threeHeight section-primary pad-top">
+            {{#each events}}
+                <h6 class="text-white"><b>{{this.name}}</b></h6>
+                {{#each this.vEvent}}
+                    <b><p class="text-white pl-2">
+                        <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
+                        {{#if this.chat}}
+                            <span class="fa fa-envelope" aria-hidden="true"></span>
+                        {{/if}}
+                    </p></b>
+                {{/each}}
             {{/each}}
-        {{/each}}
+        </div>
+        <div class="col-sm 8 mr-4 mb-4 section-light mx-auto ">
+            {{#if message}}
+                <h5 class="text-blue pl-1 pt-3 pb-3"> Conversation History </h5>
+                <form class="form-group text-right" method="post" action="/msgresponse?venueId={{venueId}}">
+                    <input class="form-control mb-2" name="subject" placeholder="Subject" required>
+                    <textarea rows="5" class="form-control" name="response" placeholder="Type a response here" id="message" required></textarea>
+                    <button class="btn btn-primary m-2"> Send </button>
+                </form>
+                {{#each message}}
+                    <div class="p-2">
+                        <p><b>From:</b> {{this.from}}</p>
+                        <p><b>Date:</b> {{this.date}}</p>
+                        <p></br> {{{this.content}}}</p>
+                    </div>
+                {{/each}}
+            {{else}}
+                <h4 class="pad-top text-center text-blue"><b>Click on a Venue to Review your Messages</b></h4>
+                <h6 class='text-muted text-center'>You'll notice a friendly envelope near the venues with conversation history</h6>
+            {{/if}}
+        </div>
+{{else}}
+    <div class="col-sm-6 offset-3 mb-4 section-transparentB p-3 text-white mx-auto">
+        <h2 class="section-heading">Meet your inbox!</h2>
+        <h4 class="text-darkerBlue text-center"><b>It's Hungry for Some Messages</b></h4></br></br>
+        <div class="col-sm-6 offset-3 text-left">
+            <h6> Once you've decided on some venues to host your next event</h6></br>
+            <h6> your inbox will serve as a storage for all of those treasured quotes and details.</h6></br>
+            <h6> Currently, its looking a little empty. Time to feed the beast, start searching!</h6></br>
+        </div>
     </div>
-    <div class="col-sm 8 mr-4 mb-4 section-light mx-auto">
-        {{#if message}}
-            <h5 class="text-blue pl-1 pt-3 pb-3"> Conversation History </h5>
-            <form class="form-group text-right" method="post" action="/msgresponse?venueId={{venueId}}">
-                <input class="form-control mb-2" name="subject" placeholder="Subject" required>
-                <textarea rows="5" class="form-control" name="response" placeholder="Type a response here" id="message" required></textarea>
-                <button class="btn btn-primary m-2"> Send </button>
-            </form>
-            {{#each message}}
-                <div class="p-2">
-                    <p><b>From:</b> {{this.from}}</p>
-                    <p><b>Date:</b> {{this.date}}</p>
-                    <p></br> {{{this.content}}}</p>
-                </div>
-            {{/each}}
-        {{else}}
-            <h4 class="pad-top text-center text-blue vertMid"><b>Click on a Venue to See Your Conversation History</b></h4>
-        {{/if}}
-    </div>
+{{/if}}
 </div>

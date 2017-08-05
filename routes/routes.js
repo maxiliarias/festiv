@@ -79,7 +79,7 @@ router.get('/blog',function(req,res){
     })
 })
 router.get('/pumpkinflair',function(req,res){
-    res.render('pumpkinflair',{loggedin: req.user ? true: false})
+    res.render('bloggers/pumpkinflair',{loggedin: req.user ? true: false})
 })
 router.get('/macaroonsBlooms',function(req,res){
     res.render('macaroonsBlooms',{loggedin: req.user ? true: false})
@@ -530,7 +530,7 @@ router.get('/addVenue',function(req,res){
                 }
             });
         } else {
-            res.redirect('/');
+            res.redirect('/venues');
         }
     })
 })
@@ -598,15 +598,20 @@ router.get('/contactlist', function(req, res, next) {
         Event.findById(req.query.eventId)
         .populate("vEvent")
         .exec(function(err,party){
+                console.log('in here', req.user);
             res.render('contactlist', ({
                 party: party,
+                events: false,
                 min: helper.formatDate(new Date()),
+                email: req.user.email ? req.user.email: "Your Email",
+                fname: req.user.fname ? req.user.fname : "Your First Name",
+                lname: req.user.lname ? req.user.lname : "Your Last Name",
                 loggedin: req.user ? true: false
             }))
         })
     } else {
         Event.find({eventOwner:req.user._id},function(err,ocassions){
-            console.log('in here');
+            console.log('occassions', ocassions);
             res.render('contactlist', ({
                 events: ocassions,
                 loggedin: req.user ? true: false
@@ -625,6 +630,7 @@ router.post('/contactlist', function(req, res) {
         event.hours=req.body.hours
         event.guestCount=req.body.guestCount
         event.price=req.body.price
+        event.additional=req.body.additional
 
         event.save(function(err,savedEvent){
             if(err){

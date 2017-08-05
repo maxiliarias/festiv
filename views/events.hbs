@@ -6,35 +6,48 @@
 </div>
 
     <div class="row pl-4 pad-top d-flex justify-content-center mx-auto">
-    {{#each events}}
-            <div class="col-sm-3 section-light pt-3 mb-4 ">
-                <form class="form text-right mx-auto" method="post" action="/updateEvent">
-                  <input type="text" class="form-control" name="name" value="{{this.name}}" required>
-                  <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
-                  <input type="date" class="form-control" name="date" value="{{this.date}}" min={{../min}}>
-                  <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="Start Time" >
-                  <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Number of Hours" >
-                  <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Guest Count" >
-                  <select class="form-control" name="price" >
-                        <option disabled selected>{{this.price}}</option>
-                        <option>Open Bar</option>
-                        <option>Minimum Spend</option>
-                        <option> {{min}}</option>
-                  </select>
-                  <a class="btn btn-yellow mt-2" href="/removeEvent?eventId={{this._id}}">Remove Event
-                  </a>
-                  <button class="btn btn-primary mt-2" type="submit" class="inline">Update Event</button>
-                 </form>
+    {{#if events}}
+        {{#each events}}
+                <div class="col-sm-3 section-light pt-3 mb-4 ">
+                    <form class="form text-right mx-auto" method="post" action="/updateEvent">
+                      <input type="text" class="form-control" name="name" value="{{this.name}}" required>
+                      <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
+                      <input type="date" class="form-control" name="date" value="{{this.date}}" min={{../min}}>
+                      <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="Start Time" >
+                      <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Number of Hours" >
+                      <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Guest Count" >
+                      <select class="form-control" name="price" >
+                            <option disabled selected>{{this.price}}</option>
+                            <option>Open Bar</option>
+                            <option>Minimum Spend</option>
+                            <option> {{min}}</option>
+                      </select>
+                      <a class="btn btn-yellow mt-2" href="/removeEvent?eventId={{this._id}}">Remove Event
+                      </a>
+                      <button class="btn btn-primary mt-2" type="submit" class="inline">Update Event</button>
+                     </form>
 
-            </div>
-            <div class="col-sm-2 section-light pt-3 mb-4 mr-4">
-                <h5 class="section-subheading text-muted"><b>Venue Contact List</b></h5>
-                {{#each this.vEvent}}
-                    <p class="text-blue">{{this.name}}
-                    <a href="/removeVenue?vEventId={{this._id}}&eventid={{../this._id}}">
-                        <button class="btn-yellow" type="submit" name="removeVEvent">x</button>
-                    </a></p>
-                {{/each}}
-            </div>
-    {{/each}}
+                </div>
+                <div class="col-sm-2 section-light pt-3 mb-4 mr-4">
+                    <h5 class="section-subheading text-muted"><b>Venue Contact List</b></h5>
+                    {{#each this.vEvent}}
+                        <p class="text-blue">{{this.name}}
+                        <a href="/removeVenue?vEventId={{this._id}}&eventid={{../this._id}}">
+                            <button class="btn-yellow" type="submit" name="removeVEvent">x</button>
+                        </a></p>
+                    {{/each}}
+                </div>
+        {{/each}}
+    {{else}}
+    <div class="col-sm-6 offset-3 section-transparent card noborder p-3 mb-5 text-blue mx-auto">
+        <h2 class="section-heading">Aww, no events!</h2>
+        <h4 class="text-yellow text-center p-4"><b>...Need ideas? You're in luck, we've got plenty</b></h4></br></br>
+        <div class="col-sm-6 offset-3 text-left">
+            <h6>How about rewarding your employees to an evening of lovely outdoor cocktails? </h6></br>
+            <h6>Or get the old gang together for an alumni reunion! </h6></br>
+            <h6> Or better yet, throw a party for an honorable cause. Easily host a ticketed open bar, you'll do good, and feel good!</h6></br>
+            <h6> The sky's the limit, let's get cranking</h6></br>
+        </div>
+    </div>
+    {{/if}}
     </div>

@@ -6,56 +6,53 @@
 </div>
 <div class="row pad-top mb-4 d-flex justify-content-around mx-auto">
     <!-- Screen to select an event -->
-    {{#if events}}
-        <div class="col-sm-2 m-2">
-            <h2 class="section-heading text-yellow vertMid"> Select an Event
-                <span class="fa fa-arrow-right" aria-hidden="true"></span>
-            </h2>
-        </div>
-        <div class="col-sm-8">
-        <div class="row">
-            {{#each events}}
-                <div class="col-sm-5 section-blue m-2 card noborder">
-                    <a href="/contactlist?eventId={{this._id}}">
-                        <h3 class="text-white text-center p-2">{{this.name}}</h3>
-                    </a>
-                </div>
-            {{/each}}
-        </div>
-        </div>
-    {{/if}}
-
     <!-- Screen for form -->
-    <div class="col-sm-4 text-center">
+    <div class="col-sm-8 text-center">
     {{#if party}}
         <h3 class="text-blue text-center mb-4">{{party.name}}</h3>
       <form id="contactForm" class="form-group text-right mx-auto" method="post" action="/contactlist?eventId={{party._id}}">
           <div class="form-group row">
-            <label class="col-2 col-form- text-left">Date</label>
+            <label class="col-2 col-form- text-left mt-2">First Name</label>
+            <div class="col-4">
+              <input type="text" class="form-control" name="fname" value="{{fname}}"  placeholder="First Name" required>
+            </div>
+            <label class="col-2 col-form- text-left mt-2">Last Name</label>
+            <div class="col-4">
+              <input type="text" class="form-control" name="lname" value="{{lname}}" placeholder="Last Name" autofocusrequired>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-2 col-form- text-left mt-2">Email</label>
+            <div class="col-10">
+              <input type="text" class="form-control" name="email" value="{{email}}" placeholder="Email" required>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-2 col-form- text-left mt-2">Date</label>
             <div class="col-10">
               <input type="date" class="form-control" name="date" value="{{party.date}}" min={{min}} required>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-2 col-form-label text-left">Start Time</label>
+            <label class="col-2 col-form-label text-left mt-2">Start Time</label>
             <div class="col-10">
-              <input type="text" class="form-control" name="starttime" value="{{party.time}}"  placeholder="Start Time"required>
+              <input type="text" class="form-control" name="starttime" value="{{party.time}}"  placeholder="Desired Start Time"required>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-2 col-form-label text-left">Hours</label>
+            <label class="col-2 col-form-label text-left mt-2">Hours</label>
             <div class="col-10">
               <input type='text' class="form-control" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-2 col-form-label text-left">Guests</label>
+            <label class="col-2 col-form-label text-left mt-2">Guests</label>
             <div class="col-10">
-              <input type='text' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Guest Count" required>
+              <input type='text' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Estimated Guest Count" required>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-2 col-form-label text-left">Price Package</label>
+            <label class="col-2 col-form-label text-left mt-2">Price Package</label>
             <div class="col-10">
                 <select class="form-control" name="price" required>
                       <option value="{{party.price}}" disabled selected>{{party.price}}</option>
@@ -64,7 +61,13 @@
                 </select>
             </div>
           </div>
-        <button id="contactBtn" class="btn btn-primary mt-2" type="submit">Send Emails</button>
+          <div class="form-group row">
+            <label class="col-2 col-form-label text-left mt-2">Additional</label>
+            <div class="col-10">
+                <textarea rows="3" class="form-control" name="additional" placeholder="Share any additional details you'd like about your event here" id="message" required></textarea>
+            </div>
+          </div>
+        <button id="contactBtn" class="btn btn-primary mt-2" type="submit">Request Bids</button>
       </form>
 
       <!-- Confirmation Modal  -->
@@ -93,8 +96,33 @@
           </div>
         </div>
       </div>
-
-
+    {{else if events.length}}
+        <div class="col-sm-2 m-2">
+            <h2 class="section-heading text-yellow vertMid"> Select an Event
+                <span class="fa fa-arrow-right" aria-hidden="true"></span>
+            </h2>
+        </div>
+        <div class="col-sm-8">
+        <div class="row">
+            {{#each events}}
+                <div class="col-sm-5 section-blue m-2 card noborder">
+                    <a href="/contactlist?eventId={{this._id}}">
+                        <h3 class="text-white text-center p-2">{{this.name}}</h3>
+                    </a>
+                </div>
+            {{/each}}
+        </div>
+        </div>
+    {{else}}
+        <div class="col-sm-6 offset-3 section-transparentB p-3 text-white mx-auto">
+            <h2 class="section-heading">Oh Hey There!</h2>
+            <h4 class="text-darkerBlue text-center"><b>we're happy you're an eager beaver</b></h4></br></br>
+            <div class="col-sm-6 offset-3 text-left">
+                <h6> We'd love to get bids for you!</h6></br>
+                <h6> First browse our venues and when you find ones you like, feel free to tag them to your own curated events. </h6></br>
+                <h6> Then we can get going here!</h6></br>
+            </div>
+        </div>
     {{/if}}
   </div>
 </div>
