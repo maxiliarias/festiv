@@ -618,7 +618,7 @@ router.get('/removeEvent', function(req, res) {
             Chat.find({chatOwner: venue._id})
             .then( msgArr => {
                 msgArr.map( msg => {
-                    console.log('Successfully deleted venue');
+                    console.log('Successfully deleted msg');
                     msg.remove()
                 })
             })
@@ -636,6 +636,7 @@ router.get('/removeEvent', function(req, res) {
         return Event.findById(eventId)
     })
     .then(event => {
+        console.log('Successfully deleted event');
         event.remove()
         res.redirect('/events')
     })
@@ -654,11 +655,25 @@ router.get('/removeVenue', function(req, res) {
         for (var i=0; i<event.vEvent.length; i++){
             if(event.vEvent[i] == vEventId){
                 event.vEvent.splice(i,1)
+                console.log('Successfully modified the event');
             }
         }
         return event.save()
     })
-    .then (e => {
+    .then(() => {
+        Chat.find({chatOwner: vEventId})
+        .then( msgArr => {
+            msgArr.map( msg => {
+                console.log('Successfully deleted msg');
+                msg.remove()
+            })
+        })
+        .catch(function(err){
+            console.log('error is', err);
+            res.redirect('/error')
+        })
+    })
+    .then (() => {
         return VEvent.findById(vEventId)
     })
     .then(venue => {
@@ -778,7 +793,7 @@ router.post('/contactlist', function(req, res) {
                 }
                 else{
                     console.log('MATCH IS', match)
-                    // helper.sendMail(req, match, v)
+                    helper.sendMail(req, match, v)
                 }
             })
             .catch(function(err){
