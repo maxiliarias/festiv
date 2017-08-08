@@ -239,7 +239,6 @@ router.post('/venue', function(req, res) {
     .populate('vEvent')
     .exec()
     .then(function(e){
-        console.log('found events in venue profile!');
         console.log('MY EVENTS', e)
         events = e;
         return clearbit.Company.find({domain: req.body.website});
@@ -387,7 +386,7 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('MAIL date', mail.date);
         var atSign= mail.to.text.indexOf("@")
         var idSpot= mail.to.text.indexOf("<id") + 3
-        console.log('MANGO',mail.to.text.slice(idSpot,atSign))
+        console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
         var chat = new Chat({
             chatOwner: venueId,
@@ -485,9 +484,6 @@ router.use(function(req, res, next) {
 
 /*Create a new event, makes a new venue, tags the venue to the event and saves to mongoose*/
 router.post('/addEvent',function(req,res){
-    console.log('user id is', req.user._id);
-    console.log('name',req.body.event);
-    console.log('placeId', req.query.placeId);
     let event;
     var newE = new Event({
         eventOwner: req.user._id,
@@ -496,7 +492,7 @@ router.post('/addEvent',function(req,res){
     return newE.save()
     .then(savedE =>{
         console.log('saved E is', savedE)
-        event= savedE
+        event = savedE
         var newVenue = new VEvent ({
             venueOption: event._id,
             placeId:req.query.placeId,
@@ -506,7 +502,7 @@ router.post('/addEvent',function(req,res){
     })
     .then(newVen => {
         console.log("new ven", newVen)
-        event.VEvent.push(newVen._id)
+        event.vEvent.push(newVen._id)
         event.save()
         res.redirect('/venues');
     })
@@ -520,9 +516,6 @@ router.post('/addEvent',function(req,res){
 router.post('/updateEvent', function(req,res){
     return Event.findById(req.body.eventId)
     .then(event => {
-        console.log('name', req.body.name);
-        console.log('date', req.body.date);
-        console.log('price', req.body.price);
         (req.body.name) ? event.name=req.body.name : null;
         (req.body.date) ? event.date= req.body.date: null;
         (req.body.time) ? event.time= req.body.time : null;
@@ -579,7 +572,7 @@ router.get('/addVenue',function(req,res){
             })
             .then(event => {
                 console.log('event is', event);
-                event.VEvent.push(newVen._id)
+                event.vEvent.push(newVen._id)
                 event.save()
                 res.redirect('/venues');
             })
@@ -727,15 +720,15 @@ router.post('/contactlist', function(req, res) {
     .then(venues => {
         console.log('VENUES FOR THAT EVENT',venues)
         venues.forEach(venue => {
-            return VData.find({placeId:venue.placeId})
+            return VData.findOne({placeId:venue.placeId})
             .then(match => {
-                var web = match.domain
+                var web = match[0].domain
                 var b;
                 console.log('THE VENUE',venue)
                 console.log('WEBSITE', web);
             // Check database to see if there's an email for that venue already
             // if not, retrieve email using hunter
-                if(!match.email){
+                if(!match[0].email){
                     console.log('no match.email', match)
                     // helper.collectEmail(web)
                     // .then((emails) => {
@@ -763,7 +756,7 @@ router.post('/contactlist', function(req, res) {
                 }
                 else{
                     console.log('MATCH IS', match)
-                    helper.sendMail(req, match, venue)
+                    // helper.sendMail(req, match, venue)
                     res.redirect('/nextsteps')
                 }
             })
@@ -791,10 +784,10 @@ router.get('/messages',function(req,res){
         if(venueId){
             return Chat.find({chatOwner:venueId})
             .then(msg => {
-                console.log('HI',msg);
-                return msg.forEach((x) => {
+                msg.forEach((x) => {
                     x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')
                 })
+                return msg
             })
             .then( msg => {
                 res.render('messages', {
@@ -826,6 +819,7 @@ router.get('/messages',function(req,res){
 /* or to official business email on file if other is not available */
 router.post('/msgresponse',function(req,res){
     let venue;
+    console.log('here', req.body.response);
     var venueId= req.query.venueId
     console.log('in msg response', venueId);
     var newMsg = new Chat({
@@ -843,6 +837,7 @@ router.post('/msgresponse',function(req,res){
         return VData.findOne({placeId: venue.placeId})
     })
     .then(vSource => {
+        console.log('printing this');
         var b={
             "personalizations": [{
                 //Send email to the last person to respond or the original email it was sent to
@@ -856,7 +851,7 @@ router.post('/msgresponse',function(req,res){
                     }
             }],
             "from": {
-                email: req.user.email,
+                email: req.user.fname + '@reply.festivspaces.com',
                 name: req.user.fname + ' (Festiv)'
             },
             "content": [{
@@ -868,20 +863,21 @@ router.post('/msgresponse',function(req,res){
                   name: req.user.fname + ' (Festiv)'
               },
             }
+        var request = sg.emptyRequest({
+            method: 'POST',
+            path: '/v3/mail/send',
+            body: b
+        });
 
-            var request = sg.emptyRequest({
-                method: 'POST',
-                path: '/v3/mail/send',
-                body: b
-            });
-            sg.API(request, function(error, response) {
-                if (error) {
-                    console.log('Error response received');
-                }
-                console.log('STATUS HERE' ,response.statusCode);
-                console.log('BODY HERE', response.body);
-            });
-            res.redirect(`/messages?venueId=${venueId}`)
+        sg.API(request, function(error, response) {
+            if (error) {
+                console.log('Error response received');
+            }
+            console.log('RESPONSE', response);
+            console.log('STATUS HERE' ,response.statusCode);
+            console.log('BODY HERE', response.body);
+        });
+        res.redirect(`/messages?venueId=${venueId}`)
     })
     .catch(function(err){
         console.log('error is', err);
