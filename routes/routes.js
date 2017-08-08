@@ -388,81 +388,82 @@ router.post('/messages', upload.array(), function(req,res){
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-    })
-    var chat = new Chat({
-        chatOwner: venueId,
-        date: helper.formatDate(mail.date),
-        from: mail.from.text,
-        content: mail.text
-    });
-    console.log('Chat saved is ',chat)
-    return chat.save()
-    .then(function(m) {
-        msg = m;
-        console.log('saved the chat!');
-        return VEvent.findById(venueId);
-    })
-    .then(function(v){
-        venue = v;
-        console.log('VEvent is', venue);
-        return Event.findById(venue.venueOption);
-    })
-    .then(function(fe){
-        foundEvent = fe;
-        console.log("Event is", foundEvent);
-        return User.findById(foundEvent.eventOwner);
-    })
-    .then(function(u){
-        user = u;
-        console.log('User is', user);
-        venue.chat.push(msg._id)
-        venue.lastFrom= mail.from.text
-        return venue.save();
-    })
-    .then(function(savedV) {
-        console.log('saved the venue w chat id!')
-        //alert the user, they've received a response/bid
-        var b = {
-            personalizations: [{
-                'substitutions': {
-                    '-businessName-': venue.name,
-                    '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
-                    '-fname-': user.fname
-                },
-                "to": [{
-                      "email": user.email
-                    }],
-                subject: "You've received a message from " + venue.name,
-                custom_args: {
-                    "VEventid": venue._id,
-                }
-            }],
-            from: {
-                email: 'alert@hello.festivspaces.com',
-                name: 'Festiv'
-            },
-            template_id: process.env.TEMPLATE_ID_ALERT
-        }
 
-        var request = sg.emptyRequest({
-            method: 'POST',
-            path: '/v3/mail/send',
-            body: b
+        var chat = new Chat({
+            chatOwner: venueId,
+            date: helper.formatDate(mail.date),
+            from: mail.from.text,
+            content: mail.text
         });
-        sg.API(request, function(error, response) {
-            if (error) {
-                console.log('Error response received');
+        console.log('Chat saved is ',chat)
+        return chat.save()
+        .then(function(m) {
+            msg = m;
+            console.log('saved the chat!');
+            return VEvent.findById(venueId);
+        })
+        .then(function(v){
+            venue = v;
+            console.log('VEvent is', venue);
+            return Event.findById(venue.venueOption);
+        })
+        .then(function(fe){
+            foundEvent = fe;
+            console.log("Event is", foundEvent);
+            return User.findById(foundEvent.eventOwner);
+        })
+        .then(function(u){
+            user = u;
+            console.log('User is', user);
+            venue.chat.push(msg._id)
+            venue.lastFrom= mail.from.text
+            return venue.save();
+        })
+        .then(function(savedV) {
+            console.log('saved the venue w chat id!')
+            //alert the user, they've received a response/bid
+            var b = {
+                personalizations: [{
+                    'substitutions': {
+                        '-businessName-': venue.name,
+                        '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+                        '-fname-': user.fname
+                    },
+                    "to": [{
+                          "email": user.email
+                        }],
+                    subject: "You've received a message from " + venue.name,
+                    custom_args: {
+                        "VEventid": venue._id,
+                    }
+                }],
+                from: {
+                    email: 'alert@hello.festivspaces.com',
+                    name: 'Festiv'
+                },
+                template_id: process.env.TEMPLATE_ID_ALERT
             }
-            console.log('STATUS HERE' ,response.statusCode);
-            console.log('BODY HERE', response.body);
-            console.log('HEADERS HERE', response.headers);
-        });
-        res.status(200).end();
-    })
-    .catch(function(err) {
-        console.log('sendgrid error', err);
-        res.status(500).end();
-        res.redirect('/error')
+
+            var request = sg.emptyRequest({
+                method: 'POST',
+                path: '/v3/mail/send',
+                body: b
+            });
+            sg.API(request, function(error, response) {
+                if (error) {
+                    console.log('Error response received');
+                }
+                console.log('STATUS HERE' ,response.statusCode);
+                console.log('BODY HERE', response.body);
+                console.log('HEADERS HERE', response.headers);
+            });
+            res.status(200).end();
+        })
+        .catch(function(err) {
+            console.log('sendgrid error', err);
+            res.status(500).end();
+            res.redirect('/error')
+        })
     })
 })
 
