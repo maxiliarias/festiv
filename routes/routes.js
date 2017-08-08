@@ -388,7 +388,7 @@ router.post('/messages', upload.array(), function(req,res){
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-
+    })    
         var chat = new Chat({
             chatOwner: venueId,
             date: helper.formatDate(mail.date),
@@ -464,7 +464,7 @@ router.post('/messages', upload.array(), function(req,res){
             res.status(500).end();
             res.redirect('/error')
         })
-    })
+
 })
 
 router.get('/error', function(req,res){
