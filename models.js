@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
 
-/*WILL NEED TO CHANGE HOW I PASS Chat Convos TO THE HBS PAGE*/
-/*WILL NEED TO CHANGE THE ADD TO CART TO BE ADD TO EVENT*/
 var userSchema = mongoose.Schema({
   fbid: String,
   username: String,

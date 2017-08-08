@@ -692,6 +692,7 @@ router.get('/contactlist', function(req, res, next) {
 router.post('/contactlist', function(req, res) {
     console.log('in contactlist', req.body)
     var eventId=req.query.eventId
+    let v;
     return User.findOne({fbid: req.user.fbid})
     .then(u => {
         u.fname = req.body.fname
@@ -719,16 +720,16 @@ router.post('/contactlist', function(req, res) {
     })
     .then(venues => {
         console.log('VENUES FOR THAT EVENT',venues)
-        venues.forEach(venue => {
+        var x = venues.map(venue => {
+            v = venue
             return VData.findOne({placeId:venue.placeId})
             .then(match => {
-                var web = match[0].domain
-                var b;
-                console.log('THE VENUE',venue)
+                var web = match.domain
+                console.log('THE VENUE',v)
                 console.log('WEBSITE', web);
             // Check database to see if there's an email for that venue already
             // if not, retrieve email using hunter
-                if(!match[0].email){
+                if(match.email.length === 0){
                     console.log('no match.email', match)
                     // helper.collectEmail(web)
                     // .then((emails) => {
@@ -746,8 +747,7 @@ router.post('/contactlist', function(req, res) {
                     // })
                     // .then(savedV => {
                     //     console.log('Successfully saved venue w emails')
-                    //     helper.sendMail(req, match, venue)
-                    //     res.redirect('/nextsteps')
+                    //     helper.sendMail(req, match, v)
                     // })
                     // .catch(function(err){
                     //     console.log('error is', err);
@@ -756,11 +756,17 @@ router.post('/contactlist', function(req, res) {
                 }
                 else{
                     console.log('MATCH IS', match)
-                    // helper.sendMail(req, match, venue)
-                    res.redirect('/nextsteps')
+                    // helper.sendMail(req, match, v)
                 }
             })
+            .catch(function(err){
+                console.log('error is', err);
+            })
         })
+        return Promise.all(x)
+    })
+    .then(() => {
+        res.redirect('/nextsteps')
     })
     .catch(function(err){
         console.log('error is', err);
