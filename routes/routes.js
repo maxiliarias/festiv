@@ -396,7 +396,7 @@ router.post('/messages', upload.array(), function(req,res){
         content: mail.text
     });
     console.log('Chat saved is ',chat)
-    return chat.save();
+    return chat.save()
     .then(function(m) {
         msg = m;
         console.log('saved the chat!');
