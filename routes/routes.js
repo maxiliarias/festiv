@@ -388,15 +388,15 @@ router.post('/messages', upload.array(), function(req,res){
         var idSpot= mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-        var chat = new Chat({
-            chatOwner: venueId,
-            date: helper.formatDate(mail.date),
-            from: mail.from.text,
-            content: mail.text
-        });
-        console.log('Chat saved is ',chat)
-        return chat.save();
     })
+    var chat = new Chat({
+        chatOwner: venueId,
+        date: helper.formatDate(mail.date),
+        from: mail.from.text,
+        content: mail.text
+    });
+    console.log('Chat saved is ',chat)
+    return chat.save();
     .then(function(m) {
         msg = m;
         console.log('saved the chat!');
