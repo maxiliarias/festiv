@@ -3,11 +3,11 @@
     <div class="col-sm-12">
         <div class="cover-container">
             <!-- START PANEL -->
-            <div class="cover-item" style="background-image: url('{{this.photo1}}')"></div>
-            <div class="cover-item" style="background-image: url('{{this.photo2}}')"></div>
-            <div class="cover-item" style="background-image: url('{{this.photo3}}')"></div>
-            <div class="cover-item" style="background-image: url('{{this.photo4}}')"></div>
-            <div class="cover-item" style="background-image: url('{{this.photo5}}')"></div>
+            <div class="cover-item" style="background-image: url('{{temp.photo1}}')"></div>
+            <div class="cover-item" style="background-image: url('{{temp.photo2}}')"></div>
+            <div class="cover-item" style="background-image: url('{{temp.photo3}}')"></div>
+            <div class="cover-item" style="background-image: url('{{temp.photo4}}')"></div>
+            <div class="cover-item" style="background-image: url('{{temp.photo5}}')"></div>
         </div>
     </div>
 </div>
@@ -25,7 +25,7 @@
                     <h6 class="mb-3"><b>My Events</b></h6>
                     {{#each events}}
                         <h6>
-                            <a href="/addVenue?/eventId={{this._id}}&venueId={{../this.placeId}}&name={{../this.name}}&dom={{../this.website}}">{{this.name}}
+                            <a href="/addVenue?/eventId={{this._id}}&venueId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
                                 <span class="fa fa-heart" aria-hidden="true"></span>
                             </a>
                         </h6>
@@ -38,60 +38,40 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <h2 class="section-heading text-blue text-left">{{this.name}}</h2>
-                <h3 class="section-subheading text-muted">{{this.company.twitter.bio}}</h2>
+                <h2 class="section-heading text-blue text-left">{{temp.name}}</h2>
+                <h3 class="section-subheading text-muted">{{temp.company.twitter.bio}}</h2>
                 <div class="row">
                     <div class="col-sm-2">
-                        <span class="fa fa-star" aria-hidden="true"><p class="inline">{{this.rating}}/5.0 Rating</p></span>
+                        <span class="fa fa-star" aria-hidden="true"><p class="inline">{{temp.rating}}/5.0 Rating</p></span>
                     </div>
                     <div class="col-sm-5">
                         <span class="fa fa-link" aria-hidden="true">
-                        <p class="inline"><a href="{{this.website}}">{{this.website}} </a></p></span>
+                        <p class="inline"><a href="{{temp.website}}">{{temp.website}} </a></p></span>
                     </div>
                     <div class="col-sm-5">
-                        <span class="fa fa-phone" aria-hidden="true"><p class="inline"> {{this.phone}} </p></span>
+                        <span class="fa fa-phone" aria-hidden="true"><p class="inline"> {{temp.phone}} </p></span>
                     </div>
                 </div>
-                <p class="pad-top">{{this.company.description}} </p>
-                <!-- <div class="row "> -->
-                    <!-- <div class="col-sm-8 sidebar pad-top">
-
+                <p class="pad-top">{{temp.company.description}} </p>
+                    <h6 class="text-blue">Hours: <span class="fa fa-clock-o" aria-hidden="true"></span></h6>
+                    <div style="padding: 5px; border-radius: 3px">
+                        {{#each temp.hours}}
+                        <p>{{this}}</p>
+                        {{/each}}
                     </div>
-                    <div class="col-sm-4 pad-top venueSide section-light"> -->
-                        <h6 class="text-blue">Hours: <span class="fa fa-clock-o" aria-hidden="true"></span></h6>
-                        <div style="padding: 5px; border-radius: 3px">
-                            {{#each this.hours}}
-                            <p>{{this}}</p>
-                            {{/each}}
-                        </div>
-                    <!-- </div> -->
-                <!-- </div> -->
             </div>
         </div>
     </div>
 
     <div class="col-sm-4 pad-top mt-4 mb-4 section-primary">
                 <div id="venueMap" class="sidebar"></div>
-                <h6 class="text-white text-center"><b>{{this.address}}</b></h6>
+                <h6 class="text-white text-center"><b>{{temp.address}}</b></h6>
     </div>
 </div>
-<!-- <div class="row ">
-        <div class="col-sm-8 sidebar pad-top">
-
-        </div>
-        <div class="col-sm-4 pad-top venueSide section-light">
-            <h6 class="text-blue">Hours: <span class="fa fa-clock-o" aria-hidden="true"></span></h6>
-            <div style="padding: 5px; border-radius: 3px">
-                {{#each this.hours}}
-                <p>{{this}}</p>
-                {{/each}}
-            </div>
-        </div>
-</div> -->
 
 <script>
 function initMap() {
-    var uluru = {lat: {{this.lat}}, lng: {{this.lng}} };
+    var uluru = {lat: {{temp.lat}}, lng: {{temp.lng}} };
     var map = new google.maps.Map(document.getElementById('venueMap'), {
         zoom: 12,
         center: uluru

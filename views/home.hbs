@@ -15,12 +15,6 @@
                     <option>Art gallery</option>
                 </select>
                 <input type="text" name="location" id="autocomplete" class="form-control mr-2" size="50" placeholder="Search a location ...">
-                <!-- <select name="radius" class="form-control">
-                    <option disabled selected>Choose your radius</option>
-                    <option value='1'>1 mile</option>
-                    <option value='5'>5 miles</option>
-                    <option value ='10'>10 miles</option>
-                </select> -->
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
         </div>
@@ -184,9 +178,9 @@
         <h2 class="section-heading ">Stay Inspired</h2>
         <h3 class="section-subheading text-muted text-center">
             Stay up-to-date on our newest venue additions, features and trends </h3>
-    <form class="form-inline mx-auto">
+    <form class="form-inline mx-auto" method="post" action="/join">
       <div class="form-group mx-auto">
-        <input type="email" class="form-control" placeholder="your email here">
+        <input type="email" name="email" class="form-control" placeholder="your email here">
         <button type="submit" class="btn btn-primary">Join</button>
       </div>
     </form>

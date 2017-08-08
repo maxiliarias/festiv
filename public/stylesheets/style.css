@@ -80,12 +80,13 @@ h3.section-subheading {
     border: rgb(76, 219, 219) solid 5px;
 }
 .parallaxHome{
-    /* The image used */
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/front-page/max.jpeg");
 }
 .parallaxNextSteps{
-    /* The image used */
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/vases.jpeg");
+}
+.parallax404{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/emotions.jpg");
 }
 
 .parallax {

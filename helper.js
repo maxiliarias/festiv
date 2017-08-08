@@ -3,6 +3,12 @@ var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
 /* TURNING OFF the below hunter request for now for safety*/
 var helper = {
+    generateGooglePhotos:function(data) {
+        if (!data) {
+            return '';
+        }
+        return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=' + data + '&key=' + process.env.GOOGLEPLACES;
+    },
     collectEmail:function(w){
         return request(`https://api.hunter.io/v2/domain-search?domain=${w}&api_key=${process.env.HUNTER}&type=generic`)
        .then(resp => JSON.parse(resp))
@@ -18,12 +24,10 @@ var helper = {
                 break;
             }
             obj.data.emails.forEach(email => {
-                if(e1){
-                    if(email.value.indexOf(toEmail[i])>=0){
+                if(email.value.indexOf(toEmail[i])>=0){
+                    if(e1){
                         e2 = email.value
-                    }
-                } else {
-                    if(email.value.indexOf(toEmail[i])>=0){
+                    } else {
                         e1 = email.value
                     }
                 }

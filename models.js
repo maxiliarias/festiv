@@ -1,4 +1,4 @@
-var mongoose = require('mongoose'), Schema = mongoose.Schema;
+var mongoose = require('mongoose');
 
 /*WILL NEED TO CHANGE HOW I PASS Chat Convos TO THE HBS PAGE*/
 /*WILL NEED TO CHANGE THE ADD TO CART TO BE ADD TO EVENT*/
@@ -10,11 +10,11 @@ var userSchema = mongoose.Schema({
   fname: String,
   lname: String,
   cart: Array,
-  event: [{ type: Schema.Types.ObjectId, ref: 'Event' }] //pulls in all the event ids related to this user
+  event: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] //pulls in all the event ids related to this user
 });
 
 var eventSchema = mongoose.Schema({
-    eventOwner: {type: Schema.Types.ObjectId, ref: 'User' }, //ties me to the userid,
+    eventOwner: {type: mongoose.Schema.Types.ObjectId, ref: 'User' }, //ties me to the userid,
     name: String,
     date: String,
     time: String,
@@ -22,15 +22,15 @@ var eventSchema = mongoose.Schema({
     guestCount: Number,
     price: String,
     additional: String,
-    vEvent: [{ type: Schema.Types.ObjectId, ref: 'VEvent' }]//pulls in all the venue ids related to this specific event of a user
+    vEvent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VEvent' }]//pulls in all the venue ids related to this specific event of a user
 })
 
 var vEventSchema = mongoose.Schema({
-    venueOption:{type: Schema.Types.ObjectId, ref: 'Event' },
+    venueOption:{type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
     placeId: String,
     name: String,
     lastFrom: String,
-    chat:[{ type: Schema.Types.ObjectId, ref: 'Chat' }]
+    chat:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }]
 })
 
 var vDataSchema = mongoose.Schema({
@@ -38,6 +38,7 @@ var vDataSchema = mongoose.Schema({
     name: String,
     domain: String,
     email: Array,
+    clearbitEmail: Array,
     description: String,
     metaD: String,
     twitterBio: String,
@@ -46,7 +47,7 @@ var vDataSchema = mongoose.Schema({
 })
 
 var chatSchema = mongoose.Schema({
-    chatOwner: {type: Schema.Types.ObjectId, ref: 'VEvent' }, //ties me to the eventid
+    chatOwner: {type: mongoose.Schema.Types.ObjectId, ref: 'VEvent' }, //ties me to the eventid
     date: String, //date email was sent
     from: String, //the business contact's email
     content: String
@@ -59,20 +60,13 @@ var blogSchema = mongoose.Schema({
     author: String,
     photographer: String,
     coverPhoto: String
-})
-
-Blog = mongoose.model('Blog', blogSchema);
-User = mongoose.model('User', userSchema);
-Event= mongoose.model('Event', eventSchema);
-VEvent = mongoose.model('VEvent',vEventSchema);
-VData = mongoose.model('VData',vDataSchema);
-Chat= mongoose.model('Chat',chatSchema);
+});
 
 module.exports = {
-  Blog: Blog,
-  User: User,
-  Event: Event,
-  VEvent: VEvent,
-  VData: VData,
-  Chat: Chat
+  Blog: mongoose.model('Blog', blogSchema),
+  User: mongoose.model('User', userSchema),
+  Event: mongoose.model('Event', eventSchema),
+  VEvent: mongoose.model('VEvent',vEventSchema),
+  VData: mongoose.model('VData',vDataSchema),
+  Chat: mongoose.model('Chat',chatSchema)
 };

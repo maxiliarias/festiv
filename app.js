@@ -10,7 +10,7 @@ var LocalStrategy = require('passport-local');
 var FacebookStrategy= require('passport-facebook');
 var mongoose = require('mongoose');
 var connect = process.env.MONGODB_URI;
-var {User} = require('./models.js');
+var { User } = require('./models.js');
 
 // var REQUIRED_ENV = "SECRET MONGODB_URI".split(" ");
 //
@@ -22,8 +22,6 @@ var {User} = require('./models.js');
 // });
 
 mongoose.connect(connect);
-
-var models = require('./models');
 
 var routes = require('./routes/routes');
 var auth = require('./routes/auth');
@@ -57,7 +55,7 @@ passport.serializeUser(function(user, done) {
 
 passport.deserializeUser(function(id, done) {
     console.log('id: ', id);
-    models.User.findById(id, function(err, user) {
+    User.findById(id, function(err, user) {
         done(null, user);
     });
 });
@@ -68,6 +66,7 @@ passport.use(new FacebookStrategy({
     clientSecret: process.env.FACEBOOK_APP_SECRET,
     callbackURL: 'http://localhost:3000/fb/login/callback'
 },
+// change localhost to process.env.DOMAIN
 function(accessToken,refreshToken,profile,done){
     console.log('returning from FACEBOOK', accessToken)
     console.log('rtoken',refreshToken)
@@ -86,7 +85,7 @@ function(accessToken,refreshToken,profile,done){
             u.save(function(err, user) {
               if (err) {
                 console.log(err);
-                res.status(500).redirect('/register');
+                res.redirect('/register');
                 return;
               }
               done(null,u)
@@ -100,7 +99,7 @@ function(accessToken,refreshToken,profile,done){
 // passport strategy
 passport.use(new LocalStrategy(function(username, password, done) {
   // Find the user with the given username
-  models.User.findOne({
+  User.findOne({
     username: username
   }, function(err, user) {
     // if there's an error, finish trying to authenticate (auth failed)
@@ -114,6 +113,7 @@ passport.use(new LocalStrategy(function(username, password, done) {
       return done(null, false, {message: 'Incorrect username.'});
     }
     // if passwords do not match, auth failed
+    // TODO: hash password...
     if (user.password !== password) {
       return done(null, false, {message: 'Incorrect password.'});
     }
@@ -161,5 +161,3 @@ var port = process.env.PORT || 3000;
 
 app.listen(port);
 console.log('Express started. Listening on port %s', port);
-
-module.exports = app;
