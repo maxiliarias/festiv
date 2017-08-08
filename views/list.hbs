@@ -93,10 +93,17 @@
         </div>
 
         <!-- Modal to pick event -->
-        <div class="viewVenues modal" style ={{this.modal}}>
+        <div class="viewVenues modal " style ={{this.modal}}>
+          <div class="modal-dialog" role="document">
             <div class="modal-content pad-top pl-4">
-                <h2 class="section-heading text-blue text-left"> My Events </h2>
-                <h3 class="section-subheading">Add <b>{{this.name}}</b> to one of my existing event lists by clicking below:</h3>
+              <div class="modal-header">
+                <h5 class="modal-title text-blue"><b>My Events</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body text-left">
+                <p>Add <b>{{this.name}}</b> to one of my existing event lists by clicking below or alternatively create a new event.</p>
                 <ul>
                     {{#each ../events}}
                     <li><a class="taggedEvent" href="/addVenue?eventId={{this._id}}&placeId={{../this.placeId}}&name={{../this.name}}"> {{this.name}} </a>
@@ -104,15 +111,20 @@
                     </li>
                     {{/each}}
                 </ul>
-                <h3 class="section-subheading">or Add this venue to a new list</h3>
-                <form class="form-inline " action="/addEvent?placeId={{this.placeId}}" method="post">
-                    <input type=text name=event class="form-control" size="60" placeholder="Name your special event here">
-                    <input type=hidden name=name value="{{this.name}}">
-                    <button class="btn btn-primary inline" type="submit" name="button"> Add your new Event!</button>
-                </form>
-                <span id="closeMod" class="close">&times;</span>
+              </div>
+              <div class="modal-footer">
+                  <form class="form-inline" action="/addEvent?placeId={{this.placeId}}" method="post">
+                     <div class="form-group-row">
+                        <input type="text" name=event class="form-control" size="28" placeholder="Name your special event here">
+                        <input type=hidden name=name value="{{this.name}}">
+                        <button class="btn btn-primary inline" type="submit" name="button"> Add a new Event!</button>
+                     </div>
+                  </form>
+              </div>
             </div>
+          </div>
         </div>
+
     </div>
     {{/each}}
 </div>

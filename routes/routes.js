@@ -612,7 +612,29 @@ router.get('/events', function(req, res) {
 router.get('/removeEvent', function(req, res) {
     console.log('req.query here', req.query);
     var eventId= req.query.eventId;
-    return Event.findById(eventId)
+    return VEvent.find({venueOption: eventId})
+    .then(venueArr => {
+        venueArr.map(venue => {
+            Chat.find({chatOwner: venue._id})
+            .then( msgArr => {
+                msgArr.map( msg => {
+                    console.log('Successfully deleted venue');
+                    msg.remove()
+                })
+            })
+            .then( () => {
+                console.log('Successfully deleted venue');
+                venue.remove()
+            })
+            .catch(function(err){
+                console.log('err is', err);
+                res.redirect('/error')
+            })
+        })
+    })
+    .then( () => {
+        return Event.findById(eventId)
+    })
     .then(event => {
         event.remove()
         res.redirect('/events')
@@ -790,6 +812,7 @@ router.get('/messages',function(req,res){
         if(venueId){
             return Chat.find({chatOwner:venueId})
             .then(msg => {
+                console.log('msg is', msg)
                 msg.forEach((x) => {
                     x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')
                 })
