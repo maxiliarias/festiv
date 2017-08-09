@@ -8,7 +8,7 @@ var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 var clearbit = require('clearbit')(process.env.CLEARBIT);
 var multer  = require('multer');
-var upload = multer();
+var upload = multer({ dest: 'uploads/' });
 var simpleParser = require('mailparser').simpleParser;
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
@@ -373,14 +373,15 @@ router.post('/join',function(req,res){
 })
 /* Allows Sendgrid to post venue replies to our emails, then we store the messages
 /*in mongoose and alert our client*/
-router.post('/messages', upload.array(), function(req,res){
+router.post('/messages', upload.any(), function(req,res){
     let msg;
     let venue;
     let foundEvent;
     let user;
     let venueId;
     let newMailSpot;
-    console.log('printing up here', req.body.email);
+    console.log('printing up here', req.files);
+    console.log("body", req.body)
 
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail);
