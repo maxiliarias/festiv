@@ -394,6 +394,7 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
+            console.log("entire venue is",venue);
             var temp = venue.chat
             console.log('FIRST venue chat is', temp);
             venue.chat = mail.text + temp
