@@ -382,28 +382,29 @@ router.post('/messages', upload.array(), function(req,res){
     let newMailSpot;
 
     simpleParser(req.body.email, function(err, mail) {
-        console.log('MAIL To', mail.to.text);
-        console.log('MAIL TEXT',mail.text);
-        console.log('MAIL FROM', mail.from.text);
-        console.log('MAIL attachments', mail.attachments);
+        console.log('MAIL To', mail);
+        // console.log('MAIL To', mail.to.text);
+        // console.log('MAIL TEXT',mail.text);
+        // console.log('MAIL FROM', mail.from.text);
+        // console.log('MAIL attachments', mail.attachments);
         var atSign = mail.to.text.indexOf("@")
         var idSpot = mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-
-        VEvent.findById(venueId)
-        .then(function(v) {
-            venue = v;
-            console.log("entire venue is",venue);
-            var temp = venue.chat
-            console.log('FIRST venue chat is', temp);
-            venue.chat = mail.text + temp
-            venue.lastFrom = mail.from.text
-            venue.lastDate = helper.formatDate(mail.date)
-            console.log('SECOND venue chat now is', venue.chat);
-            return venue.save()
-        })
-        .then(savedV => {
+        res.send(200)
+        // VEvent.findById(venueId)
+        // .then(function(v) {
+        //     venue = v;
+        //     console.log("entire venue is",venue);
+        //     var temp = venue.chat
+        //     console.log('FIRST venue chat is', temp);
+        //     venue.chat = mail.text + temp
+        //     venue.lastFrom = mail.from.text
+        //     venue.lastDate = helper.formatDate(mail.date)
+        //     console.log('SECOND venue chat now is', venue.chat);
+        //     return venue.save()
+        // })
+        // .then(savedV => {
         //     console.log('venue with chat is', savedV);
         //     return Event.findById(savedV.venueOption);
         // })
@@ -455,13 +456,13 @@ router.post('/messages', upload.array(), function(req,res){
             //     console.log('BODY HERE', response.body);
             //     console.log('HEADERS HERE', response.headers);
             // });
-            res.send(200)
-        })
-        .catch(function(err) {
-            console.log('sendgrid error', err);
-            res.status(500).end();
-            res.redirect('/error')
-        })
+            // res.send(200)
+        // })
+        // .catch(function(err) {
+        //     console.log('sendgrid error', err);
+        //     res.status(500).end();
+        //     res.redirect('/error')
+        // })
     })
 })
 
