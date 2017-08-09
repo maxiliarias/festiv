@@ -394,7 +394,7 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
-            venue.chat= mail.text
+            venue.chat= mail.text + venue.chat 
             venue.lastFrom= mail.from.text
             venue.lastDate= helper.formatDate(mail.date)
             return venue.save()
@@ -903,7 +903,7 @@ router.post('/msgresponse',function(req,res){
     VEvent.findById(venueId)
     .then(v => {
         venue = v
-        venue.chat = `${req.body.response}</br></br>${req.user.fname} ${req.user.lname}</br></br>On ${venue.lastDate} ${lastFrom} wrote:</br></br>` + venue.chat
+        venue.chat = `${req.body.response}</br></br>${req.user.fname} ${req.user.lname}</br></br>On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat
         venue.save()
         console.log('new venue chat is', venue.chat);
     })
@@ -912,45 +912,45 @@ router.post('/msgresponse',function(req,res){
     })
     .then(vSource => {
         console.log('printing this');
-        // var b={
-        //     "personalizations": [{
-        //         //Send email to the last person to respond or the original email it was sent to
-        //         // if no response from the business yet
-        //           "to": [{
-        //               "email": venue.lastFrom || vSource.email[0]
-        //             }],
-        //             subject: req.body.subject,
-        //             custom_args: {
-        //                 "vEventid": venueId
-        //             }
-        //     }],
-        //     "from": {
-        //         email: req.user.fname + '@reply.festivspaces.com',
-        //         name: req.user.fname + ' (Festiv)'
-        //     },
-        //     "content": [{
-        //           "type": "text/plain",
-        //           "value": req.body.response
-        //       }],
-        //     reply_to:{
-        //           email: 'id'+ venueId + '@reply.festivspaces.com',
-        //           name: req.user.fname + ' (Festiv)'
-        //       },
-        //     }
-        // var request = sg.emptyRequest({
-        //     method: 'POST',
-        //     path: '/v3/mail/send',
-        //     body: b
-        // });
-        //
-        // sg.API(request, function(error, response) {
-        //     if (error) {
-        //         console.log('Error response received');
-        //     }
-        //     console.log('RESPONSE', response);
-        //     console.log('STATUS HERE' ,response.statusCode);
-        //     console.log('BODY HERE', response.body);
-        // });
+        var b={
+            "personalizations": [{
+                //Send email to the last person to respond or the original email it was sent to
+                // if no response from the business yet
+                  "to": [{
+                      "email": venue.lastFrom || vSource.email[0]
+                    }],
+                    subject: req.body.subject,
+                    custom_args: {
+                        "vEventid": venueId
+                    }
+            }],
+            "from": {
+                email: req.user.fname + '@reply.festivspaces.com',
+                name: req.user.fname + ' (Festiv)'
+            },
+            "content": [{
+                  "type": "text/plain",
+                  "value": req.body.response + venue.chat
+              }],
+            reply_to:{
+                  email: 'id'+ venueId + '@reply.festivspaces.com',
+                  name: req.user.fname + ' (Festiv)'
+              },
+            }
+        var request = sg.emptyRequest({
+            method: 'POST',
+            path: '/v3/mail/send',
+            body: b
+        });
+
+        sg.API(request, function(error, response) {
+            if (error) {
+                console.log('Error response received');
+            }
+            console.log('RESPONSE', response);
+            console.log('STATUS HERE' ,response.statusCode);
+            console.log('BODY HERE', response.body);
+        });
         res.redirect(`/messages?venueId=${venueId}`)
     })
     .catch(function(err){
