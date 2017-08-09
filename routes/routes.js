@@ -380,6 +380,7 @@ router.post('/messages', upload.array(), function(req,res){
     let user;
     let venueId;
     let newMailSpot;
+    console.log('printing up here', req.body.email);
 
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail);
