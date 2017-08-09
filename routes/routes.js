@@ -377,13 +377,14 @@ router.post('/conversation', upload.any(), function(req,res){
     res.end();
     let msg;
     let mail;
+    let attach;
     let venue;
     let foundEvent;
     let user;
     let venueId;
     let newMailSpot;
     console.log('printing up here', req.files);
-
+    attach=req.files
     console.log("printing the body", req.body)
     mail = req.body
     var atSign = mail.to.indexOf("@")
@@ -398,12 +399,16 @@ router.post('/conversation', upload.any(), function(req,res){
 
         var temp = venue.chat
         console.log('FIRST venue chat is', temp);
+        console.log('from is a type', typeof mail.envelope);
+        var from = mail.envelope.indexOf('"from":')
+        console.log('sliced from', mail.envelope.slice(from,mail.envelope.length));
+
         venue.chat = mail.text + temp
         venue.lastFrom = mail.envelope.from
         venue.lastDate = helper.formatDate(new Date())
         venue.attachments.push({
-            path: req.files.filename,
-            name: req.files.originalname})
+            path: attach[0].filename,
+            name: attach[0].originalname})
 
         console.log('updated venue is', venue);
         return venue.save()
