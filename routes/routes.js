@@ -385,7 +385,7 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('MAIL To', mail.to.text);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
-        console.log('MAIL', mail;
+        console.log('MAIL', mail);
         var atSign = mail.to.text.indexOf("@")
         var idSpot = mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
