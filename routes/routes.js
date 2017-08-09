@@ -374,6 +374,7 @@ router.post('/join',function(req,res){
 /* Allows Sendgrid to post venue replies to our emails, then we store the messages
 /*in mongoose and alert our client*/
 router.post('/messages', upload.any(), function(req,res){
+    res.end();
     let msg;
     let mail;
     let venue;
@@ -394,7 +395,7 @@ router.post('/messages', upload.any(), function(req,res){
     .then(function(v) {
         venue = v;
         console.log("entire venue is",venue);
-        res.sendStatus(200)
+
         var temp = venue.chat
         console.log('FIRST venue chat is', temp);
         venue.chat = mail.text + temp
@@ -407,10 +408,13 @@ router.post('/messages', upload.any(), function(req,res){
         console.log('updated venue is', venue);
         return venue.save()
     })
+    .then(saved => {
+        console.log('got in here')
+    })
     .catch(function(err) {
         console.log('sendgrid error', err);
-        res.status(500).end();
-        res.redirect('/error')
+        // res.status(500).end();
+        // res.redirect('/error')
     })
 
     // else{
@@ -420,10 +424,10 @@ router.post('/messages', upload.any(), function(req,res){
             // console.log('MAIL TEXT',mail.text);
             // console.log('MAIL FROM', mail.from.text);
             // console.log('MAIL attachments', mail.attachments);
-            var atSign = mail.to.text.indexOf("@")
-            var idSpot = mail.to.text.indexOf("<id") + 3
-            console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
-            venueId= mail.to.text.slice(idSpot,atSign)
+            // var atSign = mail.to.text.indexOf("@")
+            // var idSpot = mail.to.text.indexOf("<id") + 3
+            // console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
+            // venueId= mail.to.text.slice(idSpot,atSign)
             // res.send(200)
 
             // .then(savedV => {
