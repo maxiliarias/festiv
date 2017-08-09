@@ -373,7 +373,7 @@ router.post('/join',function(req,res){
 })
 /* Allows Sendgrid to post venue replies to our emails, then we store the messages
 /*in mongoose and alert our client*/
-router.post('/messages', upload.any(), function(req,res){
+router.post('/conversation', upload.any(), function(req,res){
     res.end();
     let msg;
     let mail;
