@@ -394,12 +394,9 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
-            venue.chat = []
-            //mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
-            venue.lastFrom= ""
-            //mail.from.text
-            venue.lastDate= ""
-            //helper.formatDate(mail.date)
+            venue.chat = mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
+            venue.lastFrom = mail.from.text
+            venue.lastDate = helper.formatDate(mail.date)
             return venue.save()
         })
         // .then(savedV => {
@@ -793,35 +790,6 @@ router.post('/contactlist', function(req, res) {
                     console.log('MATCH IS', match)
                     helper.sendMail(req, match, v)
                 }
-
-                var initString = `Hello,
-
-                    I'm interested in booking your venue ${match.name} for a private event on ${req.body.date} and would like to know if your space is available. I would like to host an event at ${req.body.starttime} for approximately ${req.body.hours} hour(s). As of now, I expect to have about ${req.body.guestcount} guests or so attend.
-
-                    May you or someone on your team, let me know of any packages or potential pricing options available. If ${req.body.price} pricing is an option, I'd be interested in that as well. Look forward to hearing back from you!
-
-                    Sincerely,
-
-                    ${req.user.fname} `
-
-                var newChat = new Chat({
-                    chatOwner: venue._id,
-                    date: helper.formatDate(new Date()),
-                    timestamp: new Date(),
-                    from: req.user.fname + '@hello.festivspaces.com',
-                    content: initString
-                })
-                return newChat.save()
-                .then( c => {
-                    console.log('saved the new chat',c);
-                    venue.chat.push(c._id)
-                    console.log('venue is', venue)
-                    return venue.save()
-                })
-                .catch(function(err){
-                    console.log('err is', err);
-                    res.redirect('/error')
-                })
             })
             .catch(function(err){
                 console.log('error is', err);
