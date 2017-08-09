@@ -394,11 +394,12 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
-            console.log('venue is', venue);
-            venue.chat = mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
+            var temp = venue.chat
+            console.log('FIRST venue chat is', temp);
+            venue.chat = mail.text + temp
             venue.lastFrom = mail.from.text
             venue.lastDate = helper.formatDate(mail.date)
-            console.log('venue chat now is', venue.chat);
+            console.log('SECOND venue chat now is', venue.chat);
             return venue.save()
         })
         // .then(savedV => {
