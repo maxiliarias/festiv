@@ -390,20 +390,20 @@ router.post('/messages', upload.array(), function(req,res){
         var idSpot = mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-        res.send(200)
-        // VEvent.findById(venueId)
-        // .then(function(v) {
-        //     venue = v;
-        //     console.log("entire venue is",venue);
-        //     var temp = venue.chat
-        //     console.log('FIRST venue chat is', temp);
-        //     // venue.chat = mail.text + temp
-        //     // venue.lastFrom = mail.from.text
-        //     // venue.lastDate = helper.formatDate(mail.date)
-        //     // console.log('SECOND venue chat now is', venue.chat);
-        //     return venue.save()
-        // })
-        // .then(savedV => {
+
+        VEvent.findById(venueId)
+        .then(function(v) {
+            venue = v;
+            console.log("entire venue is",venue);
+            var temp = venue.chat
+            console.log('FIRST venue chat is', temp);
+            venue.chat = mail.text + temp
+            venue.lastFrom = mail.from.text
+            venue.lastDate = helper.formatDate(mail.date)
+            console.log('SECOND venue chat now is', venue.chat);
+            return venue.save()
+        })
+        .then(savedV => {
         //     console.log('venue with chat is', savedV);
         //     return Event.findById(savedV.venueOption);
         // })
@@ -455,13 +455,13 @@ router.post('/messages', upload.array(), function(req,res){
             //     console.log('BODY HERE', response.body);
             //     console.log('HEADERS HERE', response.headers);
             // });
-            // res.send(200)
-        // })
-        // .catch(function(err) {
-        //     console.log('sendgrid error', err);
-        //     res.status(500).end();
-        //     res.redirect('/error')
-        // })
+            res.send(200)
+        })
+        .catch(function(err) {
+            console.log('sendgrid error', err);
+            res.status(500).end();
+            res.redirect('/error')
+        })
     })
 })
 
@@ -726,14 +726,23 @@ router.get('/contactlist', function(req, res, next) {
 
 /* SUBMIT CONTACTLIST we will now send an email to venues*/
 router.post('/contactlist', function(req, res) {
-    console.log('in contactlist', req.body)
     var eventId=req.query.eventId
+    let fname = req.body.fname
+    let lname = req.body.lname
+    let email = req.body.email
+    let date=req.body.date
+    let starttime=req.body.starttime
+    let hours=req.body.hours
+    let guestCount=req.body.guestCount
+    let price=req.body.price
+    let additional=req.body.additional
+
     let v;
     return User.findOne({fbid: req.user.fbid})
     .then(u => {
-        u.fname = req.body.fname
-        u.lname = req.body.lname
-        u.email = req.body.email
+        u.fname = fname
+        u.lname = lname
+        u.email = email
 
         return u.save()
     })
@@ -741,12 +750,12 @@ router.post('/contactlist', function(req, res) {
         return Event.findById(eventId)
     })
     .then(event => {
-        event.date=req.body.date
-        event.time=req.body.starttime
-        event.hours=req.body.hours
-        event.guestCount=req.body.guestCount
-        event.price=req.body.price
-        event.additional=req.body.additional
+        event.date = date
+        event.time = starttime
+        event.hours = hours
+        event.guestCount = guestCount
+        event.price = price
+        event.additional = additional
 
         return event.save()
     })
@@ -792,7 +801,7 @@ router.post('/contactlist', function(req, res) {
                 }
                 else{
                     console.log('MATCH IS', match)
-                    // helper.sendMail(req, match, v)
+                    helper.sendMail(req, match, v)
                 }
             })
             .catch(function(err){
