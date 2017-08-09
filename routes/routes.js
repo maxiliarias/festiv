@@ -375,6 +375,7 @@ router.post('/join',function(req,res){
 /*in mongoose and alert our client*/
 router.post('/messages', upload.any(), function(req,res){
     let msg;
+    let mail;
     let venue;
     let foundEvent;
     let user;
@@ -383,12 +384,35 @@ router.post('/messages', upload.any(), function(req,res){
     console.log('printing up here', req.files);
 
     console.log("printing the body", req.body)
+    mail = req.body
+    var atSign = mail.to.indexOf("@")
+    var idSpot = mail.to.indexOf("<id") + 3
+    console.log('venue id slice is',mail.to.slice(idSpot,atSign))
+    venueId= mail.to.slice(idSpot,atSign)
 
-    // if(!req.body || !req.body.email){
-    //     console.log('no body')
-    //     res.send(200)
-    // }
-    res.send(200)
+    VEvent.findById(venueId)
+    .then(function(v) {
+        venue = v;
+        console.log("entire venue is",venue);
+        var temp = venue.chat
+        console.log('FIRST venue chat is', temp);
+        venue.chat = mail.text + temp
+        venue.lastFrom = mail.envelope.from
+        venue.lastDate = helper.formatDate(new Date())
+        venue.attachments.push({
+            path: req.files.filename,
+            name: req.files.originalname})
+
+        return venue.save()
+        res.sendStatus(200)
+        console.log('updated venue is', venue);
+    })
+    .catch(function(err) {
+        console.log('sendgrid error', err);
+        res.status(500).end();
+        res.redirect('/error')
+    })
+
     // else{
     //     simpleParser(req.body.email, function(err, mail) {
     //         console.log('MAIL To', mail);
@@ -396,23 +420,12 @@ router.post('/messages', upload.any(), function(req,res){
             // console.log('MAIL TEXT',mail.text);
             // console.log('MAIL FROM', mail.from.text);
             // console.log('MAIL attachments', mail.attachments);
-            // var atSign = mail.to.text.indexOf("@")
-            // var idSpot = mail.to.text.indexOf("<id") + 3
-            // console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
-            // venueId= mail.to.text.slice(idSpot,atSign)
+            var atSign = mail.to.text.indexOf("@")
+            var idSpot = mail.to.text.indexOf("<id") + 3
+            console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
+            venueId= mail.to.text.slice(idSpot,atSign)
             // res.send(200)
-            // VEvent.findById(venueId)
-            // .then(function(v) {
-            //     venue = v;
-            //     console.log("entire venue is",venue);
-            //     var temp = venue.chat
-            //     console.log('FIRST venue chat is', temp);
-            //     venue.chat = mail.text + temp
-            //     venue.lastFrom = mail.from.text
-            //     venue.lastDate = helper.formatDate(mail.date)
-            //     console.log('SECOND venue chat now is', venue.chat);
-            //     return venue.save()
-            // })
+
             // .then(savedV => {
             //     console.log('venue with chat is', savedV);
             //     return Event.findById(savedV.venueOption);
