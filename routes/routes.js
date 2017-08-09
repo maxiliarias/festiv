@@ -396,7 +396,7 @@ router.post('/messages', upload.array(), function(req,res){
             venue = v;
             venue.chat= mail.text
             venue.lastFrom= mail.from.text
-            return venue.save();
+            return venue.save()
         .then(savedV => {
             console.log('venue with chat is', savedV);
             return Event.findById(savedV.venueOption);
