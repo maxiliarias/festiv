@@ -47,7 +47,7 @@ var helper = {
                         '-guestCount-':req.body.guestCount,
                         '-price-':req.body.price,
                         '-hours-':req.body.hours,
-                        '-additional-': req.body.additional
+                        // '-additional-': req.body.additional
                     },
                     custom_args: {
                         "vEventid": venue._id,
@@ -102,7 +102,7 @@ var helper = {
         if (month < 10) {
           month = '0' + month;
         }
-        return (year+ "-" + month + "-" + dt)
+        return (month + "-" + dt + "-" + year)
     }
 }
 

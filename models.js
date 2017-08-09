@@ -47,6 +47,7 @@ var vDataSchema = mongoose.Schema({
 var chatSchema = mongoose.Schema({
     chatOwner: {type: mongoose.Schema.Types.ObjectId, ref: 'VEvent' }, //ties me to the eventid
     date: String, //date email was sent
+    timestamp: String,
     from: String, //the business contact's email
     content: String
 })
