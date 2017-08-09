@@ -404,7 +404,7 @@ router.post('/messages', upload.any(), function(req,res){
             name: req.files.originalname})
 
         return venue.save()
-        res.sendStatus(200)
+        res.status(200).end()
         console.log('updated venue is', venue);
     })
     .catch(function(err) {
