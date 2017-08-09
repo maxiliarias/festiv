@@ -394,7 +394,7 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
-            venue.chat= mail.text + venue.chat 
+            venue.chat = mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
             venue.lastFrom= mail.from.text
             venue.lastDate= helper.formatDate(mail.date)
             return venue.save()
@@ -411,7 +411,7 @@ router.post('/messages', upload.array(), function(req,res){
         .then(function(u){
             user = u;
             console.log('User is', user);
-            venue.chat.push(msg._id)
+            // venue.chat.push(msg._id)
         })
         .then(function(savedV) {
             console.log('saved the venue w chat id!')
@@ -930,7 +930,7 @@ router.post('/msgresponse',function(req,res){
             },
             "content": [{
                   "type": "text/plain",
-                  "value": req.body.response + venue.chat
+                  "value": req.body.response
               }],
             reply_to:{
                   email: 'id'+ venueId + '@reply.festivspaces.com',
