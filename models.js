@@ -28,7 +28,8 @@ var vEventSchema = mongoose.Schema({
     placeId: String,
     name: String,
     lastFrom: String,
-    chat:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }]
+    chat: String
+    // [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }]
 })
 
 var vDataSchema = mongoose.Schema({

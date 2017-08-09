@@ -385,93 +385,72 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('MAIL To', mail.to.text);
         console.log('MAIL TEXT',mail.text);
         console.log('MAIL FROM', mail.from.text);
-        console.log('MAIL', mail);
+        console.log('MAIL attachments', mail.attachments);
         var atSign = mail.to.text.indexOf("@")
         var idSpot = mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
 
         VEvent.findById(venueId)
-        .populate('chat')
-        .exec()
-        .then(ve => {
-            venue = ve
-            console.log("venue chat is", venue.chat)
-            var lastMsgContent = venue.chat[venue.chat.length-1].content
-            console.log('last msg content is', lastMsgContent);
-            // return Chat.findById(lastMsgId)
-        // })
-        // .then( msg => {
-        //     console.log('msg is', msg);
-             newMailSpot = mail.text.indexOf(lastMsgContent)
-             console.log('new mail spot is', newMailSpot)
-
-             var chat = new Chat({
-                 chatOwner: venueId,
-                 date: helper.formatDate(mail.date),
-                 from: mail.from.text,
-                 content: mail.text.slice(0,newMailSpot)
-             });
-             console.log('Chat saved is ',chat)
-            //  return chat.save()
+        .then(function(v) {
+            venue = v;
+            venue.chat= mail.text
+            venue.lastFrom= mail.from.text
+            return venue.save();
+        .then(savedV => {
+            console.log('venue with chat is', savedV);
+            return Event.findById(savedV.venueOption);
         })
-        // .then(function(m) {
-        //     msg = m;
-        //     console.log('saved the chat!');
-        //     return Event.findById(venue.venueOption);
-        // })
-        // .then(function(fe){
-        //     foundEvent = fe;
-        //     console.log("Event is", foundEvent);
-        //     return User.findById(foundEvent.eventOwner);
-        // })
-        // .then(function(u){
-        //     user = u;
-        //     console.log('User is', user);
-        //     venue.chat.push(msg._id)
-        //     venue.lastFrom= mail.from.text
-        //     return venue.save();
+        .then(function(fe){
+            foundEvent = fe;
+            console.log("Event is", foundEvent);
+            return User.findById(foundEvent.eventOwner);
+        })
+        .then(function(u){
+            user = u;
+            console.log('User is', user);
+            // venue.chat.push(msg._id)
         // })
         // .then(function(savedV) {
         //     console.log('saved the venue w chat id!')
-        //     //alert the user, they've received a response/bid
-        //     var b = {
-        //         personalizations: [{
-        //             'substitutions': {
-        //                 '-businessName-': venue.name,
-        //                 '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
-        //                 '-fname-': user.fname
-        //             },
-        //             "to": [{
-        //                   "email": user.email
-        //                 }],
-        //             subject: "You've received a message from " + venue.name,
-        //             custom_args: {
-        //                 "VEventid": venue._id,
-        //             }
-        //         }],
-        //         from: {
-        //             email: 'alert@hello.festivspaces.com',
-        //             name: 'Festiv'
-        //         },
-        //         template_id: process.env.TEMPLATE_ID_ALERT
-        //     }
-        //
-        //     var request = sg.emptyRequest({
-        //         method: 'POST',
-        //         path: '/v3/mail/send',
-        //         body: b
-        //     });
-        //     sg.API(request, function(error, response) {
-        //         if (error) {
-        //             console.log('Error response received');
-        //         }
-        //         console.log('STATUS HERE' ,response.statusCode);
-        //         console.log('BODY HERE', response.body);
-        //         console.log('HEADERS HERE', response.headers);
-        //     });
-        //     res.status(200).end();
-        // })
+            //alert the user, they've received a response/bid
+            // var b = {
+            //     personalizations: [{
+            //         'substitutions': {
+            //             '-businessName-': venue.name,
+            //             '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+            //             '-fname-': user.fname
+            //         },
+            //         "to": [{
+            //               "email": user.email
+            //             }],
+            //         subject: "You've received a message from " + venue.name,
+            //         custom_args: {
+            //             "VEventid": venue._id,
+            //         }
+            //     }],
+            //     from: {
+            //         email: 'alert@hello.festivspaces.com',
+            //         name: 'Festiv'
+            //     },
+            //     template_id: process.env.TEMPLATE_ID_ALERT
+            // }
+            //
+            // var request = sg.emptyRequest({
+            //     method: 'POST',
+            //     path: '/v3/mail/send',
+            //     body: b
+            // });
+            // sg.API(request, function(error, response) {
+            //     if (error) {
+            //         console.log('Error response received');
+            //     }
+            //     console.log('STATUS HERE' ,response.statusCode);
+            //     console.log('BODY HERE', response.body);
+            //     console.log('HEADERS HERE', response.headers);
+            // });
+            res.status(200).end();
+        })
         .catch(function(err) {
             console.log('sendgrid error', err);
             res.status(500).end();
