@@ -394,25 +394,28 @@ router.post('/messages', upload.array(), function(req,res){
         VEvent.findById(venueId)
         .then(function(v) {
             venue = v;
-            venue.chat = mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
-            venue.lastFrom= mail.from.text
-            venue.lastDate= helper.formatDate(mail.date)
+            venue.chat = [];
+            // mail.text + (venue.chat ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat): "")
+            venue.lastFrom = ""
+            //mail.from.text
+            venue.lastDate = ""
+            //helper.formatDate(mail.date)
             return venue.save()
         })
-        .then(savedV => {
-            console.log('venue with chat is', savedV);
-            return Event.findById(savedV.venueOption);
-        })
-        .then(function(fe){
-            foundEvent = fe;
-            console.log("Event is", foundEvent);
-            return User.findById(foundEvent.eventOwner);
-        })
-        .then(function(u){
-            user = u;
-            console.log('User is', user);
-            // venue.chat.push(msg._id)
-        })
+        // .then(savedV => {
+        //     console.log('venue with chat is', savedV);
+        //     return Event.findById(savedV.venueOption);
+        // })
+        // .then(function(fe){
+        //     foundEvent = fe;
+        //     console.log("Event is", foundEvent);
+        //     return User.findById(foundEvent.eventOwner);
+        // })
+        // .then(function(u){
+        //     user = u;
+        //     console.log('User is', user);
+        //     // venue.chat.push(msg._id)
+        // })
         .then(function(savedV) {
             console.log('saved the venue w chat id!')
             // alert the user, they've received a response/bid
