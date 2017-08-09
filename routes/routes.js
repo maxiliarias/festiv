@@ -397,12 +397,13 @@ router.post('/messages', upload.array(), function(req,res){
         .then(ve => {
             venue = ve
             console.log("venue chat is", venue.chat)
-            var lastMsgId = venue.chat[venue.chat.length-1]
-            return Chat.findById(lastMsgId)
-        })
-        .then( msg => {
-            console.log('msg is', msg);
-             newMailSpot = mail.text.indexOf(venue.chat.content)
+            var lastMsgContent = venue.chat[venue.chat.length-1].content
+            // return Chat.findById(lastMsgId)
+        // })
+        // .then( msg => {
+        //     console.log('msg is', msg);
+             newMailSpot = mail.text.indexOf(lastMsgContent)
+             console.log('new mail spot is', newMailSpot)
 
              var chat = new Chat({
                  chatOwner: venueId,
@@ -411,7 +412,7 @@ router.post('/messages', upload.array(), function(req,res){
                  content: mail.text.slice(0,newMailSpot)
              });
              console.log('Chat saved is ',chat)
-             return chat.save()
+            //  return chat.save()
         })
         // .then(function(m) {
         //     msg = m;
