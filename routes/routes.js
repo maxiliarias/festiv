@@ -381,24 +381,26 @@ router.post('/messages', upload.any(), function(req,res){
     let venueId;
     let newMailSpot;
     console.log('printing up here', req.files);
-    console.log("body", req.body)
 
-    if(!req.body || !req.body.email){
-        console.log('no body')
-        res.send(200)
-    }
-    else{
-        simpleParser(req.body.email, function(err, mail) {
-            console.log('MAIL To', mail);
+    console.log("printing the body", req.body)
+
+    // if(!req.body || !req.body.email){
+    //     console.log('no body')
+    //     res.send(200)
+    // }
+    res.send(200)
+    // else{
+    //     simpleParser(req.body.email, function(err, mail) {
+    //         console.log('MAIL To', mail);
             // console.log('MAIL To', mail.to.text);
             // console.log('MAIL TEXT',mail.text);
             // console.log('MAIL FROM', mail.from.text);
             // console.log('MAIL attachments', mail.attachments);
-            var atSign = mail.to.text.indexOf("@")
-            var idSpot = mail.to.text.indexOf("<id") + 3
-            console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
-            venueId= mail.to.text.slice(idSpot,atSign)
-            res.send(200)
+            // var atSign = mail.to.text.indexOf("@")
+            // var idSpot = mail.to.text.indexOf("<id") + 3
+            // console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
+            // venueId= mail.to.text.slice(idSpot,atSign)
+            // res.send(200)
             // VEvent.findById(venueId)
             // .then(function(v) {
             //     venue = v;
@@ -470,9 +472,8 @@ router.post('/messages', upload.any(), function(req,res){
             //     res.status(500).end();
             //     res.redirect('/error')
             // })
-        })
-    }
-
+        // })
+    // }
 })
 
 router.get('/error', function(req,res){
