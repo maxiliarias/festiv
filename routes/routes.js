@@ -395,12 +395,12 @@ router.post('/messages', upload.array(), function(req,res){
         .then(function(v) {
             venue = v;
             console.log("entire venue is",venue);
-            var temp = venue.chat
-            console.log('FIRST venue chat is', temp);
-            venue.chat = mail.text + temp
-            venue.lastFrom = mail.from.text
-            venue.lastDate = helper.formatDate(mail.date)
-            console.log('SECOND venue chat now is', venue.chat);
+            // var temp = venue.chat
+            // console.log('FIRST venue chat is', temp);
+            // venue.chat = mail.text + temp
+            // venue.lastFrom = mail.from.text
+            // venue.lastDate = helper.formatDate(mail.date)
+            // console.log('SECOND venue chat now is', venue.chat);
             return venue.save()
         })
         // .then(savedV => {
