@@ -7,7 +7,6 @@ var userSchema = mongoose.Schema({
   email: String,
   fname: String,
   lname: String,
-  cart: Array,
   event: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }] //pulls in all the event ids related to this user
 });
 
@@ -28,6 +27,7 @@ var vEventSchema = mongoose.Schema({
     placeId: String,
     name: String,
     lastFrom: String,
+    lastDate: String,
     chat: String
     // [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chat' }]
 })

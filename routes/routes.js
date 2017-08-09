@@ -396,6 +396,7 @@ router.post('/messages', upload.array(), function(req,res){
             venue = v;
             venue.chat= mail.text
             venue.lastFrom= mail.from.text
+            venue.lastDate= helper.formatDate(mail.date)
             return venue.save()
         })
         .then(savedV => {
@@ -410,11 +411,11 @@ router.post('/messages', upload.array(), function(req,res){
         .then(function(u){
             user = u;
             console.log('User is', user);
-            // venue.chat.push(msg._id)
-        // })
-        // .then(function(savedV) {
-        //     console.log('saved the venue w chat id!')
-            //alert the user, they've received a response/bid
+            venue.chat.push(msg._id)
+        })
+        .then(function(savedV) {
+            console.log('saved the venue w chat id!')
+            // alert the user, they've received a response/bid
             // var b = {
             //     personalizations: [{
             //         'substitutions': {
@@ -450,7 +451,7 @@ router.post('/messages', upload.array(), function(req,res){
             //     console.log('BODY HERE', response.body);
             //     console.log('HEADERS HERE', response.headers);
             // });
-            res.status(200).end();
+            // res.status(200).end();
         })
         .catch(function(err) {
             console.log('sendgrid error', err);
@@ -849,18 +850,19 @@ router.get('/messages',function(req,res){
     .then(events => {
         var venueId=req.query.venueId
         if(venueId){
-            return Chat.find({chatOwner:venueId})
-            .then(msg => {
-                console.log('msg is', msg)
-                msg.forEach((x) => {
-                    x.content = x.content.replace(/(?:\r\n|\r|\n)/g, '</br>')
-                })
-                return msg
+            return VEvent.findById(venueId)
+            .then(v => {
+                // msg.forEach((x) => {
+                    v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
+                // })
+
+                console.log('vEvent is',v)
+                return v.save()
             })
-            .then( msg => {
+            .then( newV => {
                 res.render('messages', {
                     events: events,
-                    message: msg,
+                    message: newV.chat,
                     venueId: venueId,
                     loggedin: req.user ? true: false
                 })
@@ -891,63 +893,64 @@ router.post('/msgresponse',function(req,res){
     console.log('here', req.body.response);
     var venueId= req.query.venueId
     console.log('in msg response', venueId);
-    var newMsg = new Chat({
-        chatOwner: venueId,
-        from: req.user.email,
-        date: helper.formatDate(new Date()),
-        content: req.body.response
-    })
-        return newMsg.save()
-    .then(newMsg => {
-        msg = newMsg
-        return VEvent.findById(venueId)
-    })
+    // var newMsg = new Chat({
+    //     chatOwner: venueId,
+    //     from: req.user.email,
+    //     date: helper.formatDate(new Date()),
+    //     content: req.body.response
+    // })
+    // return newMsg.save()
+    VEvent.findById(venueId)
     .then(v => {
         venue = v
-        venue.chat.push(msg._id)
+        venue.chat = `${req.body.response}</br></br>${req.user.fname} ${req.user.lname}</br></br>On ${venue.lastDate} ${lastFrom} wrote:</br></br>` + venue.chat
+        venue.save()
+        console.log('new venue chat is', venue.chat);
+    })
+    .then(() => {
         return VData.findOne({placeId: venue.placeId})
     })
     .then(vSource => {
         console.log('printing this');
-        var b={
-            "personalizations": [{
-                //Send email to the last person to respond or the original email it was sent to
-                // if no response from the business yet
-                  "to": [{
-                      "email": venue.lastFrom || vSource.email[0]
-                    }],
-                    subject: req.body.subject,
-                    custom_args: {
-                        "vEventid": venueId
-                    }
-            }],
-            "from": {
-                email: req.user.fname + '@reply.festivspaces.com',
-                name: req.user.fname + ' (Festiv)'
-            },
-            "content": [{
-                  "type": "text/plain",
-                  "value": req.body.response
-              }],
-            reply_to:{
-                  email: 'id'+ venueId + '@reply.festivspaces.com',
-                  name: req.user.fname + ' (Festiv)'
-              },
-            }
-        var request = sg.emptyRequest({
-            method: 'POST',
-            path: '/v3/mail/send',
-            body: b
-        });
-
-        sg.API(request, function(error, response) {
-            if (error) {
-                console.log('Error response received');
-            }
-            console.log('RESPONSE', response);
-            console.log('STATUS HERE' ,response.statusCode);
-            console.log('BODY HERE', response.body);
-        });
+        // var b={
+        //     "personalizations": [{
+        //         //Send email to the last person to respond or the original email it was sent to
+        //         // if no response from the business yet
+        //           "to": [{
+        //               "email": venue.lastFrom || vSource.email[0]
+        //             }],
+        //             subject: req.body.subject,
+        //             custom_args: {
+        //                 "vEventid": venueId
+        //             }
+        //     }],
+        //     "from": {
+        //         email: req.user.fname + '@reply.festivspaces.com',
+        //         name: req.user.fname + ' (Festiv)'
+        //     },
+        //     "content": [{
+        //           "type": "text/plain",
+        //           "value": req.body.response
+        //       }],
+        //     reply_to:{
+        //           email: 'id'+ venueId + '@reply.festivspaces.com',
+        //           name: req.user.fname + ' (Festiv)'
+        //       },
+        //     }
+        // var request = sg.emptyRequest({
+        //     method: 'POST',
+        //     path: '/v3/mail/send',
+        //     body: b
+        // });
+        //
+        // sg.API(request, function(error, response) {
+        //     if (error) {
+        //         console.log('Error response received');
+        //     }
+        //     console.log('RESPONSE', response);
+        //     console.log('STATUS HERE' ,response.statusCode);
+        //     console.log('BODY HERE', response.body);
+        // });
         res.redirect(`/messages?venueId=${venueId}`)
     })
     .catch(function(err){
