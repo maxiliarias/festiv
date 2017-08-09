@@ -391,15 +391,18 @@ router.post('/messages', upload.array(), function(req,res){
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
 
-        return VEvent.findById(venueId)
+        VEvent.findById(venueId)
+        .populate('chat')
+        .exec()
         .then(ve => {
             venue = ve
-            console.log("venue is", venue)
-            var lastMsgId = venue.chat[venue.length-1]
+            console.log("venue chat is", venue.chat)
+            var lastMsgId = venue.chat[venue.chat.length-1]
             return Chat.findById(lastMsgId)
         })
         .then( msg => {
-             newMailSpot = mail.text.indexOf(msg.content)
+            console.log('msg is', msg);
+             newMailSpot = mail.text.indexOf(venue.chat.content)
 
              var chat = new Chat({
                  chatOwner: venueId,
