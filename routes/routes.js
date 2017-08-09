@@ -394,7 +394,7 @@ router.post('/messages', upload.any(), function(req,res){
     .then(function(v) {
         venue = v;
         console.log("entire venue is",venue);
-        res.status(200)
+        res.send(200)
         var temp = venue.chat
         console.log('FIRST venue chat is', temp);
         venue.chat = mail.text + temp
@@ -404,9 +404,8 @@ router.post('/messages', upload.any(), function(req,res){
             path: req.files.filename,
             name: req.files.originalname})
 
-        return venue.save()
-        // res.status(200)
         console.log('updated venue is', venue);
+        return venue.save()
     })
     .catch(function(err) {
         console.log('sendgrid error', err);
