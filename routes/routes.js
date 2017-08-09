@@ -383,6 +383,11 @@ router.post('/messages', upload.any(), function(req,res){
     console.log('printing up here', req.files);
     console.log("body", req.body)
 
+    if(!req.body || !req.body.email){
+        console.log('no body')
+        res.send(200)
+    }
+
     simpleParser(req.body.email, function(err, mail) {
         console.log('MAIL To', mail);
         // console.log('MAIL To', mail.to.text);
