@@ -394,6 +394,7 @@ router.post('/messages', upload.array(), function(req,res){
         return VEvent.findById(venueId)
         .then(ve => {
             venue = ve
+            console.log("venue is", venue)
             var lastMsgId = venue.chat[venue.length-1]._id
             return Chat.findById(lastMsgId)
         })
