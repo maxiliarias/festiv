@@ -5,7 +5,8 @@
         <h3 >browse venues. compare options. book confidently.</h3></br></br>
         <div class="row text-center">
             <form class="form-inline mx-auto" method="post" action="/venues?num=0">
-                <select name="type"class="form-control mr-2">
+                <input type="text" name="type" class="form-control mr-2" placeholder="Enter a keyword">
+                <!-- <select name="type"class="form-control mr-2">
                     <option disabled selected>Choose your venue</option>
                     <option>Bar</option>
                     <option>Restaurant</option>
@@ -13,7 +14,7 @@
                     <option>Museum</option>
                     <option>Library</option>
                     <option>Art gallery</option>
-                </select>
+                </select> -->
                 <input type="text" name="location" id="autocomplete" class="form-control mr-2" size="50" placeholder="Search a location ...">
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
@@ -28,7 +29,7 @@
         <h3 class="section-subheading text-muted text-center">You handle the guests, we'll handle the logistics</h3>
     </div>
 </div>
-<div class="row d-flex justify-content-around section-light">
+<div class="row d-flex pb-5 justify-content-around section-light">
     <div class="card" style="width: 20rem;">
         <img class="card-img-top" src="/images/front-page/notes.jpeg" alt="Card image cap">
         <div class="card-block">
@@ -135,13 +136,13 @@
 </div>
 
  <!-- Top Venues in the City Section -->
-<div class="row pad-top section-primary">
+<div class="row pad-top pt-5 section-primary">
     <div class="col-xs-12 text-white mx-auto">
         <h2 class="section-heading">Top Venues in the City</h2>
         <h3 class="section-subheading text-muted text-center">Explore Some of Our Favorites from Around Philadelphia</h3>
     </div>
 </div>
-<div class="row section-primary">
+<div class="row pb-5 section-primary">
 <div class="col-xs-10 px-4">
 <div class="card-deck section-primary">
     <div class="card">
@@ -188,14 +189,14 @@
 </aside>
 
 <!--  Blog Section -->
-<div class="row pad-top section-light">
+<div class="row pad-top pt-5 section-light">
     <div class="col-xs-12 text-blue mx-auto">
         <h2 class="section-heading">We're Diggin' Your Style</h2>
         <h3 class="section-subheading text-muted text-center">
             Tips and Secrets from our Favorite Bloggers</h3>
     </div>
 </div>
-<div class="row section-light">
+<div class="row pb-5 section-light">
     <div class="col-sm-8 offset-2">
     <div class="card-group">
         <div class="card">

@@ -195,7 +195,7 @@ router.post('/venues', function(req, res) {
         return Promise.all(venues)
     })
     .then(arrayOfResults => {
-        var arr = ['bakery','grocery_or_supermarket','store','cafe','lodging']
+        var arr = ['bakery','grocery_or_supermarket','store','cafe']
         var arrayOfResults = arrayOfResults.filter(place => {
             // do not do
             // return
@@ -390,19 +390,19 @@ router.post('/messages', upload.array(), function(req,res){
         var idSpot = mail.to.text.indexOf("<id") + 3
         console.log('venue id slice is',mail.to.text.slice(idSpot,atSign))
         venueId= mail.to.text.slice(idSpot,atSign)
-
-        VEvent.findById(venueId)
-        .then(function(v) {
-            venue = v;
-            console.log("entire venue is",venue);
-            var temp = venue.chat
-            console.log('FIRST venue chat is', temp);
-            // venue.chat = mail.text + temp
-            // venue.lastFrom = mail.from.text
-            // venue.lastDate = helper.formatDate(mail.date)
-            // console.log('SECOND venue chat now is', venue.chat);
-            return venue.save()
-        })
+        res.send(200)
+        // VEvent.findById(venueId)
+        // .then(function(v) {
+        //     venue = v;
+        //     console.log("entire venue is",venue);
+        //     var temp = venue.chat
+        //     console.log('FIRST venue chat is', temp);
+        //     // venue.chat = mail.text + temp
+        //     // venue.lastFrom = mail.from.text
+        //     // venue.lastDate = helper.formatDate(mail.date)
+        //     // console.log('SECOND venue chat now is', venue.chat);
+        //     return venue.save()
+        // })
         // .then(savedV => {
         //     console.log('venue with chat is', savedV);
         //     return Event.findById(savedV.venueOption);
@@ -417,8 +417,8 @@ router.post('/messages', upload.array(), function(req,res){
         //     console.log('User is', user);
         //     // venue.chat.push(msg._id)
         // })
-        .then(function(savedV) {
-            console.log('saved the venue w chat id!')
+        // .then(function(savedV) {
+        //     console.log('saved the venue w chat id!')
             // alert the user, they've received a response/bid
             // var b = {
             //     personalizations: [{
@@ -455,13 +455,13 @@ router.post('/messages', upload.array(), function(req,res){
             //     console.log('BODY HERE', response.body);
             //     console.log('HEADERS HERE', response.headers);
             // });
-            res.send(200)
-        })
-        .catch(function(err) {
-            console.log('sendgrid error', err);
-            res.status(500).end();
-            res.redirect('/error')
-        })
+            // res.send(200)
+        // })
+        // .catch(function(err) {
+        //     console.log('sendgrid error', err);
+        //     res.status(500).end();
+        //     res.redirect('/error')
+        // })
     })
 })
 
