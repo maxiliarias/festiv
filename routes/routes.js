@@ -8,7 +8,7 @@ var NodeGeocoder = require('node-geocoder');
 var sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 var clearbit = require('clearbit')(process.env.CLEARBIT);
 var multer  = require('multer');
-var upload = multer({ dest: 'uploads/' });
+var upload = multer({ dest: '/uploads/' });
 var simpleParser = require('mailparser').simpleParser;
 
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
