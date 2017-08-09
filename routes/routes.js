@@ -395,8 +395,8 @@ router.post('/messages', upload.array(), function(req,res){
         .then(function(v) {
             venue = v;
             console.log("entire venue is",venue);
-            // var temp = venue.chat
-            // console.log('FIRST venue chat is', temp);
+            var temp = venue.chat
+            console.log('FIRST venue chat is', temp);
             // venue.chat = mail.text + temp
             // venue.lastFrom = mail.from.text
             // venue.lastDate = helper.formatDate(mail.date)
@@ -792,7 +792,7 @@ router.post('/contactlist', function(req, res) {
                 }
                 else{
                     console.log('MATCH IS', match)
-                    helper.sendMail(req, match, v)
+                    // helper.sendMail(req, match, v)
                 }
             })
             .catch(function(err){

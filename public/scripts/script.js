@@ -13,15 +13,9 @@ $( document ).ready(function() {
     if(window.location.href.split("?")[1] === "needsearch=true"){
         alert("Please make a new search first")
     }
-    // Confirmation modal on contactlist page
-    $( "#contactBtn" ).click(function( event ) {
-      event.preventDefault();
-      $('#confirmModal').modal('show');
-    });
 
     $( "#request-bids" ).click(function() {
-        $('#confirmModal').modal('hide');
-        $( "#contactForm" ).submit();
+        $( "#contactBtn" ).trigger("click");
     });
 
 });

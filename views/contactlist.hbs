@@ -14,31 +14,36 @@
           <div class="form-group row">
             <label class="col-2 col-form- text-left mt-2">Date</label>
             <div class="col-10">
-              <input type="date" class="form-control" name="date" value="{{party.date}}" min={{min}} required>
+              <input type="date" class="form-control" name="date" value="{{party.date}}" min={{min}} required oninvalid="this.setCustomValidity('A Date is requested')"
+              oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Start Time</label>
             <div class="col-10">
-              <input type="text" class="form-control" name="starttime" value="{{party.time}}"  placeholder="Desired Start Time"required>
+              <input type="text" class="form-control" name="starttime" value="{{party.time}}"  placeholder="Desired Start Time" required oninvalid="this.setCustomValidity('An Estimated Start Time is requested')"
+              oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Hours</label>
             <div class="col-10">
-              <input type='text' class="form-control" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required>
+              <input type='text' class="form-control" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required oninvalid="this.setCustomValidity('An Estimated Number of Hours is requested')"
+                oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Guests</label>
             <div class="col-10">
-              <input type='text' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Estimated Guest Count" required>
+              <input type='text' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Estimated Guest Count" required oninvalid="this.setCustomValidity('An Estimated Guest Count is requested')"
+              oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Price Package</label>
             <div class="col-10">
-                <select class="form-control" name="price" required>
+                <select class="form-control" name="price" required oninvalid="this.setCustomValidity('A Pricing Preference is requested')"
+                oninput="setCustomValidity('')">
                       <option value="{{party.price}}" disabled selected>{{party.price}}</option>
                       <option>Open Bar</option>
                       <option>Minimum Spend</option>
@@ -48,54 +53,60 @@
           <div class="form-group row">
             <label class="col-2 col-form- text-left mt-2">First Name</label>
             <div class="col-4">
-              <input type="text" class="form-control" name="fname" value="{{fname}}"  placeholder="First Name" required>
+              <input type="text" class="form-control" name="fname" value="{{fname}}"  placeholder="First Name" required oninvalid="this.setCustomValidity('Your First Name is requested')"
+              oninput="setCustomValidity('')">
             </div>
             <label class="col-2 col-form- text-left mt-2">Last Name</label>
             <div class="col-4">
-              <input type="text" class="form-control" name="lname" value="{{lname}}" placeholder="Last Name" autofocusrequired>
+              <input type="text" class="form-control" name="lname" value="{{lname}}" placeholder="Last Name" required oninvalid="this.setCustomValidity('Your Last Name is requested')"
+              oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form- text-left mt-2">Email</label>
             <div class="col-10">
-              <input type="text" class="form-control" name="email" value="{{email}}" placeholder="Email" required>
+              <input type="text" class="form-control" name="email" value="{{email}}" placeholder="Email" required oninvalid="this.setCustomValidity('Your Email is requested')"
+              oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Additional</label>
             <div class="col-10">
-                <textarea rows="3" class="form-control" name="additional" placeholder="Share any additional details you'd like about your event here. (Note this message is intended for all venues related to your selected event.)" id="message" required></textarea>
+                <textarea rows="3" class="form-control" name="additional" placeholder="Share any additional details you'd like about your event here. (Note this message is intended for all venues related to your selected event.)" id="message"></textarea>
             </div>
           </div>
-        <button id="contactBtn" class="btn btn-primary mt-2" type="submit">Request Bids</button>
-      </form>
+        <button class="btn btn-primary mt-2" type="button" data-toggle="modal" data-target="#confirmModal">Request Bids</button>
+        <button id="contactBtn" type="submit" style="display:none"></button>
 
-      <!-- Confirmation Modal  -->
-      <div class="modal " id="confirmModal">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title text-blue"><b>Confirmation</b></h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body text-left">
-                <p class="text-muted">Do all of the venues below look correct? You can make edits in your <a href="/events">my events</a> page. If ready, let's go!</p>
-                <ul>
-                    {{#each party.vEvent}}
-                    <li class="text-blue">{{this.name}}</li>
-                    {{/each}}
-                </ul>
+        <!-- Confirmation Modal  -->
+        <div class="modal " id="confirmModal">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title text-blue"><b>Confirmation</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body text-left">
+                  <p class="text-muted">Do all of the venues below look correct? You can make edits in your <a href="/events">my events</a> page. If ready, let's go!</p>
+                  <ul>
+                      {{#each party.vEvent}}
+                      <li class="text-blue">{{this.name}}</li>
+                      {{/each}}
+                  </ul>
 
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Make Changes</button>
-              <button type="button" class="btn btn-primary" id="request-bids">Request Bids</button>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Make Changes</button>
+                <button type="button" class="btn btn-primary" id="request-bids">Request Bids</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+      </form>
+
     </div>
 
       <!-- Screen to select an event -->
