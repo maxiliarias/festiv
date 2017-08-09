@@ -399,17 +399,18 @@ router.post('/conversation', upload.any(), function(req,res){
 
         var temp = venue.chat
         console.log('FIRST venue chat is', temp);
-        console.log('from is a type', typeof mail.envelope);
         var from = mail.envelope.indexOf('"from":')
-        console.log('sliced from', mail.envelope.slice(from,mail.envelope.length));
+        console.log('sliced from', mail.envelope.slice(8,mail.envelope.length-2))
 
         venue.chat = mail.text + temp
-        venue.lastFrom = mail.envelope.from
+        venue.lastFrom = mail.envelope.slice(8,mail.envelope.length-2)
         venue.lastDate = helper.formatDate(new Date())
-        venue.attachments.push({
-            path: attach[0].filename,
-            name: attach[0].originalname})
-
+        attach.forEach(x => {
+            venue.attachments.push({
+                path: x.filename,
+                name: x.originalname
+            })
+        })
         console.log('updated venue is', venue);
         return venue.save()
     })
