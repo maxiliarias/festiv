@@ -455,7 +455,7 @@ router.post('/messages', upload.array(), function(req,res){
             //     console.log('BODY HERE', response.body);
             //     console.log('HEADERS HERE', response.headers);
             // });
-            // res.status(200).end();
+            res.send(200)
         })
         .catch(function(err) {
             console.log('sendgrid error', err);
