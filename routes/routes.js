@@ -891,8 +891,9 @@ router.post('/msgresponse',function(req,res){
         venue = v
 
         venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat
+        console.log('BEFORE mongoose save', venue.chat);
         venue.save()
-        console.log('new venue chat is', venue.chat);
+        console.log('AFTER mongoose.save', venue.chat);
     })
     .then(() => {
         return VData.findOne({placeId: venue.placeId})
