@@ -38,7 +38,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(express.static(path.join(__dirname + "/uploads", 'uploads')));
 
 // Passport
 app.use(session({
@@ -65,7 +64,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_APP_SECRET,
-    callbackURL: 'http://localhost:3000/fb/login/callback'
+    callbackURL: 'http://www.festivspaces.com/fb/login/callback'
 },
 // change localhost to process.env.DOMAIN
 function(accessToken,refreshToken,profile,done){
