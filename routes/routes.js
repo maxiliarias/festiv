@@ -402,7 +402,7 @@ router.post('/conversation', upload.any(), function(req,res){
         var from = mail.envelope.indexOf('"from":')
         console.log('sliced from', mail.envelope.slice(from + 8,mail.envelope.length-2))
 
-        venue.chat = mail.text + temp ? (`${req.body.response}</br></br>${req.user.fname} ${req.user.lname}</br></br>On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : ''
+        venue.chat = mail.text + temp ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : ''
         console.log('new venue chat is', venue.chat);
         venue.lastFrom = mail.envelope.slice(from + 8,mail.envelope.length-2)
         venue.lastDate = helper.formatDate(new Date())
