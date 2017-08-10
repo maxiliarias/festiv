@@ -844,7 +844,8 @@ router.get('/messages',function(req,res){
             return VEvent.findById(venueId)
             .then(v => {
                 // msg.forEach((x) => {
-                    v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
+                    v.chat = v.chat
+                    // replace(/(?:\r\n|\r|\n)/g, '</br>')
                 // })
 
                 console.log('vEvent is',v)
@@ -890,7 +891,7 @@ router.post('/msgresponse',function(req,res){
     .then(v => {
         venue = v
 
-        venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat
+        venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat.replace('/</br>/','\n')
         console.log('BEFORE mongoose save', venue.chat);
         venue.save()
         console.log('AFTER mongoose.save', venue.chat);
