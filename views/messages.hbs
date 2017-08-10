@@ -28,14 +28,17 @@
                     <textarea rows="5" class="form-control" name="response" placeholder="Type a response here" id="message" required></textarea>
                     <button class="btn btn-primary m-2"> Send </button>
                 </form>
-                <p class="ml-2">{{{message}}}</p>
-                <!-- {{#each message}}
-                    <div class="p-2">
-                        <p><b>From:</b> {{this.from}}</p>
-                        <p><b>Date:</b> {{this.date}}</p>
-                        <p></br> {{this}}</p>
+                <div class="row">
+                    <div class="col-sm-8">
+                        <p class="ml-2">{{{message}}}</p>
                     </div>
-                {{/each}} -->
+                    <div class="col-sm-4">
+                        <h5 class="text-muted pb-3"><b>Attachments</b></h5>
+                        {{#each vEvent.attachments}}
+                            <a href='/{{this.path}}'>{{this.name}}</a></br></br>
+                        {{/each}}
+                    </div>
+                </div>
             {{else}}
                 <h4 class="pad-top text-center text-blue"><b>Click on a Venue to Review your Messages</b></h4>
                 <h6 class='text-muted text-center'>You'll notice a friendly envelope near the venues with conversation history</h6>
