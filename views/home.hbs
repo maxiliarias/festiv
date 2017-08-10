@@ -1,21 +1,27 @@
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key={{googleApi}}&libraries=places"></script>
 <div class="row parallax parallaxHome text-center flex">
-    <div class="col-xs-12 text-white mx-auto">
-        <h1 >LET'S GET FESTIV</h1>
-        <h3 >browse venues. compare options. book confidently.</h3></br></br>
+    <div class="col-lg-12 col-11 text-white mx-auto">
+        <h1>LET'S GET FESTIV</h1>
+        <div class="col-lg-12 col-11 d-flex flex-wrap justify-content-center text-white mx-auto">
+            <h3>browse venues.</h3>
+            <h3>compare options.</h3>
+            <h3>book confidently.</h3>
+        </div></br></br>
         <div class="row text-center">
-            <form class="form-inline mx-auto" method="post" action="/venues?num=0">
-                <input type="text" name="type" class="form-control mr-2" placeholder="Enter a keyword">
-                <input type="text" name="location" id="autocomplete" class="form-control mr-2" size="50" placeholder="Search a location ...">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
+            <div class="col-12 d-flex justify-content-center text-white">
+                <form class="form-inline mx-auto" method="post" action="/venues?num=0">
+                    <input type="text" name="type" class="form-control mr-2" placeholder="Enter a keyword">
+                    <input type="text" name="location" id="autocomplete" class="form-control mr-2" placeholder="Search a location ...">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- How it Works section  -->
 <div class="row pad-top section-light">
-    <div class="col-xs-12 mx-auto">
+    <div class="col-sm-12 mx-auto">
         <h2 class="section-heading text-blue">Celebrate Everything</h2>
         <h3 class="section-subheading text-muted text-center">You handle the guests, we'll handle the logistics</h3>
     </div>
@@ -128,52 +134,50 @@
 
  <!-- Top Venues in the City Section -->
 <div class="row pad-top pt-5 section-primary">
-    <div class="col-xs-12 text-white mx-auto">
+    <div class="col-sm-12 text-white mx-auto">
         <h2 class="section-heading">Top Venues in the City</h2>
         <h3 class="section-subheading text-muted text-center">Explore Some of Our Favorites from Around Philadelphia</h3>
     </div>
 </div>
-<div class="row pb-5 section-primary">
-<div class="col-xs-10 px-4">
-<div class="card-deck section-primary">
-    <div class="card">
-        <img class="card-img-top" width:"80%" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAANF3AeA9EgcZrJ2paOKuuxtc4pdzxMcKaehr8sclnBbBzpdtV9FV4W9-zia0P1d0RywPCARDC1yPnq5Ij3RDN6E1lZ0nkDhICRe78h39u6Jx0pfLs6Ys7KhTenNUwpu1BEhBJeG0I6gQToQsNXWis1p15GhQGvB2nSZIZkHNGjferKPFA_EmwBQ&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
-        <div class="card-block">
-            <h4 class="card-title">Fork </h4>
-            <p class="card-text"><small class="text-muted">Contemporary American</small></p>
-            <p class="card-text">Sophisticated New American cuisine that includes a popular brunch served amid sleek modern decor.</p>
+<div class="row pb-5 d-flex justify-content-around section-primary">
+    <div class="card-deck justify-content-center">
+        <div class="card" style="max-width: 18rem;">
+            <img class="card-img-top" width:"80%" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAANF3AeA9EgcZrJ2paOKuuxtc4pdzxMcKaehr8sclnBbBzpdtV9FV4W9-zia0P1d0RywPCARDC1yPnq5Ij3RDN6E1lZ0nkDhICRe78h39u6Jx0pfLs6Ys7KhTenNUwpu1BEhBJeG0I6gQToQsNXWis1p15GhQGvB2nSZIZkHNGjferKPFA_EmwBQ&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
+            <div class="card-block">
+                <h4 class="card-title">Fork </h4>
+                <p class="card-text"><small class="text-muted">Contemporary American</small></p>
+                <p class="card-text">Sophisticated New American cuisine that includes a popular brunch served amid sleek modern decor.</p>
+            </div>
+        </div>
+        <div class="card" style="max-width: 18rem;">
+            <img class="card-img-top" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAAKgIzEhlRGFeo1XXM1bolVtcNeMD9UkG5arHv12C7-FPl7Xpo1oAHnFu9qyEX5MFkJyYmrVuaacV5D9MvhsvgIRt8uezZPpNtTMONPX46MJVBi7w-ngypjnmFXIIQNuVbEhBllW2RazmSvkxAsHfAVt5BGhSwHwvM4FaoIoKvJTzZnhEcVmRQBA&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
+            <div class="card-block">
+                <h4 class="card-title">Lacroix Restaurant</h4>
+                <p class="card-text"><small class="text-muted">Continental</small></p>
+                <p class="card-text">Stately refuge with a global menu, plus famed chef's table, a tasting menu with kitchen seating.</p>
+            </div>
+        </div>
+        <div class="card" style="max-width: 18rem;">
+            <img class="card-img-top" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAA_hXZBZlE0kknYeSLEaCOJiqbFNj86m_6GXLcYbp8r9oIzkyEF4EKlX_KRn1G_GbdkfYoRZrs9VPG03WD0mMdxCLly4juN7N_O2Rd_TJuYbwM6HAaoRTGSfBolkW-6DCDEhCh7-TBw2JOdjaqReG_6CpIGhQQXNHRMSCWQZ_NSV94_SAoiqMYNA&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
+            <div class="card-block">
+                <h4 class="card-title">Barclay Prime</h4>
+                <p class="card-text"><small class="text-muted">Steakhouse</small></p>
+                <p class="card-text">High-end steakhouse & lounge from chef Stephen Starr in a contemporary library setting.</p>
+            </div>
         </div>
     </div>
-    <div class="card">
-        <img class="card-img-top" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAAKgIzEhlRGFeo1XXM1bolVtcNeMD9UkG5arHv12C7-FPl7Xpo1oAHnFu9qyEX5MFkJyYmrVuaacV5D9MvhsvgIRt8uezZPpNtTMONPX46MJVBi7w-ngypjnmFXIIQNuVbEhBllW2RazmSvkxAsHfAVt5BGhSwHwvM4FaoIoKvJTzZnhEcVmRQBA&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
-        <div class="card-block">
-            <h4 class="card-title">Lacroix Restaurant</h4>
-            <p class="card-text"><small class="text-muted">Continental</small></p>
-            <p class="card-text">Stately refuge with a global menu, plus famed chef's table, a tasting menu with kitchen seating.</p>
-        </div>
-    </div>
-    <div class="card">
-        <img class="card-img-top" src="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=CmRaAAAA_hXZBZlE0kknYeSLEaCOJiqbFNj86m_6GXLcYbp8r9oIzkyEF4EKlX_KRn1G_GbdkfYoRZrs9VPG03WD0mMdxCLly4juN7N_O2Rd_TJuYbwM6HAaoRTGSfBolkW-6DCDEhCh7-TBw2JOdjaqReG_6CpIGhQQXNHRMSCWQZ_NSV94_SAoiqMYNA&key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc" alt="Card image cap">
-        <div class="card-block">
-            <h4 class="card-title">Barclay Prime</h4>
-            <p class="card-text"><small class="text-muted">Steakhouse</small></p>
-            <p class="card-text">High-end steakhouse & lounge from chef Stephen Starr in a contemporary library setting.</p>
-        </div>
-    </div>
-</div>
-</div>
 </div>
 
 <!-- Email sign-up section  -->
 <aside class="row ">
-    <div class="col-xs-12 text-blue mx-auto pad-top">
+    <div class="col-sm-12 text-blue mx-auto pad-top">
         <h2 class="section-heading ">Stay Inspired</h2>
         <h3 class="section-subheading text-muted text-center">
             Stay up-to-date on our newest venue additions, features and trends </h3>
     <form class="form-inline mx-auto" method="post" action="/join">
       <div class="form-group mx-auto">
-        <input type="email" name="email" class="form-control" placeholder="your email here">
-        <button type="submit" class="btn btn-primary">Join</button>
+        <input type="email" name="email" class="inline form-control" placeholder="your email here">
+        <button type="submit" class="inline btn btn-primary">Join</button>
       </div>
     </form>
     </div>
@@ -181,16 +185,15 @@
 
 <!--  Blog Section -->
 <div class="row pad-top pt-5 section-light">
-    <div class="col-xs-12 text-blue mx-auto">
+    <div class="col-sm-12 text-blue mx-auto">
         <h2 class="section-heading">We're Diggin' Your Style</h2>
         <h3 class="section-subheading text-muted text-center">
             Tips and Secrets from our Favorite Bloggers</h3>
     </div>
 </div>
-<div class="row pb-5 section-light">
-    <div class="col-sm-8 offset-2">
+<div class="row pb-5 d-flex justify-content-center section-light">
     <div class="card-group">
-        <div class="card">
+        <div class="card" style="max-width: 18rem;">
             <a href="/pumpkinflair">
                 <img class="card-img-top" src="images/blog/oh-happy-day/pumpkintable.jpg"  class="img-responsive" width="90%" alt="Card image cap">
             </a>
@@ -202,7 +205,7 @@
                 <small class="text-muted">Authored by: Amy Moss</small>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="max-width: 18rem;">
             <a href="/whiskyaficionados">
             <img class="card-img-top" src="images/blog/green-wedding-shoes/glasses.jpg"  class="img-responsive" width="90%" alt="Card image cap">
         </a>
@@ -214,7 +217,7 @@
                 <small>Photography: Milou & Olin</small>
             </div>
         </div>
-        <div class="card">
+        <div class="card" style="max-width: 18rem;">
             <a href="/macaroonsBlooms">
             <img class="card-img-top" src="/images/blog/style-me-pretty/table.jpg" class="img-responsive" width="90%" alt="Card image cap">
             </a>
@@ -226,7 +229,6 @@
                 <small>Authored by: Stephanie Weers</small>
             </div>
         </div>
-    </div>
     </div>
 </div>
 
