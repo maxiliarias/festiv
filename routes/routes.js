@@ -844,7 +844,7 @@ router.get('/messages',function(req,res){
             return VEvent.findById(venueId)
             .then(v => {
                 // msg.forEach((x) => {
-                    v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '\n')
+                    v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
                 // })
 
                 console.log('vEvent is',v)
