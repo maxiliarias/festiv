@@ -402,7 +402,7 @@ router.post('/conversation', upload.any(), function(req,res){
         var from = mail.envelope.indexOf('"from":')
         console.log('sliced from', mail.envelope.slice(from + 8,mail.envelope.length-2))
 
-        venue.chat = mail.text 
+        venue.chat = mail.text
         // (temp ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : '')
         console.log('new venue chat is', venue.chat);
         venue.lastFrom = mail.envelope.slice(from + 8,mail.envelope.length-2)
@@ -917,7 +917,8 @@ router.post('/msgresponse',function(req,res){
             },
             "content": [{
                   "type": "text/plain",
-                  "value": venue.chat.replace(/(<([^>]+)>)/g, "")
+                  "value": venue.chat
+                //   .replace(/(<([^>]+)>)/g, "")
               }],
             reply_to:{
                   email: 'id'+ venueId + '@reply.festivspaces.com',
