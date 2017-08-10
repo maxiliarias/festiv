@@ -402,7 +402,8 @@ router.post('/conversation', upload.any(), function(req,res){
         var from = mail.envelope.indexOf('"from":')
         console.log('sliced from', mail.envelope.slice(from + 8,mail.envelope.length-2))
 
-        venue.chat = mail.text + temp ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : ''
+        venue.chat = mail.text 
+        // (temp ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : '')
         console.log('new venue chat is', venue.chat);
         venue.lastFrom = mail.envelope.slice(from + 8,mail.envelope.length-2)
         venue.lastDate = helper.formatDate(new Date())
@@ -884,18 +885,12 @@ router.post('/msgresponse',function(req,res){
     console.log('here', req.body.response);
     var venueId= req.query.venueId
     console.log('in msg response', venueId);
-    // var newMsg = new Chat({
-    //     chatOwner: venueId,
-    //     from: req.user.email,
-    //     date: helper.formatDate(new Date()),
-    //     content: req.body.response
-    // })
-    // return newMsg.save()
+
     VEvent.findById(venueId)
     .then(v => {
         venue = v
 
-        venue.chat = `${req.body.response}</br></br>${req.user.fname} ${req.user.lname}</br></br>On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + venue.chat
+        venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat
         venue.save()
         console.log('new venue chat is', venue.chat);
     })
