@@ -890,7 +890,7 @@ router.post('/msgresponse',function(req,res){
     .then(v => {
         venue = v
 
-        venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat)
+        venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat
         console.log('BEFORE mongoose save', venue.chat);
         venue.save()
         console.log('AFTER mongoose.save', venue.chat);
