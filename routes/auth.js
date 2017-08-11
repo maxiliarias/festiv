@@ -36,14 +36,20 @@ module.exports = function(passport) {
 
     // GET Login page
     router.get('/login', function(req, res) {
-        res.render('login',{
-            loggedin: req.user ? true: false,
-            user: JSON.stringify({
-                fbid: req.user.fbid ? req.user.fbid : null,
-                displayName: req.user.displayName? req.user.displayName : null,
-                email: req.user.email ? req.user.email : null
-            })
-        });
+        if (req.user) {
+            res.render('login', {
+                loggedin: req.user ? true: false,
+                user: {
+                    fbid: req.user.fbid,
+                    displayName: req.user.displayName,
+                    email: req.user.email,
+                }
+            });
+        } else {
+            res.render('login', {
+                loggedin: req.user ? true: false,
+            });
+        }
     });
 
     // POST Login page
