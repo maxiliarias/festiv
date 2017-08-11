@@ -39,7 +39,7 @@ module.exports = function(passport) {
         res.render('login',{
             loggedin: req.user ? true: false,
             u:{
-                fbid: u.fbid,
+                fbid: req.user.fbid,
                 displayName: req.user.displayName,
                 email: req.user.email
             }

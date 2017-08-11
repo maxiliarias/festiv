@@ -25,7 +25,7 @@ router.get('/', function(req, res, next) {
         googleApi: process.env.GOOGLEPLACES,
         loggedin: req.user ? true: false,
         u:{
-            fbid: u.fbid,
+            fbid: req.user.fbid,
             displayName: req.user.displayName,
             email: req.user.email
         }
@@ -58,7 +58,7 @@ router.get('/venues',function(req, res){
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
                 u:{
-                    fbid: u.fbid,
+                    fbid: req.user.fbid,
                     displayName: req.user.displayName,
                     email: req.user.email
                 }
@@ -71,7 +71,7 @@ router.get('/venues',function(req, res){
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
                 u:{
-                    fbid: u.fbid,
+                    fbid: req.user.fbid,
                     displayName: req.user.displayName,
                     email: req.user.email
                 }
