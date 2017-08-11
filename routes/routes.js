@@ -277,13 +277,14 @@ router.post('/venue', function(req, res) {
         console.log('foundVdata is', foundVdata);
         foundVdata.facebook = company.facebook.handle || ""
         foundVdata.twitter = company.twitter.handle || ""
-        foundVdata.description= company.description || ""
-        foundVdata.metaD= company.site.metaDescription || ""
-        foundVdata.twitterBio= company.twitter.Bio || ""
+        foundVdata.description = company.description || ""
+        foundVdata.metaD = company.site.metaDescription || ""
+        foundVdata.twitterBio = company.twitter.Bio || ""
         console.log('found VData, updating', foundVdata);
-        return foundVdata.save();
+        foundVdata.save();
+        return
     })
-    .then(function(savedVdata){
+    .then(function(){
         console.log('Successfully saved VData, now rendering venues.hbs');
         req.session.venueRedirect = {
             company: company,
@@ -328,6 +329,7 @@ router.post('/venue', function(req, res) {
 });
 
 router.get('/venue', function(req, res) {
+    console.log('got to venue')
     var temp = req.session.venueRedirect;
     if (!temp) {
         res.redirect('/venues');
