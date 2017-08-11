@@ -49,12 +49,10 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 passport.serializeUser(function(user, done) {
-    console.log('USER!!!', user);
     done(null, user._id);
 });
 
 passport.deserializeUser(function(id, done) {
-    console.log('id: ', id);
     User.findById(id, function(err, user) {
         done(null, user);
     });
@@ -78,6 +76,8 @@ function(accessToken,refreshToken,profile,done){
             var u = new User({
                 rtoken: refreshToken,
                 fbid: profile.id,
+                displayName: profile.displayName,
+                gender: profile.gender,
                 email: profile.email,
                 fname: profile.first_name,
                 lname: profile.last_name

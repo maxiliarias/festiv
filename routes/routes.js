@@ -23,7 +23,11 @@ router.get('/', function(req, res, next) {
 
     res.render('home', {
         googleApi: process.env.GOOGLEPLACES,
-        loggedin: req.user ? true: false
+        loggedin: req.user ? true: false,
+        u:{
+            displayName: req.user.displayName,
+            email: req.user.email
+        }
     });
 });
 
