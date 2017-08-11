@@ -1,146 +1,102 @@
 
-<!-- TOP EVENTS Dropdown -->
-<!-- <div class="row">
-<div class="col-xs-12">
-<h3> Your Events </h3>
-{{#each events}}
-<p>{{this.name}}</p>
-{{#each this.venue}}
-<p>{{this.name}}</p>
-{{/each}}
-{{/each}}
-</div>
-</div> -->
-<div class="row">
-    <div class="col-sm-12 section-blue fixed-pos nextPage inline">
-        <form class="inline" action="/venues?num=0" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 1</button></form>
-        {{#if page2}}
-        <form class="inline" action="/venues?num=1" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 2</button></form>
-        {{/if}}
-        {{#if page3}}
-        <form class="inline" action="/venues?num=2" method="post"><button class="btn btn-primary inline" type="submit" name="button">Page 3</button></form>
-        {{/if}}
-    </div>
-</div>
 <div class="row">
     <!-- Left Filter Sidebar -->
-    <div class="col-sm-2 fixed-pos section-light pad-top ml-1 sidebar listMargin">
-        <div class="col-sm-12 section-primary sidebar text-white">
-            <h4 style='padding: 10px'>New Search </h4>
-            <div >
-                <form class="mx-auto" method="post" action="/newSearch">
-                    <div class="form group">
-                        <select name="type" class="form-control">
-                            <option disabled selected>Venue Type</option>
-                            <option>Bar</option>
-                            <option>Restaurant</option>
-                            <option>Night club</option>
-                            <option>Museum</option>
-                            <option>Library</option>
-                            <option>Art gallery</option>
-                        </select>
-                    </div>
-                    <div id="locationField" class="form-group">
-                        <input type="text"  class="form-control" name="location" id="autocomplete2" placeholder="Location">
-                    </div>
-                    <!-- <div class="form-group">
-                    <select name="radius"  class="form-control">
-                    <option disabled selected>Choose your radius</option>
-                    <option value='5'>5 miles</option>
-                    <option value='10'>10 miles</option>
-                    <option value ='20'>20 miles</option>
-                </select>
-            </div> -->
-                <button class="btn btn-primary" type="submit">Search</button>
+    <div class="col-md-7 col-12 pad-top">
+            <form class="form-inline mx-auto mb-0 col-10 col-md-12 col-lg-10" method="post" action="/newSearch">
+                <input type="text" name="type" class="form-control mr-2 mb-2" placeholder="Enter a keyword">
+                <input type="text"  class="form-control mr-2 mb-2" name="location" id="autocomplete2" placeholder="Location">
+                <button type="submit" class="btn btn-primary mb-2" >Search</button>
             </form>
-        </div>
+            <!-- Pagination -->
+            <div class="text-right mr-2 mb-2">
+                <form class="inline" action="/venues?num=0" method="post"><button class="btn btn-transparent font15" type="submit">PAGE 1</button></form>
+                {{#if page2}}
+                <form class="inline" action="/venues?num=1" method="post"><button class="btn btn-transparent font15" type="submit">PAGE 2</button></form>
+                {{/if}}
+                {{#if page3}}
+                <form class="inline" action="/venues?num=2" method="post"><button class="btn btn-transparent font15" type="submit">PAGE 3</button></form>
+                {{/if}}
+            </div>
+
+    <!-- Venue Result Cards -->
+        {{#if venues}}
+            <div id="listCard" class="row section-light d-flex pb-5 pt-3 justify-content-around">
+            {{#each venues}}
+                <div class="card ml-1" style="max-width: 18rem;">
+                    <img class="card-img-top" src='{{this.photo1}}' class="img-responsive" width="250px" alt="Card image cap">
+                    <div class="card-block">
+                        <form method="post" action="/venue?name={{this.name}}&address={{this.address}}">
+                            <input type="hidden" name="placeId" value="{{this.placeId}}">
+                            <input type="hidden" name="lat" value="{{this.lat}}">
+                            <input type="hidden" name="lng" value="{{this.long}}">
+                            <input type="hidden" name="phone" value="{{this.phone}}">
+                            <input type="hidden" name="rating" value="{{this.rating}}">
+                            <input type="hidden" name="hours" value="{{this.hours}}">
+                            <input type="hidden" name="website" value="{{this.website}}">
+                            <input type="hidden" name="photo1" value="{{this.photo1}}">
+                            <input type="hidden" name="photo2" value="{{this.photo2}}">
+                            <input type="hidden" name="photo3" value="{{this.photo3}}">
+                            <input type="hidden" name="photo4" value="{{this.photo4}}">
+                            <input type="hidden" name="photo5" value="{{this.photo5}}">
+                            <input type="hidden" name="photo6" value="{{this.photo6}}">
+                            <input type="hidden" name="photo7" value="{{this.photo7}}">
+                            <input type="hidden" name="photo8" value="{{this.photo8}}">
+                            <input type="hidden" name="photo9" value="{{this.photo9}}">
+                            <input type="hidden" name="photo10" value="{{this.photo10}}">
+                            <input class="btn-transparent font25" type="submit" value="{{this.name}}">
+                        </form>
+                        <h4 class="card-title"></h4></a>
+                        <p class="card-text text-muted">{{this.address}}</p>
+                        <p class="card-text"><small class="text-muted"></small></p>
+                        <a href="/venues?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-yellow" type="submit">Tag An Event</button></a>
+                    </div>
+
+                <!-- Modal to pick event -->
+                <div class="viewVenues modal " style ={{this.modal}}>
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content pad-top pl-4">
+                      <div class="modal-header">
+                        <h5 class="modal-title text-blue"><b>My Events</b></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body text-left">
+                        <p>Add <b>{{this.name}}</b> to one of my existing event lists by clicking below or alternatively create a new event.</p>
+                        <ul>
+                            {{#each ../events}}
+                            <li><a class="taggedEvent" href="/addVenue?eventId={{this._id}}&placeId={{../this.placeId}}&name={{../this.name}}"> {{this.name}} </a>
+                                <a href="/removeEvent?eventId={{this._id}}"><button class="btn-yellow">x</button></a>
+                            </li>
+                            {{/each}}
+                        </ul>
+                      </div>
+                      <div class="modal-footer">
+                          <form class="form-inline" action="/addEvent?placeId={{this.placeId}}" method="post">
+                             <div class="form-group-row">
+                                <input type="text" name=event class="form-control" size="28" placeholder="Name your special event here">
+                                <input type=hidden name=name value="{{this.name}}">
+                                <button class="btn btn-primary inline" type="submit" name="button"> Add a new Event!</button>
+                             </div>
+                          </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                </div>
+            {{/each}}
+            </div>
+        {{else}}
+            <div class="col-lg-6 mr-4 mb-4 section-light mx-auto height" id="results">
+                <h4 class="text-center text-blue vertMid"><b>Oh darn, seems like there are 0 results for that search. Please try a different search!</b></h4>
+            </div>
+        {{/if}}
+    </div>
+    <div class="col-md-5 col-12 pl-0">
+        <div id="map" class="map" ></div>
     </div>
 </div>
-
-<!-- Venue Result Cards -->
-{{#if venues}}
-<div class="col-sm-6 float section-light pad-top listMargin" id="results">
-    {{#each venues}}
-    <div class="col-sm-6">
-        <div class="card">
-            <img class="card-img-top" src='{{this.photo1}}' class="img-responsive" width="250px" alt="Card image cap">
-            <div class="card-block">
-                <form method="post" action="/venue?name={{this.name}}&address={{this.address}}">
-                    <input type="hidden" name="placeId" value="{{this.placeId}}">
-                    <input type="hidden" name="lat" value="{{this.lat}}">
-                    <input type="hidden" name="lng" value="{{this.long}}">
-                    <input type="hidden" name="phone" value="{{this.phone}}">
-                    <input type="hidden" name="rating" value="{{this.rating}}">
-                    <input type="hidden" name="hours" value="{{this.hours}}">
-                    <input type="hidden" name="website" value="{{this.website}}">
-                    <input type="hidden" name="photo1" value="{{this.photo1}}">
-                    <input type="hidden" name="photo2" value="{{this.photo2}}">
-                    <input type="hidden" name="photo3" value="{{this.photo3}}">
-                    <input type="hidden" name="photo4" value="{{this.photo4}}">
-                    <input type="hidden" name="photo5" value="{{this.photo5}}">
-                    <input type="hidden" name="photo6" value="{{this.photo6}}">
-                    <input type="hidden" name="photo7" value="{{this.photo7}}">
-                    <input type="hidden" name="photo8" value="{{this.photo8}}">
-                    <input type="hidden" name="photo9" value="{{this.photo9}}">
-                    <input type="hidden" name="photo10" value="{{this.photo10}}">
-                    <input class="btn-transparent" type="submit" value="{{this.name}}">
-                </form>
-                <h4 class="card-title"></h4></a>
-                <p class="card-text text-muted">{{this.address}}</p>
-                <p class="card-text"><small class="text-muted"></small></p>
-                <a href="/venues?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-primary" type="submit" name="button">Tag An Event</button></a>
-            </div>
-        </div>
-
-        <!-- Modal to pick event -->
-        <div class="viewVenues modal " style ={{this.modal}}>
-          <div class="modal-dialog" role="document">
-            <div class="modal-content pad-top pl-4">
-              <div class="modal-header">
-                <h5 class="modal-title text-blue"><b>My Events</b></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body text-left">
-                <p>Add <b>{{this.name}}</b> to one of my existing event lists by clicking below or alternatively create a new event.</p>
-                <ul>
-                    {{#each ../events}}
-                    <li><a class="taggedEvent" href="/addVenue?eventId={{this._id}}&placeId={{../this.placeId}}&name={{../this.name}}"> {{this.name}} </a>
-                        <a href="/removeEvent?eventId={{this._id}}"><button class="btn-yellow">x</button></a>
-                    </li>
-                    {{/each}}
-                </ul>
-              </div>
-              <div class="modal-footer">
-                  <form class="form-inline" action="/addEvent?placeId={{this.placeId}}" method="post">
-                     <div class="form-group-row">
-                        <input type="text" name=event class="form-control" size="28" placeholder="Name your special event here">
-                        <input type=hidden name=name value="{{this.name}}">
-                        <button class="btn btn-primary inline" type="submit" name="button"> Add a new Event!</button>
-                     </div>
-                  </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-    </div>
-    {{/each}}
-</div>
-
-
-<div class="col-sm-4" id="resultsmap">
-    <div id="map" class="sidebar"></div>
-</div>
-{{else}}
-<div class="col-sm-6 mr-4 mb-4 section-light listMargin mx-auto height" id="results">
-    <h4 class="text-center text-blue vertMid"><b>Oh darn, seems like there are 0 results for that search. Please try a different search!</b></h4>
-</div>
-{{/if}}
-
-</div>
-
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdahZQdWGEqm9Nua80okO_R8UMWCjtuDc&sensor=false&libraries=places"></script>
 <script src="/markerclusterer/src/markerclusterer.js"></script>
@@ -173,8 +129,6 @@ function initialize() {
     }
     google.maps.event.addDomListener(window, 'load', initialize);
 
-    // var input = document.getElementById('autocomplete2');
-    // var autocomplete = new google.maps.places.Autocomplete(input);
     </script>
     <script>
     var input = document.getElementById('autocomplete2');

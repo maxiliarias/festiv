@@ -375,7 +375,6 @@ router.post('/join',function(req,res){
 /*in mongoose and alert our client*/
 router.post('/conversation', upload.any(), function(req,res){
     res.end();
-    // let msg;
     let mail;
     let attach;
     let venue;

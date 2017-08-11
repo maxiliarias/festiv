@@ -4,11 +4,11 @@
         <h5 class="text-white">Click, Click... Send!</h5>
     </div>
 </div>
-<div class="row threeHeight pad-top mb-4 d-flex justify-content-around mx-auto">
 
+<div class="row threeHeight pad-top mb-4 d-flex justify-content-around mx-auto">
     <!-- Screen for form -->
     {{#if party}}
-    <div class="col-sm-8 text-center">
+    <div class="col-md-8 col-12 text-center">
         <h3 class="text-blue text-center mb-4">{{party.name}}</h3>
       <form id="contactForm" class="form-group text-right mx-auto" method="post" action="/contactlist?eventId={{party._id}}">
           <div class="form-group row">
@@ -70,7 +70,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-2 col-form-label text-left mt-2">Additional</label>
+            <label class="col-2 col-form-label text-left mt-2">More</label>
             <div class="col-10">
                 <textarea rows="3" class="form-control" name="additional" placeholder="Share any additional details you'd like about your event here. (Note this message is intended for all venues related to your selected event.)" id="message"></textarea>
             </div>
@@ -111,19 +111,23 @@
 
       <!-- Screen to select an event -->
     {{else if events.length}}
-        <div class="col-sm-2 m-2">
-            <h2 class="section-heading text-yellow vertMid"> Select an Event
+        <div class="col-md-4 col-12">
+            <h2 class="section-heading pt-5 text-yellow vertMid"> Select an Event
                 <span class="fa fa-arrow-right" aria-hidden="true"></span>
             </h2>
         </div>
-        <div class="col-sm-6">
+        <div class="col-md-8 col-12 pb-5 d-flex justify-content-center">
+            <div class="row">
             {{#each events}}
-                <div class="col-sm-6 section-blue m-2 card noborder">
-                    <a href="/contactlist?eventId={{this._id}}">
-                        <h3 class="text-white text-center p-2">{{this.name}}</h3>
-                    </a>
+                <div class="col-md-6 col-12">
+                    <div class="card section-blue m-2 noborder">
+                        <a href="/contactlist?eventId={{this._id}}">
+                            <h3 class="text-white text-center p-2">{{this.name}}</h3>
+                        </a>
+                    </div>
                 </div>
             {{/each}}
+            </div>
         </div>
     {{else}}
         <div class="col-sm-6 offset-3 section-transparentB p-3 text-white mx-auto">

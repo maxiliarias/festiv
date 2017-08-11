@@ -25,14 +25,22 @@ btn-primary, .btn-xl, h2 {
     border-color: #F2DA45;
 }
 .btn-transparent{
-    background-color: white;
+    background-color: rgba(255,0,0,0);
     color: rgb(76, 219, 219);
     border: none;
-    font-size: 25px;
     text-align: left;
     white-space: normal;
 }
-
+.btn-transparent:hover{
+    text-decoration: none;
+    color: rgb(19, 245, 245);
+}
+.font25{
+    font-size: 25px;
+}
+.font15{
+    font-size: 15px;
+}
 h2.section-heading {
   font-size: 40px;
   margin-top: 0;
@@ -86,7 +94,7 @@ h3.section-subheading {
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/vases.jpeg");
 }
 .parallax404{
-    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/emotions.jpg");
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url("../images/hero/calm.jpeg");
 }
 
 .parallax {
@@ -210,7 +218,7 @@ a:hover{
     padding-right: 7%;
 }
 
-ul.nav-item a:hover { color: red !important; }
+/*ul.nav-item a:hover { color: red !important; }*/
 
 .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.open, .navbar-light .navbar-nav .open>.nav-link {
     color: #636c72;
@@ -219,7 +227,7 @@ aside {
     background-color: #ffffb3;
     padding: 30px;
 }
-footer{
+.footer{
     background-color: rgb(201, 226, 226);
     padding-bottom: 20px;
     position:relative;
@@ -229,8 +237,11 @@ footer{
     z-index: 3;
     padding-left: 47%;
 }
-form{
+form {
     margin-bottom: 20px;
+}
+.form-control{
+    color: rgb(76, 219, 219);
 }
 .section-primary{
     background-color: rgb(201, 226, 226);
@@ -246,6 +257,9 @@ form{
 }
 .section-blue{
     background-color:rgb(76, 219, 219);
+}
+.section-yellow{
+    background-color: #EEDE76;
 }
 
 .card{
@@ -273,17 +287,16 @@ form{
 .fixed-pos{
     position:fixed;
 }
-.listMargin{
-margin-top: 4%;
+#listCard{
+    max-height: 450px;
+    overflow: scroll;
+    border-top: 2px solid rgb(242, 242, 242);
 }
-#results{
-    margin-left: 17%;
-}
-#resultsmap{
-    position: fixed;
-    top: 16%;
-    left: 67%;
-    padding: 25px 0px 0px 0px;
+
+.map{
+    height:100%;
+    width: 100%;
+    min-height: 500px;
 }
 #venueMap {
     height: 300px;

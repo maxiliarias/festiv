@@ -8,14 +8,14 @@
     <div class="row pl-4 pad-top d-flex justify-content-center mx-auto">
     {{#if events}}
         {{#each events}}
-                <div class="col-sm-3 section-light pt-3 mb-4 ">
+                <div class="col-md-3 col-sm-10 section-light pt-3 mb-4 ">
                     <form class="form text-right mx-auto" method="post" action="/updateEvent">
                       <input type="text" class="form-control" name="name" value="{{this.name}}" required>
                       <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
                       <input type="date" class="form-control" name="date" value="{{this.date}}" min={{../min}}>
-                      <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="Start Time" >
-                      <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Number of Hours" >
-                      <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Guest Count" >
+                      <input type="text" class="form-control" name="time" value="{{this.time}}" placeholder="E.g. 8:00 PM" >
+                      <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Estimated # of Hours" >
+                      <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Expected Guest Count" >
                       <select class="form-control" name="price" >
                             <option disabled selected>{{this.price}}</option>
                             <option>Open Bar</option>
@@ -28,7 +28,7 @@
                      </form>
 
                 </div>
-                <div class="col-sm-2 section-light pt-3 mb-4 mr-4">
+                <div class="col-md-2 col-sm-10 section-light pt-3 mb-4 mr-4">
                     <h5 class="section-subheading text-muted"><b>Venue Contact List</b></h5>
                     {{#each this.vEvent}}
                         <p class="text-blue">{{this.name}}
