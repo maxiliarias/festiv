@@ -18,6 +18,7 @@ $( document ).ready(function() {
         $( "#contactBtn" ).trigger("click");
     });
 
+
 });
 
 //Do something to indicate venue has been added to a particular list

@@ -21,15 +21,23 @@ router.get('/', function(req, res, next) {
     console.log('second', req.session.search);
     console.log('pagetoken', req.session.pagetoken);
     console.log('user', req.user)
-    res.render('home', {
-        googleApi: process.env.GOOGLEPLACES,
-        loggedin: req.user ? true: false,
-        u:{
-            fbid: req.user.fbid ? req.user.fbid : null,
-            displayName: req.user.displayName? req.user.displayName : null,
-            email: req.user.email ? req.user.email : null
-        }
-    });
+    if (req.user) {
+        res.render('home', {
+            googleApi: process.env.GOOGLEPLACES,
+            loggedin: req.user ? true: false,
+            user: {
+                fbid: req.user.fbid,
+                displayName: req.user.displayName,
+                email: req.user.email,
+            }
+        });
+    } else {
+        res.render('home', {
+            googleApi: process.env.GOOGLEPLACES,
+            loggedin: req.user ? true: false,
+        });
+    }
+
 });
 
 router.get('/venues',function(req, res){

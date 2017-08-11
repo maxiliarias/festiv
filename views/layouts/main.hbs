@@ -33,12 +33,12 @@
                     <a class="nav-link" href="/blog">Blog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/quotelist">Request Bids</a>
+                    <a class="nav-link" href="/quotelist">Request Bids {{user}}</a>
                 </li>
                 <li class="nav-item dropdown">
                     {{#if loggedin}}
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{u.displayName}}
+
                         </a>
                     {{else}}
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -67,7 +67,6 @@
         <div class="row footer">
             <div class="col-sm-6 col-8 text-left text-white pl-5 mx-auto">
                 <h6 class="pad-top"><b>ABOUT US</b></h6>
-                <p>{{u.fbid}}</p>
                 <p >Festiv is designed to guide every hostess in their quest for the perfect venue. We know ambiance is everything. That’s why, our mission is to transform the creative imagination of every social enthusiast into reality. We make it easy by consolidating a curated list of venues options and bringing pricing straight to your inbox. How Festiv!</p>
             </div>
             <div class="col-sm-6 col-4 pad-top wordwrap text-right text-white pr-4 mx-auto">
@@ -112,12 +111,16 @@
         })(window,document,window['_fs_namespace'],'script','user');
     </script>
     <script>
-        if({{u.fbid}}){
-            FS.identify({{u.fbid}}, {
-              displayName: {{u.displayName}},
-              email: {{u.email}},
+    {{#if user}}
+    var u = { fbid: {{user.fbid}}, displayName: {{user.displayName}}, email: {{user.email}} };
+    console.log(u);
+        if(u.fbid){
+            FS.identify(u.fbid, {
+              displayName: u.displayName,
+              email: u.email,
             });
         }
+    {{/if}}
     </script>
 </body>
 </html>
