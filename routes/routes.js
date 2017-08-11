@@ -10,7 +10,7 @@ var clearbit = require('clearbit')(process.env.CLEARBIT);
 var multer  = require('multer');
 var upload = multer({ dest: 'public/' });
 var simpleParser = require('mailparser').simpleParser;
-
+var fullStory = require('fullstory');
 //////////////////////////////// PUBLIC ROUTES ////////////////////////////////
 // Users who are not logged in can see these routes
 
