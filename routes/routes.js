@@ -25,6 +25,7 @@ router.get('/', function(req, res, next) {
         googleApi: process.env.GOOGLEPLACES,
         loggedin: req.user ? true: false,
         u:{
+            fbid: u.fbid,
             displayName: req.user.displayName,
             email: req.user.email
         }
