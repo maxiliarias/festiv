@@ -33,7 +33,7 @@
                     <a class="nav-link" href="/blog">Blog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/quotelist">Request Bids {{user}}</a>
+                    <a class="nav-link" href="/quotelist">Request Bids</a>
                 </li>
                 <li class="nav-item dropdown">
                     {{#if loggedin}}
@@ -112,7 +112,7 @@
     </script>
     <script>
     {{#if user}}
-    var u = { fbid: {{user.fbid}}, displayName: {{user.displayName}}, email: {{user.email}} };
+    var u = { fbid: '{{user.fbid}}', displayName: '{{user.displayName}}', email: '{{user.email}}' };
     console.log(u);
         if(u.fbid){
             FS.identify(u.fbid, {
