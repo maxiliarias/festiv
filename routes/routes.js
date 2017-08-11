@@ -20,14 +20,14 @@ router.get('/', function(req, res, next) {
     delete req.session.pagetoken
     console.log('second', req.session.search);
     console.log('pagetoken', req.session.pagetoken);
-
+    console.log('user', req.user)
     res.render('home', {
         googleApi: process.env.GOOGLEPLACES,
         loggedin: req.user ? true: false,
         u:{
-            fbid: req.user.fbid,
-            displayName: req.user.displayName,
-            email: req.user.email
+            fbid: req.user.fbid ? req.user.fbid : null,
+            displayName: req.user.displayName? req.user.displayName : null,
+            email: req.user.email ? req.user.email : null
         }
     });
 });
@@ -221,7 +221,6 @@ router.post('/venues', function(req, res) {
         });
         console.log(arrayOfResults.length-arrayOfResults.length, ' # of venues removed')
         req.session.search = arrayOfResults;
-        console.log('session saved', req.session.search[0].name);
         res.render('list', {
             venues: arrayOfResults,
             googleApi: process.env.GOOGLEPLACES,

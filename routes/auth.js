@@ -39,9 +39,9 @@ module.exports = function(passport) {
         res.render('login',{
             loggedin: req.user ? true: false,
             u:{
-                fbid: req.user.fbid,
-                displayName: req.user.displayName,
-                email: req.user.email
+                fbid: req.user.fbid ? req.user.fbid : null,
+                displayName: req.user.displayName? req.user.displayName : null,
+                email: req.user.email ? req.user.email : null
             }
         });
     });
