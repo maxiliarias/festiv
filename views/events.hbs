@@ -22,18 +22,18 @@
                             <option>Minimum Spend</option>
                             <option> {{min}}</option>
                       </select>
-                      <a class="btn btn-yellow mt-2" href="/removeEvent?eventId={{this._id}}">Remove Event
+                      <a class="btn btn-brightblue mt-2" href="/removeEvent?eventId={{this._id}}">Remove Event
                       </a>
                       <button class="btn btn-primary mt-2" type="submit" class="inline">Update Event</button>
                      </form>
 
                 </div>
                 <div class="col-md-2 col-sm-10 section-light pt-3 mb-4 mr-4">
-                    <h5 class="section-subheading text-muted"><b>Venue Contact List</b></h5>
+                    <h5 class="section-subheading text-blue"><b>Venue Quote List</b></h5>
                     {{#each this.vEvent}}
-                        <p class="text-blue">{{this.name}}
+                        <p class="text-muted">{{this.name}}
                         <a href="/removeVenue?vEventId={{this._id}}&eventid={{../this._id}}">
-                            <button class="btn-yellow" type="submit" name="removeVEvent">x</button>
+                            <button class="btn-yellowBord" type="submit" name="removeVEvent">x</button>
                         </a></p>
                     {{/each}}
                 </div>

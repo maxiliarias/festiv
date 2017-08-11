@@ -33,19 +33,19 @@
                     <a class="nav-link" href="/blog">Blog</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/contactlist">Request Bids</a>
+                    <a class="nav-link" href="/quotelist">Request Bids</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Account
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="/events">My Events</a>
-                        <a class="dropdown-item" href="/messages">Inbox</a>
+                        <a class="dropdown-item text-blue" href="/events">My Events</a>
+                        <a class="dropdown-item text-blue" href="/messages">Inbox</a>
                         {{#if loggedin}}
-                        <a class="dropdown-item" href="/logout">Logout</a>
+                        <a class="dropdown-item text-blue" href="/logout">Logout</a>
                         {{else}}
-                        <a class="dropdown-item" href="/login">Login</a>
+                        <a class="dropdown-item text-blue" href="/login">Login</a>
                         {{/if}}
                     </div>
                 </li>
@@ -60,11 +60,11 @@
     <footer>
         <div class="row footer">
             <div class="col-sm-6 col-8 text-left text-white pl-4 mx-auto">
-                <h6 class="pad-top">ABOUT US</h6>
-                <p >Festiv is designed to help every hostess in their quest for the perfect venue. We know ambiance is everything. That’s why, our mission is to transform the creative imagination of every social enthusiast into reality. We make it easy by consolidating a curated list of venues options and bringing pricing straight to your inbox. How Festiv!</p>
+                <h6 class="pad-top"><b>ABOUT US</b></h6>
+                <p >Festiv is designed to guide every hostess in their quest for the perfect venue. We know ambiance is everything. That’s why, our mission is to transform the creative imagination of every social enthusiast into reality. We make it easy by consolidating a curated list of venues options and bringing pricing straight to your inbox. How Festiv!</p>
             </div>
             <div class="col-sm-6 col-4 pad-top wordwrap text-right text-white pr-4 mx-auto">
-                <p class="mb-1"><span class="text-blue">Questions?</span> We've got answers!</p>
+                <p class="pad-top mb-1"><span class="text-blue">Questions?</span> We've got answers!</p>
                 <p class="mb-0">Contact us at <span class="text-blue">hello@festivspaces.com</span></p>
             </div>
         </div>

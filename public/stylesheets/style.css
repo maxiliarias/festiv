@@ -20,6 +20,10 @@ btn-primary, .btn-xl, h2 {
     background-color: #EEDE76;
     border-color: #EEDE76;
 }
+.btn-yellowBord{
+    color: white;
+    border-color: #EEDE76;
+}
 .btn-yellow:hover{
     background-color: #F2DA45;
     border-color: #F2DA45;

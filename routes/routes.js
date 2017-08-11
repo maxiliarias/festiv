@@ -692,15 +692,15 @@ router.get('/removeVenue', function(req, res) {
     })
 })
 
-/* CONTACTLIST is the link to the questionnaire*/
-router.get('/contactlist', function(req, res, next) {
+/* QUOTELIST is the link to the questionnaire*/
+router.get('/quotelist', function(req, res, next) {
     if(req.query.eventId){
         return Event.findById(req.query.eventId)
         .populate("vEvent")
         .exec()
         .then(party => {
             console.log('in here', req.user);
-            res.render('contactlist', ({
+            res.render('quotelist', ({
                 party: party,
                 events: false,
                 min: helper.formatDate(new Date()),
@@ -718,7 +718,7 @@ router.get('/contactlist', function(req, res, next) {
         return Event.find({eventOwner:req.user._id})
         .then(ocassions =>{
             console.log('occassions', ocassions);
-            res.render('contactlist', ({
+            res.render('quotelist', ({
                 events: ocassions,
                 loggedin: req.user ? true: false
             }))
@@ -730,8 +730,8 @@ router.get('/contactlist', function(req, res, next) {
     }
 })
 
-/* SUBMIT CONTACTLIST we will now send an email to venues*/
-router.post('/contactlist', function(req, res) {
+/* SUBMIT QUOTELIST we will now send an email to venues*/
+router.post('/quotelist', function(req, res) {
     var eventId=req.query.eventId
     let fname = req.body.fname
     let lname = req.body.lname

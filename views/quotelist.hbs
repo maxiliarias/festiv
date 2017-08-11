@@ -1,6 +1,6 @@
 <div class="row bg4 hero-image">
     <div class="col-sm-12 text-center hero-text ">
-        <h3 class="text-white">Contact List Details</h3>
+        <h3 class="text-white">Request Bids</h3>
         <h5 class="text-white">Click, Click... Send!</h5>
     </div>
 </div>
@@ -10,7 +10,7 @@
     {{#if party}}
     <div class="col-md-8 col-12 text-center">
         <h3 class="text-blue text-center mb-4">{{party.name}}</h3>
-      <form id="contactForm" class="form-group text-right mx-auto" method="post" action="/contactlist?eventId={{party._id}}">
+      <form id="contactForm" class="form-group text-right mx-auto" method="post" action="/quotelist?eventId={{party._id}}">
           <div class="form-group row">
             <label class="col-2 col-form- text-left mt-2">Date</label>
             <div class="col-10">
@@ -121,7 +121,7 @@
             {{#each events}}
                 <div class="col-md-6 col-12">
                     <div class="card section-blue m-2 noborder">
-                        <a href="/contactlist?eventId={{this._id}}">
+                        <a href="/quotelist?eventId={{this._id}}">
                             <h3 class="text-white text-center p-2">{{this.name}}</h3>
                         </a>
                     </div>
