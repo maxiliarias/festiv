@@ -36,7 +36,14 @@ module.exports = function(passport) {
 
     // GET Login page
     router.get('/login', function(req, res) {
-        res.render('login');
+        res.render('login',{
+            loggedin: req.user ? true: false,
+            u:{
+                fbid: u.fbid,
+                displayName: req.user.displayName,
+                email: req.user.email
+            }
+        });
     });
 
     // POST Login page

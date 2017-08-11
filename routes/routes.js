@@ -56,7 +56,12 @@ router.get('/venues',function(req, res){
                 events: ocassions,
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
-                loggedin: req.user ? true: false
+                loggedin: req.user ? true: false,
+                u:{
+                    fbid: u.fbid,
+                    displayName: req.user.displayName,
+                    email: req.user.email
+                }
             })
         } else {
             res.render('list', {
@@ -64,7 +69,12 @@ router.get('/venues',function(req, res){
                 googleApi: process.env.GOOGLEPLACES,
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
-                loggedin: req.user ? true: false
+                loggedin: req.user ? true: false,
+                u:{
+                    fbid: u.fbid,
+                    displayName: req.user.displayName,
+                    email: req.user.email
+                }
             })
         }
     })
