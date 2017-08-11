@@ -270,7 +270,7 @@ form {
     overflow:hidden;
     height: 200px;
 }
-.card p{
+.card p, .wordwrap{
     word-wrap: break-word;
 }
 .card-img-top{
