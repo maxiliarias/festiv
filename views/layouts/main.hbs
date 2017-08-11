@@ -38,7 +38,7 @@
                 <li class="nav-item dropdown">
                     {{#if loggedin}}
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
+                            {{displayName}}
                         </a>
                     {{else}}
                         <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -111,16 +111,16 @@
         })(window,document,window['_fs_namespace'],'script','user');
     </script>
     <script>
-    {{#if user}}
-    var u = { fbid: '{{user.fbid}}', displayName: '{{user.displayName}}', email: '{{user.email}}' };
-    console.log(u);
-        if(u.fbid){
-            FS.identify(u.fbid, {
-              displayName: u.displayName,
-              email: u.email,
-            });
-        }
-    {{/if}}
+        {{#if user}}
+            var u = { fbid: '{{user.fbid}}', displayName: '{{user.displayName}}', email: '{{user.email}}' };
+            console.log(u);
+                if(u.fbid){
+                    FS.identify(u.fbid, {
+                      displayName: u.displayName,
+                      email: u.email,
+                    });
+                }
+        {{/if}}
     </script>
 </body>
 </html>
