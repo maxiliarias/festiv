@@ -66,7 +66,7 @@ router.get('/venues',function(req, res){
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
-                displayName: req.user.displayName
+                displayName: req.user ? req.user.displayName : null
             })
         } else {
             res.render('list', {
@@ -75,7 +75,7 @@ router.get('/venues',function(req, res){
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
-                displayName: req.user.displayName
+                displayName: req.user ? req.user.displayName : null
             })
         }
     })
@@ -92,7 +92,7 @@ router.get('/blog', function(req, res){
         res.render('blog',{
             blog: blogs,
             loggedin: req.user ? true: false,
-            displayName: req.user.displayName,
+            displayName: req.user ? req.user.displayName : null,
         })
     })
     .catch(function(err){
@@ -103,19 +103,22 @@ router.get('/blog', function(req, res){
 router.get('/pumpkinflair',function(req,res){
     res.render('bloggers/pumpkinflair',{
         loggedin: req.user ? true: false,
-        displayName: req.user.displayName})
+        displayName: req.user ? req.user.displayName : null})
 })
 router.get('/macaroonsBlooms',function(req,res){
     res.render('bloggers/macaroonsBlooms',{
         loggedin: req.user ? true: false,
-        displayName: req.user.displayName})
+        displayName: req.user ? req.user.displayName : null})
 })
 router.get('/whiskyaficionados',function(req,res){
     res.render('bloggers/whiskyaficionados',{
         loggedin: req.user ? true: false,
-        displayName: req.user.displayName
+        displayName: req.user ? req.user.displayName : null
     })
 })
+
+/* FAVORITE Venues*/
+router.post
 
 /* VENUES creates session venues */
 router.post('/venues', function(req, res) {
@@ -139,10 +142,11 @@ router.post('/venues', function(req, res) {
         lng= response[0].longitude
     })
     .then(function() {
-        // let radius = (parseInt(req.body.radius) * 1609.34).toString();
         req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
         keyword= req.session.keyword
         req.session.pagetoken= req.session.pagetoken || [""];
+        console.log('(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))');
+
         return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``));
     })
     .then(resp => JSON.parse(resp))
@@ -221,9 +225,6 @@ router.post('/venues', function(req, res) {
     .then(arrayOfResults => {
         var arr = ['bakery','grocery_or_supermarket','store','cafe']
         var arrayOfResults = arrayOfResults.filter(place => {
-            // do not do
-            // return
-            // place.type....on separate lines
             return place.type.every(function(elem){
                 return arr.indexOf(elem) === -1;
             }) && place.photo5 !== "";
@@ -236,7 +237,7 @@ router.post('/venues', function(req, res) {
             page2: req.session.pagetoken[1]? 'true': null,
             page3: req.session.pagetoken[2]? 'true': null,
             loggedin: req.user ? true: false,
-            displayName: req.user.displayName
+            displayName: req.user ? req.user.displayName : null
         });
     })
     .catch(function(err) {
@@ -334,7 +335,7 @@ router.post('/venue', function(req, res) {
             url: req.body.url, //
             website: req.body.website,
             loggedin: req.user ? true: false,
-            displayName: req.user.displayName
+            displayName: req.user ? req.user.displayName : null
         };
         res.redirect('/venue')
     })
@@ -363,7 +364,7 @@ router.get('/venue', function(req, res) {
     res.render('venue', {
         temp:temp,
         loggedin: req.user ? true: false,
-        displayName: req.user.displayName });
+        displayName: req.user ? req.user.displayName : null });
 })
 
 router.post('/join',function(req,res){
@@ -633,7 +634,7 @@ router.get('/events', function(req, res) {
             events: events,
             min: helper.formatDate(new Date()),
             loggedin: req.user ? true: false,
-            displayName: req.user.displayName
+            displayName: req.user ? req.user.displayName : null
         }))
     })
     .catch(function(err){
@@ -737,7 +738,7 @@ router.get('/quotelist', function(req, res, next) {
                 fname: req.user.fname ? req.user.fname : "Your First Name",
                 lname: req.user.lname ? req.user.lname : "Your Last Name",
                 loggedin: req.user ? true: false,
-                displayName: req.user.displayName
+                displayName: req.user ? req.user.displayName : null
             }))
         })
         .catch(function(err){
@@ -751,7 +752,7 @@ router.get('/quotelist', function(req, res, next) {
             res.render('quotelist', ({
                 events: ocassions,
                 loggedin: req.user ? true: false,
-                displayName: req.user.displayName
+                displayName: req.user ? req.user.displayName : null
             }))
         })
         .catch(function(err){
@@ -860,7 +861,7 @@ router.post('/quotelist', function(req, res) {
 router.get('/nextsteps',function(req,res){
     res.render('nextsteps',{
         loggedin: req.user ? true: false,
-        displayName: req.user.displayName
+        displayName: req.user ? req.user.displayName : null
     })
 })
 
@@ -888,7 +889,7 @@ router.get('/messages',function(req,res){
                     vEvent: newV,
                     venueId: venueId,
                     loggedin: req.user ? true: false,
-                    displayName: req.user.displayName
+                    displayName: req.user ? req.user.displayName : null
                 })
             })
             .catch(function(err){
@@ -900,7 +901,7 @@ router.get('/messages',function(req,res){
             res.render('messages', {
                 events: events,
                 loggedin: req.user ? true: false,
-                displayName: req.user.displayName
+                displayName: req.user ? req.user.displayName : null
             })
         }
     })

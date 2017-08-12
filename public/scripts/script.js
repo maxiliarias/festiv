@@ -18,6 +18,16 @@ $( document ).ready(function() {
         $( "#contactBtn" ).trigger("click");
     });
 
+    // Make post requests to these searches
+    $('#topvenue1').click(function(){
+        $( "#topvenue1" ).submit();
+    })
+    $('#topvenue2').click(function(){
+        $( "#topvenue2" ).submit();
+    })
+    $('#topvenue3').click(function(){
+        $( "#topvenue3" ).submit();
+    })
 
 });
 

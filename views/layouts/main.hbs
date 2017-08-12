@@ -27,13 +27,10 @@
                     <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item" id="venueLink" >
-                    <a class="nav-link" href="/venues">Venues</a>
+                    <a class="nav-link" href="/venues">Most Recent Search</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/blog">Blog</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/quotelist">Request Bids</a>
                 </li>
                 <li class="nav-item dropdown">
                     {{#if loggedin}}
@@ -47,6 +44,7 @@
                     {{/if}}
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                         <a class="dropdown-item text-blue" href="/events">My Events</a>
+                        <a class="dropdown-item text-blue" href="/quotelist">Request Bids</a>
                         <a class="dropdown-item text-blue" href="/messages">Inbox</a>
                         {{#if loggedin}}
                         <a class="dropdown-item text-blue" href="/logout">Logout</a>
