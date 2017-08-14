@@ -117,8 +117,10 @@ router.get('/whiskyaficionados',function(req,res){
     })
 })
 
-/* FAVORITE Venues*/
-router.post
+// Test API function by AARON FORD
+router.get('/api/venue', function(req, res) {
+    return res.end(JSON.stringify({name: 'maxi'}));
+})
 
 /* VENUES creates session venues */
 router.post('/venues', function(req, res) {

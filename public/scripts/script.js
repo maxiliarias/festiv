@@ -13,10 +13,10 @@ $( document ).ready(function() {
         })
 
     // MODAL ON LIST PAGE
-    //When you click "x" button, closes the modal in venue list view
-        // $('.close').on('click', function(){
-        //   $(".viewVenues").hide()
-        // })
+    // When you click "x" button, closes the modal in venue list view
+        $('.close').on('click', function(){
+          $(".viewVenues").hide() 
+        })
     //When you tag a venue to an event, close the modal
         $('.taggedEvent').on('click', function(){
           alert("Great! You saved the venue!")

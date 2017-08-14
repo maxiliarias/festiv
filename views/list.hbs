@@ -50,10 +50,10 @@
                         <h4 class="card-title"></h4></a>
                         <p class="card-text text-muted">{{this.address}}</p>
                         <p class="card-text"><small class="text-muted"></small></p>
-                        {{#if loggedin}}
+                        {{#if ../loggedin}}
                             <a href="/venues?placeId={{this.placeId}}"><button id="myVenues" class="btn btn-yellow" type="submit">Tag An Event</button></a>
                         {{else}}
-                            <button class="btn btn-yellow attemptToTag" type="button" data-toggle="modal" data-target="#mod{{this.placeId}}">Tag An Event</button>
+                            <button class="btn btn-yellow attemptToTag" type="button" data-toggle="modal" data-target="#mod{{this.placeId}}">{{loggedin}}Tag An Event</button>
                         {{/if}}
                     </div>
 
@@ -101,7 +101,7 @@
                         </button>
                       </div>
                       <div class="modal-body text-left">
-                        <p>We'd love to save this venue for you, please login first.</p>
+                        <p>We'd love to save this venue for you, please <a href="/login">login</a> first.</p>
                       </div>
                     </div>
                   </div>
