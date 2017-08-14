@@ -41,19 +41,19 @@
             <button class="btn btn-primary" type="submit">All Set? Request Bids
             </button>
         </a>
-        <h5 class="text-yellow mt-4">Tag An Event Below</h5>
+        <h5 class="text-yellow mt-4"><b>Tag An Event Below</b></h5>
         <div class="contactSide mb-4 text-left">
             {{#if loggedin}}
                 <h6 class="text-yellow mb-3"><b>My Events</b></h6>
-                <form class="form-inline" action="/addEvent?placeId={{../temp.placeId}}" method="post">
+                <form class="form-inline text-right" action="/addEvent?placeId={{../temp.placeId}}" method="post">
                     <div class="form-group-row">
                         <div class="col-12">
-                          <input type="text" name=event class="form-control" placeholder="Name your special event here">
+                          <input type="text" name=event class="form-control" placeholder="Your Event">
                           <input type=hidden name=name value="{{../temp.name}}">
                           <input type=hidden name=profile value="true">
                         </div>
-                        <div class="col-12">  
-                            <button class="btn btn-primary inline" type="submit" name="button"> Add</button>
+                        <div class="col-12 mt-2">
+                          <input class="btn btn-primary inline" type="submit"> Add</input>
                         </div>
                     </div>
                 </form>
