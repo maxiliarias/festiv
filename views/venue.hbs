@@ -45,12 +45,12 @@
         <div class="contactSide mb-4 text-left">
             {{#if loggedin}}
                 <h6 class="text-yellow mb-3"><b>My Events</b></h6>
-                <form class="form-inline text-right" action="/addEvent?placeId={{../temp.placeId}}" method="post">
+                <form class="form-inline text-right" action="/addEvent?placeId={{temp.placeId}}" method="post">
                     <div class="form-group-row">
                         <div class="row">
                             <div class="col-12">
                               <input type="text" name=event class="form-control" placeholder="Your Event">
-                              <input type=hidden name=name value="{{../temp.name}}">
+                              <input type=hidden name=name value="{{temp.name}}">
                               <input type=hidden name=profile value="true">
                             </div>
                         </div>
@@ -72,7 +72,7 @@
                             <p class="ml-2">{{this.name}}</p>
                         {{/each}}
                     {{/if}}
-            {{/each}}
+                {{/each}}
             {{else}}
                 <h6 class="text-yellow mb-3"><b>Please login to create or view your events</b></h6>
             {{/if}}

@@ -581,6 +581,8 @@ router.use(function(req, res, next) {
 /*Create a new event, makes a new venue, tags the venue to the event and saves to mongoose*/
 router.post('/addEvent',function(req,res){
     let event;
+    console.log('name', req.body.name)
+    console.log('placeId is',req.query.placeId);
     var newE = new Event({
         eventOwner: req.user._id,
         name: req.body.event,
@@ -600,7 +602,7 @@ router.post('/addEvent',function(req,res){
         console.log("new ven", newVen)
         event.vEvent.push(newVen._id)
         event.save()
-        if(req.body.profile){    
+        if(req.body.profile){
             res.redirect('back');
         } else {
             res.redirect('/venues');
