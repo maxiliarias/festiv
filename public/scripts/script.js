@@ -25,9 +25,9 @@ $( document ).ready(function() {
     //If not loggedin, show modal requesting user log in
 
     // for when Most Recent Search renders nothing
-        if(window.location.href.split("?")[1] === "needsearch=true"){
-            alert("Please make an initial search first")
-        }
+        // if(window.location.href.split("?")[1] === "needsearch=true"){
+        //     alert("Please make an initial search first")
+        // }
 
     //QUOTE PAGE
     $( "#request-bids" ).click(function() {

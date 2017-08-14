@@ -39,49 +39,50 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/venues',function(req, res){
-    if (!req.session.search){
-        res.redirect('/?needsearch=true')
-        return;
-    }
-    Event.find({eventOwner: req.user._id})
-    .populate('vEvent')
-    .exec()
-    .then(ocassions => {
-        if (req.query.placeId) {
-            var temp = JSON.parse(JSON.stringify(req.session.search));
-            temp.forEach(function(venue) {
-                if (venue.placeId === req.query.placeId) {
-                    venue.modal = "display:block";
-                } else {
-                    venue.modal = "";
-                }
-            });
+    let events;
+
+    if (req.query.placeId) {
+        var temp = JSON.parse(JSON.stringify(req.session.search));
+        temp.forEach(function(venue) {
+            if (venue.placeId === req.query.placeId) {
+                venue.modal = "display:block";
+            } else {
+                venue.modal = "";
+            }
+        });
+        if(req.user){
+            Event.find({eventOwner: req.user._id})
+            .populate('vEvent')
+            .exec()
+            .then(o => {
+                events = o
+            })
+            .catch(function(err){
+                console.log('error is ', err);
+                res.redirect('/error')
+            })
+        }
             res.render('list', {
                 venues: temp,
                 googleApi: process.env.GOOGLEPLACES,
-                events: ocassions,
+                events: events,
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
                 searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             })
-        } else {
-            res.render('list', {
-                venues: req.session.search,
-                googleApi: process.env.GOOGLEPLACES,
-                page2: req.session.pagetoken[1] ? 'true' : null,
-                page3: req.session.pagetoken[2] ? 'true' : null,
-                loggedin: req.user ? true: false,
-                searchSesh: req.session.search ? true : false,
-                displayName: req.user ? req.user.displayName : null
-            })
-        }
-    })
-    .catch(function(err){
-        console.log('error is ', err);
-        res.redirect('/error')
-    })
+    } else {
+        res.render('list', {
+            venues: req.session.search,
+            googleApi: process.env.GOOGLEPLACES,
+            page2: req.session.pagetoken[1] ? 'true' : null,
+            page3: req.session.pagetoken[2] ? 'true' : null,
+            loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
+            displayName: req.user ? req.user.displayName : null
+        })
+    }
 })
 
 /* Blog Routes public*/
@@ -398,7 +399,7 @@ router.get('/venue', function(req, res) {
                 res.render('venue', {
                     temp:temp,
                     events: events,
-                    loggedin: true,
+                    loggedin: "yes",
                     displayName: req.user.displayName
                 });
             })

@@ -43,7 +43,12 @@
         </a>
         <h5 class="text-yellow mt-4">Tag An Event Below</h5>
         <div class="contactSide mb-4 text-left">
-            <h6 class="text-yellow mb-3"><b>My Events</b></h6>
+            {{#if loggedin}}
+                <h6>{{this}}</h6>
+                <h6 class="text-yellow mb-3"><b>My Events</b></h6>
+            {{else}}
+                <h6 class="text-yellow mb-3"><b>Please login to create or view your events</b></h6>
+            {{/if}}
             {{#each events}}
                 <h6>
                     <a class="taggedEvent" href="/addVenue?/eventId={{this._id}}&venueId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}

@@ -39,6 +39,7 @@ module.exports = function(passport) {
         if (req.user) {
             res.render('login', {
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 user: {
                     fbid: req.user.fbid,
                     displayName: req.user.displayName,
@@ -48,6 +49,7 @@ module.exports = function(passport) {
         } else {
             res.render('login', {
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false
             });
         }
     });
