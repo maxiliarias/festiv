@@ -266,6 +266,9 @@ form {
     background-color: #EEDE76;
 }
 
+.break{
+    word-break: break-all;   
+}
 .card{
     border-radius: 25px;
     margin-bottom: 30px;

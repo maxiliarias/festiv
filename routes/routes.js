@@ -16,11 +16,10 @@ var fullStory = require('fullstory');
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-    delete req.session.search
-    delete req.session.pagetoken
-    console.log('second', req.session.search);
-    console.log('pagetoken', req.session.pagetoken);
-    console.log('user', req.user)
+    // delete req.session.search
+    // delete req.session.pagetoken
+    // console.log('second', req.session.search);
+    // console.log('pagetoken', req.session.pagetoken);
     if (req.user) {
         res.render('home', {
             googleApi: process.env.GOOGLEPLACES,
@@ -312,7 +311,6 @@ router.post('/venue', function(req, res) {
         return
     })
     .then(function(){
-        console.log('Successfully saved VData, now rendering venues.hbs');
         req.session.venueRedirect = {
             company: company,
             events: events,
@@ -339,6 +337,9 @@ router.post('/venue', function(req, res) {
             loggedin: req.user ? true: false,
             displayName: req.user ? req.user.displayName : null
         };
+    })
+    .then(() => {
+        console.log('Successfully saved VData, now rendering venues.hbs', req.session.venueRedirect);
         res.redirect('/venue')
     })
     .catch(clearbit.Company.QueuedError, function (err) {
@@ -362,6 +363,7 @@ router.get('/venue', function(req, res) {
         res.redirect('/venues');
         return;
     } else {
+        console.log("venues is", temp);
         if(req.user){
             Event.find({eventOwner: req.user._id})
             .then(events => {
