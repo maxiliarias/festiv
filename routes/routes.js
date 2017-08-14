@@ -357,16 +357,33 @@ router.post('/venue', function(req, res) {
 });
 
 router.get('/venue', function(req, res) {
-    console.log('got to venue')
     var temp = req.session.venueRedirect;
     if (!temp) {
         res.redirect('/venues');
         return;
+    } else {
+        if(req.user){
+            Event.find({eventOwner: req.user._id})
+            .then(events => {
+                res.render('venue', {
+                    temp:temp,
+                    events: events,
+                    loggedin: req.user ? true: false,
+                    displayName: req.user ? req.user.displayName : null
+                });
+            })
+            .catch(function(err){
+                console.log('error is ', err);
+                res.redirect('/error')
+            })
+        } else {
+            res.render('venue', {
+                temp:temp,
+                loggedin: req.user ? true: false,
+                displayName: req.user ? req.user.displayName : null
+            });
+        }
     }
-    res.render('venue', {
-        temp:temp,
-        loggedin: req.user ? true: false,
-        displayName: req.user ? req.user.displayName : null });
 })
 
 router.post('/join',function(req,res){
