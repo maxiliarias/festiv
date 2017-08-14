@@ -27,7 +27,9 @@
                 <div class="card ml-1" style="max-width: 18rem;">
                     <img class="card-img-top" src='{{this.photo1}}' class="img-responsive" width="250px" alt="Card image cap">
                     <div class="card-block">
-                        <form method="post" action="/venue?name={{this.name}}&address={{this.address}}">
+                        <form method="get" action="/venue">
+                            <input type="hidden" name="name" value="{{this.name}}">
+                            <input type="hidden" name="address" value="{{this.address}}">
                             <input type="hidden" name="placeId" value="{{this.placeId}}">
                             <input type="hidden" name="lat" value="{{this.lat}}">
                             <input type="hidden" name="lng" value="{{this.long}}">

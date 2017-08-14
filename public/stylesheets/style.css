@@ -148,7 +148,9 @@ h3.section-subheading {
 .bg6{
     background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/plandesk.jpeg');
 }
-
+.bg7{
+    background:linear-gradient( rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url('../images/hero/team.jpg');
+}
 .hero-image {
     height: 400px;
     background-position: center;
@@ -167,6 +169,13 @@ h3.section-subheading {
     margin-top: 25%;
 }
 
+/*Text-edits*/
+.lineheight2{
+    line-height: 200%;
+}
+.break{
+    word-break: break-all;
+}
 .text-white{
     color: white;
 }
@@ -266,9 +275,7 @@ form {
     background-color: #EEDE76;
 }
 
-.break{
-    word-break: break-all;   
-}
+
 .card{
     border-radius: 25px;
     margin-bottom: 30px;

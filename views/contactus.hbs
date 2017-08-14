@@ -1,0 +1,55 @@
+<div class="row bg7 hero-image">
+    <div class="col-sm-12 text-center hero-text ">
+    <h2 class= "text-white">Contact Us</h2>
+    <h5 class="text-white">Got Questions? We've got Answers.</h5>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 offset-md-3 col-10 offset-1 pad-top">
+        <h6 class="lineheight2">Send us a note on any questions you have, or clarifications you may need. Our team is eager to help and will get back to you shortly. And hey while you're at it, if you have any feedback that you'd like to share, please send it over our way. We love hearing from our users, even if it's just to say hello. <b>So don't be shy!</b></h6>
+        <h6><b> Contact us at:</b> <span class="text-blue">hello@festivspaces.com</span> </h6>
+    </div>
+    <div class="col-md-8 offset-md-2 col-10 offset-1 pad-top">
+        <h4 class="text-center text-blue mb-4">What's on your mind?</h4>
+        <form class="form-group text-right mx-auto" action="/contactus" method="POST">
+            <div class="form-group row">
+              <label class="col-2 col-form-label text-left text-blue mt-2">Message</label>
+              <div class="col-10">
+                  <textarea rows="7" class="form-control" name="message" placeholder="Share any thoughts and feedback" required></textarea>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-2 col-form-label text-left text-blue  mt-2">Email</label>
+              <div class="col-10">
+                <input type="email" class="form-control" name="email" placeholder="Your Email" required oninvalid="this.setCustomValidity('Your Email is requested')"
+                oninput="setCustomValidity('')">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-2 col-form-label text-left text-blue mt-2">Name</label>
+              <div class="col-10">
+                <input type="text" class="form-control" name="name" placeholder="Your Name">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <!-- modal to confirm message was sent -->
+        <div id="sentMsg" class="modal fade">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content pad-top pl-4">
+              <div class="modal-header">
+                <h5 class="modal-title text-blue"><b>Success!</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body text-left">
+                <p>Your message has been sent! We'll get back to you on any questions shortly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>

@@ -16,14 +16,11 @@ var fullStory = require('fullstory');
 
 /* HOME PAGE where you can enter your search */
 router.get('/', function(req, res, next) {
-    // delete req.session.search
-    // delete req.session.pagetoken
-    // console.log('second', req.session.search);
-    // console.log('pagetoken', req.session.pagetoken);
     if (req.user) {
         res.render('home', {
             googleApi: process.env.GOOGLEPLACES,
             loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
             displayName: req.user.displayName,
             user: {
                 fbid: req.user.fbid,
@@ -35,6 +32,7 @@ router.get('/', function(req, res, next) {
         res.render('home', {
             googleApi: process.env.GOOGLEPLACES,
             loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false
         });
     }
 
@@ -65,6 +63,7 @@ router.get('/venues',function(req, res){
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             })
         } else {
@@ -74,6 +73,7 @@ router.get('/venues',function(req, res){
                 page2: req.session.pagetoken[1] ? 'true' : null,
                 page3: req.session.pagetoken[2] ? 'true' : null,
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             })
         }
@@ -91,6 +91,7 @@ router.get('/blog', function(req, res){
         res.render('blog',{
             blog: blogs,
             loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
             displayName: req.user ? req.user.displayName : null,
         })
     })
@@ -102,18 +103,75 @@ router.get('/blog', function(req, res){
 router.get('/pumpkinflair',function(req,res){
     res.render('bloggers/pumpkinflair',{
         loggedin: req.user ? true: false,
+        searchSesh: req.session.search ? true : false,
         displayName: req.user ? req.user.displayName : null})
 })
 router.get('/macaroonsBlooms',function(req,res){
     res.render('bloggers/macaroonsBlooms',{
         loggedin: req.user ? true: false,
+        searchSesh: req.session.search ? true : false,
         displayName: req.user ? req.user.displayName : null})
 })
 router.get('/whiskyaficionados',function(req,res){
     res.render('bloggers/whiskyaficionados',{
         loggedin: req.user ? true: false,
+        searchSesh: req.session.search ? true : false,
         displayName: req.user ? req.user.displayName : null
     })
+})
+
+/*CONTACT US Page*/
+router.get('/contactus', function(req,res){
+    if(req.query.message){
+        res.render('contactus', {
+            modal: true,
+            loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
+            displayName: req.user ? req.user.displayName : null,
+        })
+    } else {
+        res.render('contactus', {
+            loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
+            displayName: req.user ? req.user.displayName : null,
+        })
+    }
+})
+
+router.post('/contactus', function(req,res){
+    var b = {
+        personalizations: [{
+            "to": [{
+                  "email": "maxiliarias@gmail.com"
+              },{
+                  "email": "hello@festivspaces.com"
+              }],
+            subject: req.body.email + " has sent you a message",
+        }],
+        from: {
+            email: 'alert@hello.festivspaces.com',
+            name: 'Festiv'
+        },
+        "content": [{
+              "type": "text/plain",
+              "value": "from " + req.body.name + "\n" + req.body.message
+            }]
+    }
+
+    var request = sg.emptyRequest({
+        method: 'POST',
+        path: '/v3/mail/send',
+        body: b
+    });
+    sg.API(request, function(error, response) {
+        if (error) {
+            console.log('Error response received');
+        }
+        console.log('STATUS HERE' ,response.statusCode);
+        console.log('BODY HERE', response.body);
+        console.log('HEADERS HERE', response.headers);
+    });
+    res.redirect('/contactus?message=sent')
 })
 
 // Test API function by AARON FORD
@@ -238,6 +296,7 @@ router.post('/venues', function(req, res) {
             page2: req.session.pagetoken[1]? 'true': null,
             page3: req.session.pagetoken[2]? 'true': null,
             loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
             displayName: req.user ? req.user.displayName : null
         });
     })
@@ -258,22 +317,16 @@ router.post('/newSearch', function(req, res) {
 })
 
 /* INDIVIDUAL VENUE can see more information about one venue */
-router.post('/venue', function(req, res) {
+router.get('/venue', function(req, res) {
     let events;
     let company;
-    Event.find({eventOwner: req.user._id})
-    .populate('vEvent')
-    .exec()
-    .then(function(e){
-        console.log('MY EVENTS', e)
-        events = e;
-        return clearbit.Company.find({domain: req.body.website});
-    })
+
+    clearbit.Company.find({domain: req.query.website})
     .then(function (c) {
         console.log('inside clearbit ', c);
         company = c;
         if(c.site.emailAddresses){
-            return VData.findOne({placeId: req.body.placeId})
+            return VData.findOne({placeId: req.query.placeId})
             .then(v => {
                 console.log('v is ', v);
                 let toEmail=['events@','info@','privatedining@','contact@','reservations@']
@@ -294,10 +347,10 @@ router.post('/venue', function(req, res) {
                     })
                 }
                 v.save()
-                return VData.findOne({placeId: req.body.placeId});
+                return VData.findOne({placeId: req.query.placeId});
             })
         }
-        return VData.findOne({placeId: req.body.placeId});
+        return VData.findOne({placeId: req.query.placeId});
     })
     .then(function(foundVdata){
         console.log('foundVdata is', foundVdata);
@@ -311,82 +364,67 @@ router.post('/venue', function(req, res) {
         return
     })
     .then(function(){
-        req.session.venueRedirect = {
+        let temp  = {
             company: company,
-            events: events,
-            placeId: req.body.placeId,
+            placeId: req.query.placeId,
             name: req.query.name,
             address: req.query.address,
-            phone: req.body.phone,
-            photo1: req.body.photo1,
-            photo2: helper.generateGooglePhotos(req.body.photo2),
-            photo3: helper.generateGooglePhotos(req.body.photo3),
-            photo4: helper.generateGooglePhotos(req.body.photo4),
-            photo5: helper.generateGooglePhotos(req.body.photo5),
-            photo6: helper.generateGooglePhotos(req.body.photo6),
-            photo7: helper.generateGooglePhotos(req.body.photo7),
-            photo8: helper.generateGooglePhotos(req.body.photo8),
-            photo9: helper.generateGooglePhotos(req.body.photo9),
-            photo10: helper.generateGooglePhotos(req.body.photo10),
-            rating: req.body.rating,
-            lat: req.body.lat,
-            lng: req.body.lng,
-            hours: req.body.hours.split(','),
-            url: req.body.url, //
-            website: req.body.website,
-            loggedin: req.user ? true: false,
-            displayName: req.user ? req.user.displayName : null
+            phone: req.query.phone,
+            photo1: req.query.photo1,
+            photo2: helper.generateGooglePhotos(req.query.photo2),
+            photo3: helper.generateGooglePhotos(req.query.photo3),
+            photo4: helper.generateGooglePhotos(req.query.photo4),
+            photo5: helper.generateGooglePhotos(req.query.photo5),
+            photo6: helper.generateGooglePhotos(req.query.photo6),
+            photo7: helper.generateGooglePhotos(req.query.photo7),
+            photo8: helper.generateGooglePhotos(req.query.photo8),
+            photo9: helper.generateGooglePhotos(req.query.photo9),
+            photo10: helper.generateGooglePhotos(req.query.photo10),
+            rating: req.query.rating,
+            lat: req.query.lat,
+            lng: req.query.lng,
+            hours: req.query.hours.split(','),
+            url: req.query.url, //
+            website: req.query.website,
         };
-    })
-    .then(() => {
-        console.log('Successfully saved VData, now rendering venues.hbs', req.session.venueRedirect);
-        res.redirect('/venue')
-    })
-    .catch(clearbit.Company.QueuedError, function (err) {
-        // Company lookup queued - try again later
-        res.redirect('/error')
-    })
-    .catch(clearbit.Company.NotFoundError, function (err) {
-        // Company could not be found
-        console.log(err);
-        res.redirect('/error')
-    })
-    .catch(function (err) {
-        console.error(err);
-        res.redirect('/error')
-    });
-});
-
-router.get('/venue', function(req, res) {
-    var temp = req.session.venueRedirect;
-    if (!temp) {
-        res.redirect('/venues');
-        return;
-    } else {
-        console.log("venues is", temp);
+        console.log('Successfully saved VData, now rendering venues.hbs', temp);
         if(req.user){
             Event.find({eventOwner: req.user._id})
-            .then(events => {
+            .populate('vEvent')
+            .exec()
+            .then(function(e){
+                console.log('MY EVENTS', e)
+                events = e;
                 res.render('venue', {
                     temp:temp,
                     events: events,
-                    loggedin: req.user ? true: false,
-                    displayName: req.user ? req.user.displayName : null
+                    loggedin: true,
+                    displayName: req.user.displayName
                 });
-            })
-            .catch(function(err){
-                console.log('error is ', err);
-                res.redirect('/error')
             })
         } else {
             res.render('venue', {
                 temp:temp,
-                loggedin: req.user ? true: false,
-                displayName: req.user ? req.user.displayName : null
+                loggedin: false,
+                displayName:  null
             });
         }
-    }
-})
+    })
+    .catch(clearbit.Company.QueuedError, function (err) {
+        // Company lookup queued - try again later
+        console.log('error1', err)
+        res.redirect('/error')
+    })
+    .catch(clearbit.Company.NotFoundError, function (err) {
+        // Company could not be found
+        console.log('error2',err);
+        res.redirect('/error')
+    })
+    .catch(function (err) {
+        console.error('error3',err);
+        res.redirect('/error')
+    });
+});
 
 router.post('/join',function(req,res){
     var b = {
@@ -655,6 +693,7 @@ router.get('/events', function(req, res) {
             events: events,
             min: helper.formatDate(new Date()),
             loggedin: req.user ? true: false,
+            searchSesh: req.session.search ? true : false,
             displayName: req.user ? req.user.displayName : null
         }))
     })
@@ -759,6 +798,7 @@ router.get('/quotelist', function(req, res, next) {
                 fname: req.user.fname ? req.user.fname : "Your First Name",
                 lname: req.user.lname ? req.user.lname : "Your Last Name",
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             }))
         })
@@ -773,6 +813,7 @@ router.get('/quotelist', function(req, res, next) {
             res.render('quotelist', ({
                 events: ocassions,
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             }))
         })
@@ -882,6 +923,7 @@ router.post('/quotelist', function(req, res) {
 router.get('/nextsteps',function(req,res){
     res.render('nextsteps',{
         loggedin: req.user ? true: false,
+        searchSesh: req.session.search ? true : false,
         displayName: req.user ? req.user.displayName : null
     })
 })
@@ -910,6 +952,7 @@ router.get('/messages',function(req,res){
                     vEvent: newV,
                     venueId: venueId,
                     loggedin: req.user ? true: false,
+                    searchSesh: req.session.search ? true : false,
                     displayName: req.user ? req.user.displayName : null
                 })
             })
@@ -922,6 +965,7 @@ router.get('/messages',function(req,res){
             res.render('messages', {
                 events: events,
                 loggedin: req.user ? true: false,
+                searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             })
         }
