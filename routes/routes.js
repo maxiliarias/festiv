@@ -600,7 +600,11 @@ router.post('/addEvent',function(req,res){
         console.log("new ven", newVen)
         event.vEvent.push(newVen._id)
         event.save()
-        res.redirect('/venues');
+        if(req.body.profile){    
+            res.redirect('back');
+        } else {
+            res.redirect('/venues');
+        }
     })
     .catch(function(err){
         console.log('error is ', err);
