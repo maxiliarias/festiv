@@ -44,31 +44,34 @@
         <h5 class="text-yellow mt-4">Tag An Event Below</h5>
         <div class="contactSide mb-4 text-left">
             {{#if loggedin}}
-                <h6>{{this}}</h6>
                 <h6 class="text-yellow mb-3"><b>My Events</b></h6>
+                <form class="form-inline" action="/addEvent?placeId={{../temp.placeId}}" method="post">
+                    <div class="form-group-row">
+                        <div class="col-12">
+                          <input type="text" name=event class="form-control" placeholder="Name your special event here">
+                          <input type=hidden name=name value="{{../temp.name}}">
+                          <input type=hidden name=profile value="true">
+                        </div>
+                        <div class="col-12">  
+                            <button class="btn btn-primary inline" type="submit" name="button"> Add</button>
+                        </div>
+                    </div>
+                </form>
+                {{#each events}}
+                    <h6>
+                        <a class="taggedEvent" href="/addVenue?/eventId={{this._id}}&venueId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
+                            <span class="fa fa-heart" aria-hidden="true"></span>
+                        </a>
+                    </h6>
+                    {{#if this.vEvent}}
+                        {{#each this.vEvent}}
+                            <p class="ml-2">{{this.name}}</p>
+                        {{/each}}
+                    {{/if}}
+            {{/each}}
             {{else}}
                 <h6 class="text-yellow mb-3"><b>Please login to create or view your events</b></h6>
             {{/if}}
-            {{#each events}}
-                <form class="form-inline" action="/addEvent?placeId={{../temp.placeId}}" method="post">
-                   <div class="form-group-row">
-                      <input type="text" name=event class="form-control" placeholder="Name your special event here">
-                      <input type=hidden name=name value="{{../temp.name}}">
-                      <input type=hidden name=profile value="true">
-                      <button class="btn btn-primary inline" type="submit" name="button"> Add a new Event!</button>
-                   </div>
-                </form>
-                <h6>
-                    <a class="taggedEvent" href="/addVenue?/eventId={{this._id}}&venueId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
-                        <span class="fa fa-heart" aria-hidden="true"></span>
-                    </a>
-                </h6>
-                {{#if this.vEvent}}
-                    {{#each this.vEvent}}
-                        <p class="ml-2">{{this.name}}</p>
-                    {{/each}}
-                {{/if}}
-            {{/each}}
         </div>
     </div>
     <div class="col-lg-4 col-12 mb-4 section-light">
