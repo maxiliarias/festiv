@@ -400,7 +400,7 @@ router.get('/venue', function(req, res) {
                     temp:temp,
                     events: events,
                     loggedin: true,
-                    searchSesh: req.session.search ? true : false
+                    searchSesh: req.session.search ? true : false,
                     displayName: req.user.displayName
                 });
             })
@@ -408,7 +408,7 @@ router.get('/venue', function(req, res) {
             res.render('venue', {
                 temp:temp,
                 loggedin: false,
-                searchSesh: req.session.search ? true : false
+                searchSesh: req.session.search ? true : false,
                 displayName:  null
             });
         }
