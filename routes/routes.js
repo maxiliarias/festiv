@@ -639,17 +639,18 @@ router.post('/updateEvent', function(req,res){
 
 /* ADDS A VENUE TO AN EXISTING EVENT */
 router.get('/addVenue',function(req,res){
-    var eventId=req.query.eventId;
-    var placeId=req.query.placeId;
-    var name=req.query.name;
+    let eventId=req.query.eventId;
+    let placeId=req.query.placeId;
+    let name=req.query.name;
     let newVen;
-    console.log('EVENTID',eventId)
+    console.log('EVENTID',eventId, req.query.eventId)
     console.log('PLACEID',placeId)
     console.log('Name',name)
     //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
     return VEvent.find({venueOption: eventId})
     .then(venues => {
+        console.log("mom's 60", venues);
         if (!venues || venues.length <= 0) {
             return false;
         }
@@ -678,14 +679,14 @@ router.get('/addVenue',function(req,res){
                 console.log('event is', event);
                 event.vEvent.push(newVen._id)
                 event.save()
-                res.redirect('/venues');
+                res.redirect('back');
             })
             .catch(function(err){
                 console.log('error is', err);
                 res.redirect('/error')
             })
         } else {
-            res.redirect('/venues');
+            res.redirect('back');
         }
     })
     .catch(function(err){

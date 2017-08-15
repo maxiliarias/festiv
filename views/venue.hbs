@@ -63,7 +63,7 @@
                 </form>
                 {{#each events}}
                     <h6>
-                        <a class="taggedEvent" href="/addVenue?/eventId={{this._id}}&venueId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
+                        <a class="taggedEvent" href="/addVenue?eventId={{this._id}}&placeId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
                             <span class="fa fa-heart" aria-hidden="true"></span>
                         </a>
                     </h6>
