@@ -70,8 +70,8 @@
                             <option>11:00 AM</option>
                             <option>11:30 AM</option>
                       </select>
-                      <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Estimated # of Hours" >
-                      <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Expected Guest Count" >
+                      <input type='number' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Estimated # of Hours" >
+                      <input type='number' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Expected Guest Count" >
                       <select class="form-control" name="price" >
                             <option disabled selected>
                                 {{#if this.price}}

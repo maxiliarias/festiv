@@ -565,7 +565,11 @@ router.post('/conversation', upload.any(), function(req,res){
 })
 
 router.get('/error', function(req,res){
-    res.render('error')
+    res.render('error',{
+        loggedin: req.user ? true: false,
+        searchSesh: req.session.search ? true : false,
+        displayName: req.user ? req.user.displayName : null
+    })
 })
 ///////////////////////////// END OF PUBLIC ROUTES /////////////////////////////
 
@@ -643,9 +647,10 @@ router.get('/addVenue',function(req,res){
     let placeId=req.query.placeId;
     let name=req.query.name;
     let newVen;
-    console.log('EVENTID',eventId, req.query.eventId)
+    console.log('EVENTID',eventId)
     console.log('PLACEID',placeId)
     console.log('Name',name)
+    console.log('profile is', req.query.profile);
     //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
     return VEvent.find({venueOption: eventId})
@@ -678,14 +683,26 @@ router.get('/addVenue',function(req,res){
                 console.log('event is', event);
                 event.vEvent.push(newVen._id)
                 event.save()
-                res.redirect('back');
+                console.log('profile is 2', req.query.profile);
+                if(req.query.profile){
+                    console.log('inside first if');
+                    res.redirect('back');
+                } else{
+                    res.redirect('/venues')
+                }
             })
             .catch(function(err){
                 console.log('error is', err);
                 res.redirect('/error')
             })
         } else {
-            res.redirect('back');
+            console.log('profile is 3', req.query.profile);
+            if(req.query.profile){
+                console.log('inside second first if');
+                res.redirect('back');
+            } else{
+                res.redirect('/venues')
+            }
         }
     })
     .catch(function(err){

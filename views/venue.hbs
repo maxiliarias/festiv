@@ -66,6 +66,7 @@
                         <input type=hidden class="form-control" name=eventId value="{{this._id}}">
                         <input type=hidden class="form-control" name=placeId value="{{../temp.placeId}}">
                         <input type=hidden class="form-control" name=name value="{{../temp.name}}">
+                        <input type=hidden class="form-control" name=profile value="{{../temp.phone}}">
                         <input type=submit class="col-10 form-control btn-transparent" name=eventName value="{{this.name}}">
                     </form>
                     {{#if this.vEvent}}
@@ -75,7 +76,7 @@
                     {{/if}}
                 {{/each}}
             {{else}}
-                <h6 class="text-yellow mb-3"><b>Please login to create or view your events</b></h6>
+                <h6 class="text-yellow mb-3"><b>Please <a href="/login">login</a> to create or view your events</b></h6>
             {{/if}}
         </div>
     </div>
