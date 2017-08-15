@@ -324,46 +324,64 @@ router.get('/venue', function(req, res) {
     let events;
     let company;
 
-    clearbit.Company.find({domain: req.query.website})
-    .then(function (c) {
-        console.log('inside clearbit ');
-        company = c;
-        if(c.site.emailAddresses){
-            return VData.findOne({placeId: req.query.placeId})
-            .then(v => {
-                console.log('v is ', v);
-                let toEmail=['events@','info@','privatedining@','contact@','reservations@']
+    VData.findOne({placeId: req.query.placeId})
+    .then(v => {
+        if(!v.clearbit){
+            console.log('inside the IF CLEARBIT');
+            return clearbit.Company.find({domain: req.query.website})
+            .then(function (c) {
+                console.log('inside clearbit ');
+                v.clearbit= true
+                company = c;
+                if(c.site.emailAddresses){
+                    console.log('inside the c.side emailaddresses');
+                    let toEmail=['events@','info@','privatedining@','contact@','reservations@']
 
-                for (var i=0; i< toEmail.length; i++){
-                    if(v.clearbitEmail && v.clearbitEmail[1]){
-                        break;
-                    }
-                    c.site.emailAddresses.forEach(email => {
-                        if(email.indexOf(toEmail[i])>=0){
-                            if(v.clearbitEmail && v.clearbitEmail[0]){
-                                console.log('inside here second email');
-                                v.clearbitEmail.push(email)
-                            } else {
-                                v.clearbitEmail = [email]
-                            }
+                    for (var i=0; i< toEmail.length; i++){
+                        if(v.clearbitEmail && v.clearbitEmail[1]){
+                            break;
                         }
-                    })
+                        c.site.emailAddresses.forEach(email => {
+                            if(email.indexOf(toEmail[i])>=0){
+                                if(v.clearbitEmail && v.clearbitEmail[0]){
+                                    console.log('inside here second email');
+                                    v.clearbitEmail.push(email)
+                                } else {
+                                    v.clearbitEmail = [email]
+                                }
+                            }
+                        })
+                    }
+                    return v.save()
                 }
-                v.save()
-                return VData.findOne({placeId: req.query.placeId});
+                return v.save();
+            })
+            .then(function(foundVdata){
+                console.log('foundVdata is', foundVdata);
+                foundVdata.facebook = company.facebook.handle || ""
+                foundVdata.twitter = company.twitter.handle || ""
+                foundVdata.description = company.description || ""
+                foundVdata.metaD = company.site.metaDescription || ""
+                foundVdata.twitterBio = company.twitter.Bio || ""
+                console.log('found VData, updating', foundVdata);
+                foundVdata.save();
+                return
+            })
+            .catch(clearbit.Company.QueuedError, function (err) {
+                // Company lookup queued - try again later
+                console.log('error1', err)
+                res.redirect('/error')
+            })
+            .catch(clearbit.Company.NotFoundError, function (err) {
+                // Company could not be found
+                console.log('error2',err);
+                res.redirect('/error')
+            })
+            .catch(function(err){
+                console.log('error is',err);
             })
         }
-        return VData.findOne({placeId: req.query.placeId});
-    })
-    .then(function(foundVdata){
-        console.log('foundVdata is', foundVdata);
-        foundVdata.facebook = company.facebook.handle || ""
-        foundVdata.twitter = company.twitter.handle || ""
-        foundVdata.description = company.description || ""
-        foundVdata.metaD = company.site.metaDescription || ""
-        foundVdata.twitterBio = company.twitter.Bio || ""
-        console.log('found VData, updating', foundVdata);
-        foundVdata.save();
+        v.save()
         return
     })
     .then(function(){
@@ -387,7 +405,6 @@ router.get('/venue', function(req, res) {
             lat: req.query.lat,
             lng: req.query.lng,
             hours: req.query.hours.split(','),
-            url: req.query.url, //
             website: req.query.website,
         };
         console.log('Successfully saved VData, now rendering venues.hbs', temp.name);
@@ -406,6 +423,10 @@ router.get('/venue', function(req, res) {
                     displayName: req.user.displayName
                 });
             })
+            .catch(function (err) {
+                console.error('error3 is',err);
+                res.redirect('/error')
+            });
         } else {
             res.render('venue', {
                 temp:temp,
@@ -415,18 +436,8 @@ router.get('/venue', function(req, res) {
             });
         }
     })
-    .catch(clearbit.Company.QueuedError, function (err) {
-        // Company lookup queued - try again later
-        console.log('error1', err)
-        res.redirect('/error')
-    })
-    .catch(clearbit.Company.NotFoundError, function (err) {
-        // Company could not be found
-        console.log('error2',err);
-        res.redirect('/error')
-    })
     .catch(function (err) {
-        console.error('error3',err);
+        console.error('error4',err);
         res.redirect('/error')
     });
 });
@@ -564,6 +575,10 @@ router.post('/conversation', upload.any(), function(req,res){
     })
 })
 
+router.post('/eventlogs',function(req,res){
+    res.end()
+    console.log(req.body)
+})
 router.get('/error', function(req,res){
     res.render('error',{
         loggedin: req.user ? true: false,

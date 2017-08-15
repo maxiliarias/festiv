@@ -41,6 +41,7 @@ var vDataSchema = mongoose.Schema({
     domain: String,
     email: Array,
     clearbitEmail: Array,
+    clearbit: Boolean,
     description: String,
     metaD: String,
     twitterBio: String,
