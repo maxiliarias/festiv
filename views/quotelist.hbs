@@ -14,7 +14,7 @@
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Date</label>
             <div class="col-10">
-              <input type="date" class="form-control" name="date" value="{{party.date}}" min={{min}} required oninvalid="this.setCustomValidity('A Date is requested')"
+              <input type="date" class="form-control" name="date" placeholder="Enter Event Date" value="{{party.date}}" min={{min}} required oninvalid="this.setCustomValidity('A Date is requested')"
               oninput="setCustomValidity('')">
             </div>
           </div>
@@ -23,7 +23,13 @@
             <div class="col-10">
               <select class="form-control" name="time" required oninvalid="this.setCustomValidity('An Estimated Start Time is requested')"
               oninput="setCustomValidity('')">
-                    <option disabled selected>{{party.time}}</option>
+                    <option disabled selected>
+                        {{#if party.time}}
+                            {{party.time}}
+                        {{else}}
+                            Start Time
+                        {{/if}}
+                    </option>
                     <option>12:00 PM</option>
                     <option>12:30 PM</option>
                     <option>01:00 PM</option>
@@ -94,7 +100,13 @@
             <div class="col-10">
                 <select class="form-control" name="price" required oninvalid="this.setCustomValidity('A Pricing Preference is requested')"
                 oninput="setCustomValidity('')">
-                      <option value="{{party.price}}" disabled selected>{{party.price}}</option>
+                      <option value="{{party.price}}" disabled selected>
+                        {{#if party.price}}
+                            {{party.price}}
+                        {{else}}
+                            Price Preference
+                        {{/if}}
+                      </option>
                       <option>Open Bar</option>
                       <option>Minimum Spend</option>
                 </select>

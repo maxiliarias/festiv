@@ -10,11 +10,17 @@
         {{#each events}}
                 <div class="col-md-3 col-sm-10 section-light pt-3 mb-4 ">
                     <form class="form text-right mx-auto" method="post" action="/updateEvent">
-                      <input type="text" class="form-control" name="name" value="{{this.name}}" required>
+                      <input type="text" class="form-control" name="name" value="{{this.name}}" placeholder="Your name here" required>
                       <input type=hidden class="form-control" name='eventId' value={{this._id}} required>
-                      <input type="date" class="form-control" name="date" value="{{this.date}}" min={{../min}}>
+                      <input type="date" class="form-control" name="date" value="{{this.date}}" min={{../min}} placeholder="Enter Event Date">
                       <select class="form-control" name="time">
-                            <option disabled selected>{{this.time}}</option>
+                            <option disabled selected>
+                                {{#if this.time}}
+                                    {{this.time}}
+                                {{else}}
+                                    Start Time
+                                {{/if}}
+                            </option>
                             <option>12:00 PM</option>
                             <option>12:30 PM</option>
                             <option>01:00 PM</option>
@@ -67,7 +73,13 @@
                       <input type='text' class="form-control" name="hours" value="{{this.hours}}"  placeholder="Estimated # of Hours" >
                       <input type='text' class="form-control" name="guestCount" value="{{this.guestCount}}" placeholder="Expected Guest Count" >
                       <select class="form-control" name="price" >
-                            <option disabled selected>{{this.price}}</option>
+                            <option disabled selected>
+                                {{#if this.price}}
+                                    {{this.price}}
+                                {{else}}
+                                    Price Preference
+                                {{/if}}
+                            </option>
                             <option>Open Bar</option>
                             <option>Minimum Spend</option>
                       </select>
