@@ -50,18 +50,13 @@ router.get('/venues',function(req, res){
                 venue.modal = "";
             }
         });
-        if(req.user){
-            Event.find({eventOwner: req.user._id})
-            .populate('vEvent')
-            .exec()
-            .then(o => {
-                events = o
-            })
-            .catch(function(err){
-                console.log('error is ', err);
-                res.redirect('/error')
-            })
-        }
+
+        Event.find({eventOwner: req.user._id})
+        .populate('vEvent')
+        .exec()
+        .then(o => {
+            events = o
+            console.log('events r', events);
             res.render('list', {
                 venues: temp,
                 googleApi: process.env.GOOGLEPLACES,
@@ -72,10 +67,17 @@ router.get('/venues',function(req, res){
                 searchSesh: req.session.search ? true : false,
                 displayName: req.user ? req.user.displayName : null
             })
+        })
+        .catch(function(err){
+            console.log('error is ', err);
+            res.redirect('/error')
+        })
+
     } else {
         res.render('list', {
             venues: req.session.search,
             googleApi: process.env.GOOGLEPLACES,
+            events: events,
             page2: req.session.pagetoken[1] ? 'true' : null,
             page3: req.session.pagetoken[2] ? 'true' : null,
             loggedin: req.user ? true: false,
