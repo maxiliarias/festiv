@@ -165,6 +165,9 @@ h3.section-subheading {
     display: flex;
     align-items: center;
 }
+.flexgrow{
+    flex-grow: 1;
+}
 .vertMid{
     margin-top: 25%;
 }
