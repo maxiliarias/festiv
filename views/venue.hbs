@@ -44,7 +44,7 @@
         <h5 class="text-yellow mt-4"><b>Tag An Event Below</b></h5>
         <div class="contactSide mb-4 text-left">
             {{#if loggedin}}
-                <h6 class="text-yellow mb-3"><b>My Events</b></h6>
+                <h6 class="text-yellow mb-3"><b>My Events </b><span class="fa fa-heart" aria-hidden="true"></span></h6>
                 <form class="form-inline text-right" action="/addEvent?placeId={{temp.placeId}}" method="post">
                     <div class="form-group-row">
                         <div class="row">
@@ -62,11 +62,12 @@
                     </div>
                 </form>
                 {{#each events}}
-                    <h6>
-                        <a class="taggedEvent" href="/addVenue?eventId={{this._id}}&placeId={{../temp.placeId}}&name={{../temp.name}}&dom={{../temp.website}}">{{this.name}}
-                            <span class="fa fa-heart" aria-hidden="true"></span>
-                        </a>
-                    </h6>
+                    <form action="/addVenue" method="get" class="row taggedEvent">
+                        <input type=hidden class="form-control" name=eventId value="{{this._id}}">
+                        <input type=hidden class="form-control" name=placeId value="{{../temp.placeId}}">
+                        <input type=hidden class="form-control" name=name value="{{../temp.name}}">
+                        <input type=submit class="col-10 form-control btn-transparent" name=eventName value="{{this.name}}">
+                    </form>
                     {{#if this.vEvent}}
                         {{#each this.vEvent}}
                             <p class="ml-2">{{this.name}}</p>

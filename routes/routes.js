@@ -326,7 +326,7 @@ router.get('/venue', function(req, res) {
 
     clearbit.Company.find({domain: req.query.website})
     .then(function (c) {
-        console.log('inside clearbit ', c);
+        console.log('inside clearbit ');
         company = c;
         if(c.site.emailAddresses){
             return VData.findOne({placeId: req.query.placeId})
@@ -390,7 +390,7 @@ router.get('/venue', function(req, res) {
             url: req.query.url, //
             website: req.query.website,
         };
-        console.log('Successfully saved VData, now rendering venues.hbs', temp);
+        console.log('Successfully saved VData, now rendering venues.hbs', temp.name);
         if(req.user){
             Event.find({eventOwner: req.user._id})
             .populate('vEvent')
@@ -650,7 +650,6 @@ router.get('/addVenue',function(req,res){
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
     return VEvent.find({venueOption: eventId})
     .then(venues => {
-        console.log("mom's 60", venues);
         if (!venues || venues.length <= 0) {
             return false;
         }
