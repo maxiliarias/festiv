@@ -10,25 +10,20 @@
     {{#if party}}
     <div class="col-md-8 col-12 text-center">
         <h3 class="text-blue text-center mb-4">{{party.name}}</h3>
-      <form id="contactForm" class="form-group text-right mx-auto" method="post" action="/quotelist?eventId={{party._id}}">
+      <form id="contactForm" onsubmit="return checkform(this)"class="form-group text-right mx-auto" method="post" action="/quotelist?eventId={{party._id}}">
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Date</label>
             <div class="col-10">
-              <input type="date" class="form-control" name="date" placeholder="Enter Event Date" value="{{party.date}}" min={{min}} required oninvalid="this.setCustomValidity('A Date is requested')"
+              <input type="date" class="form-control otherInput" name="date" placeholder="Enter Event Date" value="{{party.date}}" min={{min}} required oninvalid="this.setCustomValidity('A Date is requested')"
               oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Start Time</label>
             <div class="col-10">
-              <select class="form-control" name="time" required oninvalid="this.setCustomValidity('An Estimated Start Time is requested')"
-              oninput="setCustomValidity('')">
-                    <option disabled selected>
-                        {{#if party.time}}
-                            {{party.time}}
-                        {{else}}
+              <select id="time" class="form-control" name="time" required oninvalid="this.setCustomValidity('An Estimated Start Time is requested')" oninput="setCustomValidity('')">
+                    <option value="" disabled selected>
                             Start Time
-                        {{/if}}
                     </option>
                     <option>12:00 PM</option>
                     <option>12:30 PM</option>
@@ -84,60 +79,57 @@
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Hours</label>
             <div class="col-10">
-              <input type='number' class="form-control" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required oninvalid="this.setCustomValidity('An Estimated Number of Hours is requested')"
+              <input type='number' class="form-control otherInput" name="hours" value="{{party.hours}}"  placeholder="Number of Hours" required oninvalid="this.setCustomValidity('An Estimated Number of Hours is requested')"
                 oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Guests</label>
             <div class="col-10">
-              <input type='number' class="form-control" name="guestCount" value="{{party.guestCount}}" placeholder="Estimated Guest Count" required oninvalid="this.setCustomValidity('An Estimated Guest Count is requested')"
+              <input type='number' class="form-control otherInput" name="guestCount" value="{{party.guestCount}}" placeholder="Estimated Guest Count" required oninvalid="this.setCustomValidity('An Estimated Guest Count is requested')"
               oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Price Package</label>
             <div class="col-10">
-                <select class="form-control" name="price" required oninvalid="this.setCustomValidity('A Pricing Preference is requested')"
+                <select id="price" class="form-control" name="price" required oninvalid="this.setCustomValidity('A Pricing Preference is requested')"
                 oninput="setCustomValidity('')">
-                      <option value="{{party.price}}" disabled selected>
-                        {{#if party.price}}
-                            {{party.price}}
-                        {{else}}
-                            Price Preference
-                        {{/if}}
-                      </option>
-                      <option>Open Bar</option>
-                      <option>Minimum Spend</option>
+                    <option value="" disabled selected>
+                        Price Preference
+                    </option>
+                    </option>
+                    <option>Open Bar</option>
+                    <option>Minimum Spend</option>
                 </select>
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">First Name</label>
             <div class="col-4">
-              <input type="text" class="form-control" name="fname" value="{{fname}}"  placeholder="First Name" required oninvalid="this.setCustomValidity('Your First Name is requested')"
+              <input type="text" class="form-control otherInput" name="fname" value="{{fname}}"  placeholder="First Name" required oninvalid="this.setCustomValidity('Your First Name is requested')"
               oninput="setCustomValidity('')">
             </div>
             <label class="col-2 col-form-label text-left mt-2">Last Name</label>
             <div class="col-4">
-              <input type="text" class="form-control" name="lname" value="{{lname}}" placeholder="Last Name" required oninvalid="this.setCustomValidity('Your Last Name is requested')"
+              <input type="text" class="form-control otherInput" name="lname" value="{{lname}}" placeholder="Last Name" required oninvalid="this.setCustomValidity('Your Last Name is requested')"
               oninput="setCustomValidity('')">
             </div>
           </div>
           <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">Email</label>
             <div class="col-10">
-              <input type="email" class="form-control" name="email" value="{{email}}" placeholder="Email" required oninvalid="this.setCustomValidity('Your Email is requested')"
+              <input type="email" class="form-control otherInput" name="email" value="{{email}}" placeholder="Email" required oninvalid="this.setCustomValidity('Your Email is requested')"
               oninput="setCustomValidity('')">
             </div>
           </div>
-          <div class="form-group row">
+          <!-- <div class="form-group row">
             <label class="col-2 col-form-label text-left mt-2">More</label>
             <div class="col-10">
-                <textarea rows="3" class="form-control" name="additional" placeholder="Share any additional details you'd like about your event here. (Note this message is intended for all venues related to your selected event.)" id="message"></textarea>
+                <textarea rows="3" class="form-control" name="more" placeholder="Share any additional details you'd like about your event here. (Note this message is intended for all venues related to your selected event.)" id="message"></textarea>
             </div>
-          </div>
-        <button class="btn btn-primary mt-2" type="button" data-toggle="modal" data-target="#confirmModal">Request Bids</button>
+          </div> -->
+        <button id="checkForm" class="btn btn-primary mt-2" type="button" data-toggle="modal" data-target="#confirmModal">Request Bids</button>
         <button id="contactBtn" type="submit" style="display:none"></button>
 
         <!-- Confirmation Modal  -->

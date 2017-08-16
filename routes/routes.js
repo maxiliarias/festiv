@@ -575,6 +575,7 @@ router.post('/conversation', upload.any(), function(req,res){
     })
 })
 
+/* Router for Sendgrid to send eventLogs on email opens,clicks etc.*/
 router.post('/eventlogs',function(req,res){
     res.end()
     console.log(req.body)
@@ -874,11 +875,11 @@ router.post('/quotelist', function(req, res) {
     let lname = req.body.lname
     let email = req.body.email
     let date=req.body.date
-    let starttime=req.body.starttime
+    let time=req.body.time
     let hours=req.body.hours
     let guestCount=req.body.guestCount
     let price=req.body.price
-    let additional=req.body.additional
+    let additional=req.body.more
 
     let v;
     return User.findOne({fbid: req.user.fbid})
@@ -894,7 +895,7 @@ router.post('/quotelist', function(req, res) {
     })
     .then(event => {
         event.date = date
-        event.time = starttime
+        event.time = time
         event.hours = hours
         event.guestCount = guestCount
         event.price = price
