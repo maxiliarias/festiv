@@ -591,6 +591,8 @@ router.get('/error', function(req,res){
 
 router.use(function(req, res, next) {
     if (!req.user) {
+        req.session.url = req.url
+        console.log('url is', req.session.url, req.url)
         res.redirect('/login');
     } else {
         return next();

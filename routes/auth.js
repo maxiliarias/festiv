@@ -73,7 +73,11 @@ module.exports = function(passport) {
       passport.authenticate('facebook', { failureRedirect: '/login' }),
       function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect('back')
+        console.log('inside facebook');
+        var redirectTo = req.session.url? req.session.url: '/';
+        delete req.session.redirectTo;
+        // is authenticated ?
+        res.redirect(redirectTo);
       });
 
     // GET Logout page
