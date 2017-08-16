@@ -537,7 +537,7 @@ router.post('/conversation', upload.any(), function(req,res){
             personalizations: [{
                 'substitutions': {
                     '-businessName-': venue.name,
-                    '-link-': `https://nameless-reef-77538.herokuapp.com/messages?venueId=${venueId}`,
+                    '-link-': `http://www.festivspaces.com/messages?venueId=${venueId}`,
                     '-fname-': user.fname
                 },
                 "to": [{
