@@ -52,7 +52,10 @@ var helper = {
                     custom_args: {
                         "vEventid": venue._id,
                         "vDataid": match._id
-                    }
+                    },
+                    "bcc": [{
+                        "email": "hello@festivspaces.com"
+                    }]
                 }],
                 from: {
                     email: req.user.fname + '@hello.festivspaces.com',

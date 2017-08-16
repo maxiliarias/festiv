@@ -665,10 +665,6 @@ router.get('/addVenue',function(req,res){
     let placeId=req.query.placeId;
     let name=req.query.name;
     let newVen;
-    console.log('EVENTID',eventId)
-    console.log('PLACEID',placeId)
-    console.log('Name',name)
-    console.log('profile is', req.query.profile);
     //If that venue already exists under that eventId, DON'T CREATE A NEW VENUEID
     //Do a Venue.find(venueOption=eventid) to find all of the venues under that event umbrella
     return VEvent.find({venueOption: eventId})
@@ -924,28 +920,28 @@ router.post('/quotelist', function(req, res) {
                 // if not, retrieve email using hunter
                     if(match.email.length === 0){
                         console.log('no match.email', match)
-                        // helper.collectEmail(web)
-                        // .then((emails) => {
-                        //     console.log('RETRIEVED EMAILS', emails)
-                        //     //STORE THE EMAILS IN THE DATABASE
-                        //
-                        //     if (emails[0]){
-                        //         match.email.push(emails[0])
-                        //     }
-                        //     if(emails[1]){
-                        //         match.email.push(emails[1])
-                        //     }
-                        //
-                        //     return match.save()
-                        // })
-                        // .then(savedV => {
-                        //     console.log('Successfully saved venue w emails')
-                        //     helper.sendMail(req, match, v)
-                        // })
-                        // .catch(function(err){
-                        //     console.log('error is', err);
-                        //      res.redirect('/error')
-                        // })
+                        helper.collectEmail(web)
+                        .then((emails) => {
+                            console.log('RETRIEVED EMAILS', emails)
+                            //STORE THE EMAILS IN THE DATABASE
+
+                            if (emails[0]){
+                                match.email.push(emails[0])
+                            }
+                            if(emails[1]){
+                                match.email.push(emails[1])
+                            }
+
+                            return match.save()
+                        })
+                        .then(savedV => {
+                            console.log('Successfully saved venue w emails')
+                            helper.sendMail(req, match, v)
+                        })
+                        .catch(function(err){
+                            console.log('error is', err);
+                             res.redirect('/error')
+                        })
                     }
                     else{
                         console.log('MATCH IS', match)
