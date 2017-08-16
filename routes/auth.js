@@ -64,20 +64,15 @@ module.exports = function(passport) {
     router.get('/fb/login', passport.authenticate('facebook'))
 
     //Upon giving permission, sends user back to this route
-    // router.get('/fb/login/callback', passport.authenticate('facebook', {
-    //     successRedirect: '/',
-    //     failureRedirect: '/login'
-    // }))
-
     router.get('/fb/login/callback',
-      passport.authenticate('facebook', { failureRedirect: '/login' }),
-      function(req, res) {
-        // Successful authentication, redirect home.
-        console.log('inside facebook');
-        var redirectTo = req.session.url? req.session.url: '/';
-        delete req.session.redirectTo;
-        // is authenticated ?
-        res.redirect(redirectTo);
+        passport.authenticate('facebook', { failureRedirect: '/login' }),
+          function(req, res) {
+            // Successful authentication, redirect home.
+            console.log('inside facebook');
+            var redirectTo = req.session.url? req.session.url: '/';
+            delete req.session.redirectTo;
+            // is authenticated ?
+            res.redirect(redirectTo);
       });
 
     // GET Logout page
