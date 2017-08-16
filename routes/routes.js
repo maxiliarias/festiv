@@ -56,7 +56,6 @@ router.get('/venues',function(req, res){
         .exec()
         .then(o => {
             events = o
-            console.log('events r', events);
             res.render('list', {
                 venues: temp,
                 googleApi: process.env.GOOGLEPLACES,
@@ -70,6 +69,7 @@ router.get('/venues',function(req, res){
         })
         .catch(function(err){
             console.log('error is ', err);
+            console.log('url is', req.url);
             res.redirect('/error')
         })
 
@@ -100,6 +100,7 @@ router.get('/blog', function(req, res){
     })
     .catch(function(err){
         console.log('error is', err);
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -207,18 +208,17 @@ router.post('/venues', function(req, res) {
         req.session.keyword =  req.body.type ===" "? req.session.keyword : req.body.type.split(" ").join("_").toLowerCase();
         keyword= req.session.keyword
         req.session.pagetoken= req.session.pagetoken || [""];
-        console.log('(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))');
 
         return request(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``));
     })
     .then(resp => JSON.parse(resp))
     .then(obj => {
         console.log('REQUEST', `https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${process.env.GOOGLEPLACES}&location=${lat},${lng}&rankby=distance&keyword=${keyword}&minprice=3`+ (parseInt(req.query.num) ? `&pagetoken=${req.session.pagetoken[req.query.num]}` : ``))
-        console.log('pagetoken before', req.session.pagetoken);
+
         if(obj.next_page_token && req.session.pagetoken.length<= 3){
             req.session.pagetoken.push(obj.next_page_token);
         }
-        console.log('page token after', req.session.pagetoken);
+
         obj.results.forEach(item => {
             placeId.push(item.place_id)
         });
@@ -234,7 +234,6 @@ router.post('/venues', function(req, res) {
                             .then(function(storedVenues){
                                 for (var j=0; j< storedVenues.length; j++){
                                     if(storedVenues[j].placeId === v){
-                                        console.log('found vdata');
                                         return true;
                                     }
                                 }
@@ -248,7 +247,7 @@ router.post('/venues', function(req, res) {
                                         domain: obj2.result.website
                                     })
                                     newVen.save(function(err, ven) {
-                                        console.log(err); // ignore
+                                        console.log('err is', err); // ignore
                                     });
                                 }
                                 return ({
@@ -291,7 +290,6 @@ router.post('/venues', function(req, res) {
                 return arr.indexOf(elem) === -1;
             }) && place.photo5 !== "";
         });
-        console.log(arrayOfResults.length-arrayOfResults.length, ' # of venues removed')
         req.session.search = arrayOfResults;
         res.render('list', {
             venues: arrayOfResults,
@@ -305,6 +303,7 @@ router.post('/venues', function(req, res) {
     })
     .catch(function(err) {
         console.log('error is',err);
+        console.log('url is', req.url);
         res.redirect('/error')
     });
 })
@@ -313,7 +312,6 @@ router.post('/venues', function(req, res) {
 router.post('/newSearch', function(req, res) {
     req.session.search =[]
     req.session.pagetoken=[""]
-    console.log('clear pg token', req.session.pagetoken);
     //307 repeats the request with the same method (here that is a post) and the
     //the same parameters (here thats the submitted req.body)
     res.redirect(307, '/venues');
@@ -327,14 +325,11 @@ router.get('/venue', function(req, res) {
     VData.findOne({placeId: req.query.placeId})
     .then(v => {
         if(!v.clearbit){
-            console.log('inside the IF CLEARBIT');
             return clearbit.Company.find({domain: req.query.website})
             .then(function (c) {
-                console.log('inside clearbit ');
                 v.clearbit= true
                 company = c;
                 if(c.site.emailAddresses){
-                    console.log('inside the c.side emailaddresses');
                     let toEmail=['events@','info@','privatedining@','contact@','reservations@']
 
                     for (var i=0; i< toEmail.length; i++){
@@ -344,7 +339,6 @@ router.get('/venue', function(req, res) {
                         c.site.emailAddresses.forEach(email => {
                             if(email.indexOf(toEmail[i])>=0){
                                 if(v.clearbitEmail && v.clearbitEmail[0]){
-                                    console.log('inside here second email');
                                     v.clearbitEmail.push(email)
                                 } else {
                                     v.clearbitEmail = [email]
@@ -357,28 +351,29 @@ router.get('/venue', function(req, res) {
                 return v.save();
             })
             .then(function(foundVdata){
-                console.log('foundVdata is', foundVdata);
                 foundVdata.facebook = company.facebook.handle || ""
                 foundVdata.twitter = company.twitter.handle || ""
                 foundVdata.description = company.description || ""
                 foundVdata.metaD = company.site.metaDescription || ""
                 foundVdata.twitterBio = company.twitter.Bio || ""
-                console.log('found VData, updating', foundVdata);
                 foundVdata.save();
                 return
             })
             .catch(clearbit.Company.QueuedError, function (err) {
                 // Company lookup queued - try again later
                 console.log('error1', err)
+                console.log('url is', req.url);
                 res.redirect('/error')
             })
             .catch(clearbit.Company.NotFoundError, function (err) {
                 // Company could not be found
                 console.log('error2',err);
+                console.log('url is', req.url);
                 res.redirect('/error')
             })
             .catch(function(err){
                 console.log('error is',err);
+                console.log('url is', req.url);
             })
         }
         v.save()
@@ -407,13 +402,11 @@ router.get('/venue', function(req, res) {
             hours: req.query.hours.split(','),
             website: req.query.website,
         };
-        console.log('Successfully saved VData, now rendering venues.hbs', temp.name);
         if(req.user){
             Event.find({eventOwner: req.user._id})
             .populate('vEvent')
             .exec()
             .then(function(e){
-                console.log('MY EVENTS', e)
                 events = e;
                 res.render('venue', {
                     temp:temp,
@@ -425,6 +418,7 @@ router.get('/venue', function(req, res) {
             })
             .catch(function (err) {
                 console.error('error3 is',err);
+                console.log('url is', req.url);
                 res.redirect('/error')
             });
         } else {
@@ -486,28 +480,24 @@ router.post('/conversation', upload.any(), function(req,res){
     let user;
     let venueId;
     let newMailSpot;
-    console.log('printing up here', req.files);
+
     attach=req.files
-    console.log("printing the body", req.body)
+
     mail = req.body
     var atSign = mail.to.indexOf("@")
     var idSpot = mail.to.indexOf("<id") + 3
-    console.log('venue id slice is',mail.to.slice(idSpot,atSign))
+
     venueId= mail.to.slice(idSpot,atSign)
 
     VEvent.findById(venueId)
     .then(function(v) {
         venue = v;
-        console.log("entire venue is",venue);
 
         var temp = venue.chat
-        console.log('FIRST venue chat is', temp);
         var from = mail.envelope.indexOf('"from":')
-        console.log('sliced from', mail.envelope.slice(from + 8,mail.envelope.length-2))
 
         venue.chat = mail.text
-        // (temp ? (`On ${venue.lastDate} ${venue.lastFrom} wrote:</br></br>` + temp) : '')
-        console.log('new venue chat is', venue.chat);
+
         venue.lastFrom = mail.envelope.slice(from + 8,mail.envelope.length-2)
         venue.lastDate = helper.formatDate(new Date())
         attach.forEach(x => {
@@ -519,18 +509,16 @@ router.post('/conversation', upload.any(), function(req,res){
         return venue.save()
     })
     .then(savedV => {
-        console.log('updated venue is', savedV);
+        ;
         return Event.findById(savedV.venueOption);
     })
     .then(function(fe){
         foundEvent = fe;
-        console.log("Event is", foundEvent);
+
         return User.findById(foundEvent.eventOwner);
     })
     .then(function(u){
         user = u;
-        console.log('User is', user);
-        // venue.chat.push(msg._id)
 
         // alert the user, they've received a response/bid
         var b = {
@@ -592,7 +580,7 @@ router.get('/error', function(req,res){
 router.use(function(req, res, next) {
     if (!req.user) {
         req.session.url = req.url
-        console.log('url is', req.session.url, req.url)
+        console.log('url is', req.session.url)
         res.redirect('/login');
     } else {
         return next();
@@ -605,15 +593,13 @@ router.use(function(req, res, next) {
 /*Create a new event, makes a new venue, tags the venue to the event and saves to mongoose*/
 router.post('/addEvent',function(req,res){
     let event;
-    console.log('name', req.body.name)
-    console.log('placeId is',req.query.placeId);
     var newE = new Event({
         eventOwner: req.user._id,
         name: req.body.event,
     })
     return newE.save()
     .then(savedE =>{
-        console.log('saved E is', savedE)
+
         event = savedE
         var newVenue = new VEvent ({
             venueOption: event._id,
@@ -623,7 +609,7 @@ router.post('/addEvent',function(req,res){
         return newVenue.save()
     })
     .then(newVen => {
-        console.log("new ven", newVen)
+
         event.vEvent.push(newVen._id)
         event.save()
         if(req.body.profile){
@@ -634,6 +620,7 @@ router.post('/addEvent',function(req,res){
     })
     .catch(function(err){
         console.log('error is ', err);
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -648,13 +635,14 @@ router.post('/updateEvent', function(req,res){
         (req.body.hours) ? event.hours= req.body.hours :null;
         (req.body.guestCount) ? event.guestCount= req.body.guestCount : null;
         (req.body.price) ? event.price= req.body.price : null;
-        console.log('event is', event)
+
         event.save()
-        console.log('saved the event changes');
+
         res.redirect('/events')
     })
     .catch(function(err){
         console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -674,7 +662,6 @@ router.get('/addVenue',function(req,res){
         }
         for(var i = 0; i < venues.length; i++) {
             if (venues[i].placeId === placeId) {
-                // maybe here remove the venue if its a toggle
                 return true;
             }
         }
@@ -690,16 +677,12 @@ router.get('/addVenue',function(req,res){
             return newVenue.save()
             .then(nV => {
                 newVen=nV
-                console.log('saved new venue to event',newVen)
                 return Event.findById(eventId)
             })
             .then(event => {
-                console.log('event is', event);
                 event.vEvent.push(newVen._id)
                 event.save()
-                console.log('profile is 2', req.query.profile);
                 if(req.query.profile){
-                    console.log('inside first if');
                     res.redirect('back');
                 } else{
                     res.redirect('/venues')
@@ -707,12 +690,11 @@ router.get('/addVenue',function(req,res){
             })
             .catch(function(err){
                 console.log('error is', err);
+                console.log('url is', req.url);
                 res.redirect('/error')
             })
         } else {
-            console.log('profile is 3', req.query.profile);
             if(req.query.profile){
-                console.log('inside second first if');
                 res.redirect('back');
             } else{
                 res.redirect('/venues')
@@ -721,6 +703,7 @@ router.get('/addVenue',function(req,res){
     })
     .catch(function(err){
         console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -741,13 +724,13 @@ router.get('/events', function(req, res) {
     })
     .catch(function(err){
         console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
 
 /* REMOVE a specific event from the database*/
 router.get('/removeEvent', function(req, res) {
-    console.log('req.query here', req.query);
     var eventId= req.query.eventId;
     return VEvent.find({venueOption: eventId})
     .then(venueArr => {
@@ -755,16 +738,15 @@ router.get('/removeEvent', function(req, res) {
             Chat.find({chatOwner: venue._id})
             .then( msgArr => {
                 msgArr.map( msg => {
-                    console.log('Successfully deleted msg');
                     msg.remove()
                 })
             })
             .then( () => {
-                console.log('Successfully deleted venue');
                 venue.remove()
             })
             .catch(function(err){
                 console.log('err is', err);
+                console.log('url is', req.url);
                 res.redirect('/error')
             })
         })
@@ -773,12 +755,12 @@ router.get('/removeEvent', function(req, res) {
         return Event.findById(eventId)
     })
     .then(event => {
-        console.log('Successfully deleted event');
         event.remove()
         res.redirect('/events')
     })
     .catch(function(err){
         console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -792,7 +774,6 @@ router.get('/removeVenue', function(req, res) {
         for (var i=0; i<event.vEvent.length; i++){
             if(event.vEvent[i] == vEventId){
                 event.vEvent.splice(i,1)
-                console.log('Successfully modified the event');
             }
         }
         return event.save()
@@ -801,12 +782,12 @@ router.get('/removeVenue', function(req, res) {
         Chat.find({chatOwner: vEventId})
         .then( msgArr => {
             msgArr.map( msg => {
-                console.log('Successfully deleted msg');
                 msg.remove()
             })
         })
         .catch(function(err){
             console.log('error is', err);
+            console.log('url is', req.url);
             res.redirect('/error')
         })
     })
@@ -815,11 +796,11 @@ router.get('/removeVenue', function(req, res) {
     })
     .then(venue => {
         venue.remove()
-        console.log('Successfully removed venue');
         res.redirect('/events')
     })
     .catch(function(err){
-        console.log('error is', err);
+        console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -831,7 +812,6 @@ router.get('/quotelist', function(req, res, next) {
         .populate("vEvent")
         .exec()
         .then(party => {
-            console.log('in here', req.user);
             res.render('quotelist', ({
                 party: party,
                 events: false,
@@ -851,7 +831,6 @@ router.get('/quotelist', function(req, res, next) {
     } else {
         return Event.find({eventOwner:req.user._id})
         .then(ocassions =>{
-            console.log('occassions', ocassions);
             res.render('quotelist', ({
                 events: ocassions,
                 loggedin: req.user ? true: false,
@@ -861,6 +840,7 @@ router.get('/quotelist', function(req, res, next) {
         })
         .catch(function(err){
             console.log('error is', err)
+            console.log('url is', req.url);
             res.redirect('/error')
         })
     }
@@ -904,18 +884,14 @@ router.post('/quotelist', function(req, res) {
             return event.save()
         })
         .then(savedEvent => {
-            console.log('Successfully saved event parameters');
             return VEvent.find({venueOption: eventId})
         })
         .then(venues => {
-            console.log('VENUES FOR THAT EVENT',venues)
             var x = venues.map(venue => {
                 v = venue
                 return VData.findOne({placeId:venue.placeId})
                 .then(match => {
                     var web = match.domain
-                    console.log('THE VENUE',v)
-                    console.log('WEBSITE', web);
                 // Check database to see if there's an email for that venue already
                 // if not, retrieve email using hunter
                     if(match.email.length === 0){
@@ -940,6 +916,7 @@ router.post('/quotelist', function(req, res) {
                         })
                         .catch(function(err){
                             console.log('error is', err);
+                            console.log('url is', req.url);
                              res.redirect('/error')
                         })
                     }
@@ -950,6 +927,7 @@ router.post('/quotelist', function(req, res) {
                 })
                 .catch(function(err){
                     console.log('error is', err);
+                    console.log('url is', req.url);
                     res.redirect('/error')
                 })
             })
@@ -960,6 +938,7 @@ router.post('/quotelist', function(req, res) {
         })
         .catch(function(err){
             console.log('error is', err);
+            console.log('url is', req.url);
             res.redirect('/error')
         })
     } else {
@@ -986,11 +965,8 @@ router.get('/messages',function(req,res){
         if(venueId){
             return VEvent.findById(venueId)
             .then(v => {
-                // msg.forEach((x) => {
                     v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
-                // })
 
-                console.log('vEvent is',v)
                 return v.save()
             })
             .then( newV => {
@@ -1006,10 +982,10 @@ router.get('/messages',function(req,res){
             })
             .catch(function(err){
                 console.log('error is', err);
+                console.log('url is', req.url);
                 res.redirect('/error')
             })
         } else {
-            console.log('events', events)
             res.render('messages', {
                 events: events,
                 loggedin: req.user ? true: false,
@@ -1020,6 +996,7 @@ router.get('/messages',function(req,res){
     })
     .catch(function(err){
         console.log('error is', err)
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })
@@ -1029,24 +1006,19 @@ router.get('/messages',function(req,res){
 router.post('/msgresponse',function(req,res){
     let venue;
     let msg;
-    console.log('here', req.body.response);
     var venueId= req.query.venueId
-    console.log('in msg response', venueId);
 
     VEvent.findById(venueId)
     .then(v => {
         venue = v
 
         venue.chat = `${req.body.response}\n\n${req.user.fname} ${req.user.lname}\n\nOn ${venue.lastDate} ${venue.lastFrom} wrote:\n\n` + venue.chat
-        console.log('BEFORE mongoose save', venue.chat);
         venue.save()
-        console.log('AFTER mongoose.save', venue.chat);
     })
     .then(() => {
         return VData.findOne({placeId: venue.placeId})
     })
     .then(vSource => {
-        console.log('printing this');
         var b={
             "personalizations": [{
                 //Send email to the last person to respond or the original email it was sent to
@@ -1081,6 +1053,7 @@ router.post('/msgresponse',function(req,res){
         sg.API(request, function(error, response) {
             if (error) {
                 console.log('Error response received');
+                console.log('url is', req.url);
             }
             console.log('RESPONSE', response);
             console.log('STATUS HERE' ,response.statusCode);
@@ -1090,6 +1063,7 @@ router.post('/msgresponse',function(req,res){
     })
     .catch(function(err){
         console.log('error is', err);
+        console.log('url is', req.url);
         res.redirect('/error')
     })
 })

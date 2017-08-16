@@ -70,7 +70,7 @@ module.exports = function(passport) {
             // Successful authentication, redirect home.
             console.log('inside facebook');
             var redirectTo = req.session.url? req.session.url: '/';
-            delete req.session.redirectTo;
+            delete req.session.url;
             // is authenticated ?
             res.redirect(redirectTo);
       });
