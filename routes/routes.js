@@ -870,98 +870,104 @@ router.get('/quotelist', function(req, res, next) {
 
 /* SUBMIT QUOTELIST we will now send an email to venues*/
 router.post('/quotelist', function(req, res) {
-    var eventId=req.query.eventId
-    let fname = req.body.fname
-    let lname = req.body.lname
-    let email = req.body.email
-    let date=req.body.date
-    let time=req.body.time
-    let hours=req.body.hours
-    let guestCount=req.body.guestCount
-    let price=req.body.price
-    let additional=req.body.more
+    //if Form fields are not empty
+    if(req.body.fname || req.body.lname || req.body.email || req.body.date || req.body.time || req.body.hours || req.body.guestCount || req.body.price){
+        var eventId=req.query.eventId
+        let fname = req.body.fname
+        let lname = req.body.lname
+        let email = req.body.email
+        let date=req.body.date
+        let time=req.body.time
+        let hours=req.body.hours
+        let guestCount=req.body.guestCount
+        let price=req.body.price
+        let additional=req.body.more
 
-    let v;
-    return User.findOne({fbid: req.user.fbid})
-    .then(u => {
-        u.fname = fname
-        u.lname = lname
-        u.email = email
+        let v;
+        return User.findOne({fbid: req.user.fbid})
+        .then(u => {
+            u.fname = fname
+            u.lname = lname
+            u.email = email
 
-        return u.save()
-    })
-    .then(() => {
-        return Event.findById(eventId)
-    })
-    .then(event => {
-        event.date = date
-        event.time = time
-        event.hours = hours
-        event.guestCount = guestCount
-        event.price = price
-        event.additional = additional
-
-        return event.save()
-    })
-    .then(savedEvent => {
-        console.log('Successfully saved event parameters');
-        return VEvent.find({venueOption: eventId})
-    })
-    .then(venues => {
-        console.log('VENUES FOR THAT EVENT',venues)
-        var x = venues.map(venue => {
-            v = venue
-            return VData.findOne({placeId:venue.placeId})
-            .then(match => {
-                var web = match.domain
-                console.log('THE VENUE',v)
-                console.log('WEBSITE', web);
-            // Check database to see if there's an email for that venue already
-            // if not, retrieve email using hunter
-                if(match.email.length === 0){
-                    console.log('no match.email', match)
-                    // helper.collectEmail(web)
-                    // .then((emails) => {
-                    //     console.log('RETRIEVED EMAILS', emails)
-                    //     //STORE THE EMAILS IN THE DATABASE
-                    //
-                    //     if (emails[0]){
-                    //         match.email.push(emails[0])
-                    //     }
-                    //     if(emails[1]){
-                    //         match.email.push(emails[1])
-                    //     }
-                    //
-                    //     return match.save()
-                    // })
-                    // .then(savedV => {
-                    //     console.log('Successfully saved venue w emails')
-                    //     helper.sendMail(req, match, v)
-                    // })
-                    // .catch(function(err){
-                    //     console.log('error is', err);
-                    //      res.redirect('/error')
-                    // })
-                }
-                else{
-                    console.log('MATCH IS', match)
-                    helper.sendMail(req, match, v)
-                }
-            })
-            .catch(function(err){
-                console.log('error is', err);
-                res.redirect('/error')
-            })
+            return u.save()
         })
-        return Promise.all(x)
-    })
-    .then(() => {
-        res.redirect('/nextsteps')
-    })
-    .catch(function(err){
-        console.log('error is', err);
-        res.redirect('/error')
-    })
+        .then(() => {
+            return Event.findById(eventId)
+        })
+        .then(event => {
+            event.date = date
+            event.time = time
+            event.hours = hours
+            event.guestCount = guestCount
+            event.price = price
+            event.additional = additional
+
+            return event.save()
+        })
+        .then(savedEvent => {
+            console.log('Successfully saved event parameters');
+            return VEvent.find({venueOption: eventId})
+        })
+        .then(venues => {
+            console.log('VENUES FOR THAT EVENT',venues)
+            var x = venues.map(venue => {
+                v = venue
+                return VData.findOne({placeId:venue.placeId})
+                .then(match => {
+                    var web = match.domain
+                    console.log('THE VENUE',v)
+                    console.log('WEBSITE', web);
+                // Check database to see if there's an email for that venue already
+                // if not, retrieve email using hunter
+                    if(match.email.length === 0){
+                        console.log('no match.email', match)
+                        // helper.collectEmail(web)
+                        // .then((emails) => {
+                        //     console.log('RETRIEVED EMAILS', emails)
+                        //     //STORE THE EMAILS IN THE DATABASE
+                        //
+                        //     if (emails[0]){
+                        //         match.email.push(emails[0])
+                        //     }
+                        //     if(emails[1]){
+                        //         match.email.push(emails[1])
+                        //     }
+                        //
+                        //     return match.save()
+                        // })
+                        // .then(savedV => {
+                        //     console.log('Successfully saved venue w emails')
+                        //     helper.sendMail(req, match, v)
+                        // })
+                        // .catch(function(err){
+                        //     console.log('error is', err);
+                        //      res.redirect('/error')
+                        // })
+                    }
+                    else{
+                        console.log('MATCH IS', match)
+                        helper.sendMail(req, match, v)
+                    }
+                })
+                .catch(function(err){
+                    console.log('error is', err);
+                    res.redirect('/error')
+                })
+            })
+            return Promise.all(x)
+        })
+        .then(() => {
+            res.redirect('/nextsteps')
+        })
+        .catch(function(err){
+            console.log('error is', err);
+            res.redirect('/error')
+        })
+    } else {
+        res.redirect(`/quotelist?eventId=${req.query.eventId}&field=required`)
+    }
+
 })
 
 router.get('/nextsteps',function(req,res){

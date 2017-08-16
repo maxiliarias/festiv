@@ -22,14 +22,10 @@ $( document ).ready(function() {
         $( "#contactBtn" ).trigger("click");
     });
 
-    // $('#checkForm').click(function(){
-    //     if($("#time").length === 0 || $("#price").length === 0 ){
-    //         alert("Please make a selection in the dropdown boxes")
-    //         return
-    //     } else if ($("#otherinput").val() === ""){
-    //         alert('Please fill out all required fields')
-    //     }
-    // })
+    if(window.location.href.split("?")[1].split("&")[1] === "field=required"){
+        alert('Please fill out all fields')
+    }
+
 });
 
 //Do something to indicate venue has been added to a particular list
