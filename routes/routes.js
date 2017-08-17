@@ -895,30 +895,30 @@ router.post('/quotelist', function(req, res) {
                 // Check database to see if there's an email for that venue already
                 // if not, retrieve email using hunter
                     if(match.email.length === 0){
-                        console.log('no match.email', match)
-                        helper.collectEmail(web)
-                        .then((emails) => {
-                            console.log('RETRIEVED EMAILS', emails)
-                            //STORE THE EMAILS IN THE DATABASE
-
-                            if (emails[0]){
-                                match.email.push(emails[0])
-                            }
-                            if(emails[1]){
-                                match.email.push(emails[1])
-                            }
-
-                            return match.save()
-                        })
-                        .then(savedV => {
-                            console.log('Successfully saved venue w emails')
-                            helper.sendMail(req, match, v)
-                        })
-                        .catch(function(err){
-                            console.log('error is', err);
-                            console.log('url is', req.url);
-                             res.redirect('/error')
-                        })
+                        // console.log('no match.email', match)
+                        // helper.collectEmail(web)
+                        // .then((emails) => {
+                        //     console.log('RETRIEVED EMAILS', emails)
+                        //     //STORE THE EMAILS IN THE DATABASE
+                        //
+                        //     if (emails[0]){
+                        //         match.email.push(emails[0])
+                        //     }
+                        //     if(emails[1]){
+                        //         match.email.push(emails[1])
+                        //     }
+                        //
+                        //     return match.save()
+                        // })
+                        // .then(savedV => {
+                        //     console.log('Successfully saved venue w emails')
+                        //     helper.sendMail(req, match, v)
+                        // })
+                        // .catch(function(err){
+                        //     console.log('error is', err);
+                        //     console.log('url is', req.url);
+                        //      res.redirect('/error')
+                        // })
                     }
                     else{
                         console.log('MATCH IS', match)
