@@ -43,7 +43,7 @@ var helper = {
                         '-businessName-':match.name,
                         '-fname-':req.user.fname,
                         '-date-':req.body.date,
-                        '-starttime-':req.body.starttime,
+                        '-starttime-':req.body.time,
                         '-guestCount-':req.body.guestCount,
                         '-price-':req.body.price,
                         '-hours-':req.body.hours,
