@@ -869,7 +869,8 @@ router.post('/quotelist', function(req, res) {
 
             return u.save()
         })
-        .then(() => {
+        .then((u) => {
+            console.log("user is ", u);
             return Event.findById(eventId)
         })
         .then(event => {
@@ -911,7 +912,7 @@ router.post('/quotelist', function(req, res) {
                         })
                         .then(savedV => {
                             console.log('Successfully saved venue w emails')
-                            helper.sendMail(req, match, v)
+                            helper.sendMail(req, match, v,fname)
                         })
                         .catch(function(err){
                             console.log('error is', err);
@@ -921,7 +922,7 @@ router.post('/quotelist', function(req, res) {
                     }
                     else{
                         console.log('MATCH IS', match)
-                        helper.sendMail(req, match, v)
+                        helper.sendMail(req, match, v,fname)
                     }
                 })
                 .catch(function(err){

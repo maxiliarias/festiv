@@ -36,12 +36,13 @@ var helper = {
         return [e1, e2]
         })
     },
-    sendMail: function(req, match, venue){
+    sendMail: function(req, match, venue, fname){
+        console.log('FNAME IS ', fname)
         var b = {
                 personalizations: [{
                     'substitutions': {
                         '-businessName-':match.name,
-                        '-fname-':req.user.fname,
+                        '-fname-':fname,
                         '-date-':req.body.date,
                         '-starttime-':req.body.time,
                         '-guestCount-':req.body.guestCount,
@@ -58,12 +59,12 @@ var helper = {
                     }]
                 }],
                 from: {
-                    email: req.user.fname + '@hello.festivspaces.com',
-                    name: req.user.fname + ' (Festiv)'
+                    email: fname + '@hello.festivspaces.com',
+                    name: fname + ' (Festiv)'
                 },
                 reply_to:{
                     email: 'id'+ venue._id + '@reply.festivspaces.com',
-                    name: req.user.fname + ' (Festiv)'
+                    name: fname + ' (Festiv)'
                 },
                 template_id: process.env.TEMPLATE_ID_QUOTE
             }
