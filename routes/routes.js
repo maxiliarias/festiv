@@ -965,8 +965,9 @@ router.get('/messages',function(req,res){
         if(venueId){
             return VEvent.findById(venueId)
             .then(v => {
+                if(v.chat){
                     v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
-
+                }    
                 return v.save()
             })
             .then( newV => {
