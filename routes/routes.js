@@ -363,17 +363,18 @@ router.get('/venue', function(req, res) {
                 // Company lookup queued - try again later
                 console.log('error1', err)
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             })
             .catch(clearbit.Company.NotFoundError, function (err) {
                 // Company could not be found
                 console.log('error2',err);
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             })
             .catch(function(err){
                 console.log('error is',err);
                 console.log('url is', req.url);
+                throw err
             })
         }
         v.save()
@@ -419,7 +420,7 @@ router.get('/venue', function(req, res) {
             .catch(function (err) {
                 console.error('error3 is',err);
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             });
         } else {
             res.render('venue', {
@@ -519,7 +520,6 @@ router.post('/conversation', upload.any(), function(req,res){
     })
     .then(function(u){
         user = u;
-
         // alert the user, they've received a response/bid
         var b = {
             personalizations: [{
@@ -556,7 +556,6 @@ router.post('/conversation', upload.any(), function(req,res){
             console.log('BODY HERE', response.body);
             console.log('HEADERS HERE', response.headers);
         });
-        // res.send(200)
     })
     .catch(function(err) {
         console.log('sendgrid error', err);
@@ -691,7 +690,7 @@ router.get('/addVenue',function(req,res){
             .catch(function(err){
                 console.log('error is', err);
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             })
         } else {
             if(req.query.profile){
@@ -747,7 +746,7 @@ router.get('/removeEvent', function(req, res) {
             .catch(function(err){
                 console.log('err is', err);
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             })
         })
     })
@@ -788,7 +787,7 @@ router.get('/removeVenue', function(req, res) {
         .catch(function(err){
             console.log('error is', err);
             console.log('url is', req.url);
-            res.redirect('/error')
+            throw err
         })
     })
     .then (() => {
@@ -895,30 +894,30 @@ router.post('/quotelist', function(req, res) {
                 // Check database to see if there's an email for that venue already
                 // if not, retrieve email using hunter
                     if(match.email.length === 0){
-                        // console.log('no match.email', match)
-                        // helper.collectEmail(web)
-                        // .then((emails) => {
-                        //     console.log('RETRIEVED EMAILS', emails)
-                        //     //STORE THE EMAILS IN THE DATABASE
-                        //
-                        //     if (emails[0]){
-                        //         match.email.push(emails[0])
-                        //     }
-                        //     if(emails[1]){
-                        //         match.email.push(emails[1])
-                        //     }
-                        //
-                        //     return match.save()
-                        // })
-                        // .then(savedV => {
-                        //     console.log('Successfully saved venue w emails')
-                        //     helper.sendMail(req, match, v)
-                        // })
-                        // .catch(function(err){
-                        //     console.log('error is', err);
-                        //     console.log('url is', req.url);
-                        //      res.redirect('/error')
-                        // })
+                        console.log('no match.email', match)
+                        helper.collectEmail(web)
+                        .then((emails) => {
+                            console.log('RETRIEVED EMAILS', emails)
+                            //STORE THE EMAILS IN THE DATABASE
+
+                            if (emails[0]){
+                                match.email.push(emails[0])
+                            }
+                            if(emails[1]){
+                                match.email.push(emails[1])
+                            }
+
+                            return match.save()
+                        })
+                        .then(savedV => {
+                            console.log('Successfully saved venue w emails')
+                            helper.sendMail(req, match, v)
+                        })
+                        .catch(function(err){
+                            console.log('error is', err);
+                            console.log('url is', req.url);
+                            throw err
+                        })
                     }
                     else{
                         console.log('MATCH IS', match)
@@ -928,7 +927,7 @@ router.post('/quotelist', function(req, res) {
                 .catch(function(err){
                     console.log('error is', err);
                     console.log('url is', req.url);
-                    res.redirect('/error')
+                    throw err
                 })
             })
             return Promise.all(x)
@@ -967,7 +966,7 @@ router.get('/messages',function(req,res){
             .then(v => {
                 if(v.chat){
                     v.chat = v.chat.replace(/(?:\r\n|\r|\n)/g, '</br>')
-                }    
+                }
                 return v.save()
             })
             .then( newV => {
@@ -984,7 +983,7 @@ router.get('/messages',function(req,res){
             .catch(function(err){
                 console.log('error is', err);
                 console.log('url is', req.url);
-                res.redirect('/error')
+                throw err
             })
         } else {
             res.render('messages', {
