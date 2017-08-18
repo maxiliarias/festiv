@@ -70,6 +70,12 @@ h3.section-subheading {
 .threeHeight{
     min-height: 300px;
 }
+.vh69{
+    min-height: 69vh;
+}
+.vh42{
+    min-height: 42vh;
+}
 .sidebar{
     height: 630px;
     width: 100%;
