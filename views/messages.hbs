@@ -12,7 +12,7 @@
                 <h6 class="text-white"><b>{{this.name}}</b></h6>
                 {{#each this.vEvent}}
                     <b><p class="text-white pl-2">
-                        <a href="/messages?venueId={{this._id}}">{{this.name}}</a>
+                        <a class="text-muted" href="/messages?venueId={{this._id}}">{{this.name}}</a>
                         {{#if this.chat}}
                             <span class="fa fa-envelope" aria-hidden="true"></span>
                         {{/if}}
